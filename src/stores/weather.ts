@@ -1,0 +1,30 @@
+import { ref, computed } from 'vue'
+import { defineStore } from 'pinia'
+
+export const useWeatherStore = defineStore('weather', () => {
+  const temp = ref(72)
+  const condition = ref('Partly Cloudy')
+  const humidity = ref(45)
+  const uvIndex = ref(6)
+  const soilMoisture = ref(32)
+  const windSpeed = ref(8)
+  const aqi = ref(24)
+  const feelsLike = ref(75)
+
+  const forecast = ref([
+    { day: 'TODAY', date: 'May 12', icon: 'sun', tempHi: 72, tempLo: 54, active: true },
+    { day: 'MON', date: 'May 13', icon: 'cloud-sun', tempHi: 68, tempLo: 51, active: false },
+    { day: 'TUE', date: 'May 14', icon: 'rain', tempHi: 62, tempLo: 49, active: false },
+    { day: 'WED', date: 'May 15', icon: 'cloud', tempHi: 65, tempLo: 50, active: false },
+    { day: 'THU', date: 'May 16', icon: 'sun', tempHi: 70, tempLo: 52, active: false },
+  ])
+
+  const uvLabel = computed(() => {
+    if (uvIndex.value >= 8) return 'Very High'
+    if (uvIndex.value >= 6) return 'High'
+    if (uvIndex.value >= 3) return 'Moderate'
+    return 'Low'
+  })
+
+  return { temp, condition, humidity, uvIndex, soilMoisture, windSpeed, aqi, feelsLike, forecast, uvLabel }
+})

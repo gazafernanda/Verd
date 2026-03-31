@@ -4,26 +4,29 @@ import { RouterView } from 'vue-router'
 </script>
 
 <template>
-  <main class="app-container">
+  <main class="w-full h-screen flex bg-bg-app overflow-hidden">
     <Sidebar />
-    <div class="content">
-      <RouterView />
+    <div class="flex-1 py-10 px-12 overflow-y-auto">
+      <RouterView v-slot="{ Component }">
+        <Transition name="page" mode="out-in">
+          <component :is="Component" />
+        </Transition>
+      </RouterView>
     </div>
   </main>
 </template>
 
-<style scoped>
-.app-container {
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  background-color: var(--bg-color);
-  overflow: hidden;
+<style>
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.18s ease, transform 0.18s ease;
 }
-
-.content {
-  flex: 1;
-  padding: 40px 48px;
-  overflow-y: auto;
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
 }
 </style>
