@@ -13,6 +13,7 @@ lerna-debug.log*
 .env.development.local
 .env.test.local
 .env.production.local
+.env.developments
 
 # Dependency directories
 node_modules/
@@ -28,7 +29,15 @@ dist-ssr/
 .idea
 .DS_Store
 *.suo
+*.sln
 *.ntvs*
 *.njsproj
-*.sln
 *.sw?
+
+# .NET build artifacts
+Verd.Api/bin/
+Verd.Api/obj/
+*.user
+
+# Production secrets only (appsettings.json is committed, production overrides are not)
+Verd.Api/appsettings.Production.json

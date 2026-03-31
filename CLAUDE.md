@@ -23,11 +23,37 @@ npm run format       # Format src/ with Prettier
 
 Node version requirement: `^20.19.0 || >=22.12.0`
 
+```bash
+# Backend (.NET 9 — run from Verd.Api/)
+cd Verd.Api
+dotnet restore           # Restore NuGet packages
+dotnet run               # Start API on http://localhost:5000
+dotnet watch             # Start with hot reload
+
+# EF Core migrations
+dotnet ef migrations add <Name>   # Create a new migration
+dotnet ef database update         # Apply migrations
+
+# PostgreSQL via Docker
+docker compose up -d     # Start Postgres on port 5432
+docker compose down      # Stop
+```
+
 ## Architecture
 
 **Verd** is a Vue 3 + TypeScript SPA for plant care management — weather integration, care recommendations, AI chat, and user profiles.
 
-### Stack
+### Monorepo layout
+
+```
+Verd/
+  src/          # Vue 3 frontend
+  Verd.Api/     # ASP.NET Core 9 backend
+  Verd.sln      # .NET solution
+  docker-compose.yml  # PostgreSQL
+```
+
+### Frontend stack
 
 - **Vue 3** with Composition API (`<script setup>`)
 - **Vue Router 5** — all routes lazy-loaded via dynamic imports
@@ -70,6 +96,18 @@ src/
 - Font: Plus Jakarta Sans (loaded from Google Fonts)
 - Transitions: `0.2s ease` standard
 - Responsive: `max-lg:` breakpoints for sidebar/layout
+
+### Backend stack (`Verd.Api/`)
+
+- **ASP.NET Core 9** — controller-based REST API
+- **Entity Framework Core 9** + **Npgsql** — PostgreSQL via EF migrations
+- **JWT Bearer auth** — `JwtService` generates tokens; all routes except `/api/auth/*` require `[Authorize]`
+- **BCrypt.Net-Next** — password hashing
+- **Swagger** at `/swagger` in development
+
+Key files: `Program.cs` (DI/middleware setup), `Data/AppDbContext.cs`, `Services/JwtService.cs`
+DTOs live in `DTOs/{Auth,Plants,Users,Weather}/`. Models in `Models/`.
+`appsettings.json` holds the DB connection string and JWT config — override with `appsettings.Production.json` (gitignored).
 
 ### Linting
 

@@ -1,5 +1,14 @@
 <script setup lang="ts">
-// Icons can be SVGs or imported here
+import { useRouter } from 'vue-router'
+import { useUserStore } from '../stores/user'
+
+const router = useRouter()
+const user = useUserStore()
+
+function logout() {
+  user.logout()
+  router.push({ name: 'login' })
+}
 </script>
 
 <template>
@@ -69,10 +78,10 @@
     <div class="flex-1"></div>
 
     <div class="px-5">
-      <a href="#" class="flex items-center gap-4 px-5 py-[14px] rounded-lg text-text-muted font-medium transition-colors hover:bg-bg-app hover:text-text-main">
+      <button @click="logout" class="w-full flex items-center gap-4 px-5 py-[14px] rounded-lg text-text-muted font-medium transition-colors hover:bg-bg-app hover:text-text-main">
         <svg class="shrink-0" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 256 256"><path fill="currentColor" d="M120,216a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V40a8,8,0,0,1,8-8h64a8,8,0,0,1,0,16H56V208h56A8,8,0,0,1,120,216Zm109.66-93.66-40-40a8,8,0,0,0-11.32,11.32L204.69,120H104a8,8,0,0,0,0,16H204.69l-26.35,26.34a8,8,0,0,0,11.32,11.32l40-40A8,8,0,0,0,229.66,122.34Z"/></svg>
         Logout
-      </a>
+      </button>
     </div>
   </aside>
 </template>

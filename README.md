@@ -1,48 +1,139 @@
-# verd
+# Verd
 
-This template should help get you started developing with Vue 3 in Vite.
+A plant care companion app with AI chat, real-time weather integration, and personalized care recommendations.
 
-## Recommended IDE Setup
+**Stack:** Vue 3 + TypeScript (frontend) · ASP.NET Core 9 (backend) · PostgreSQL · JWT auth
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+---
 
-## Recommended Browser Setup
+## Prerequisites
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+| Tool | Version | Install |
+|---|---|---|
+| Node.js | ^20.19 or ≥22.12 | [nodejs.org](https://nodejs.org) |
+| .NET SDK | 9.x | `brew install --cask dotnet-sdk` |
+| Docker | any | [docker.com](https://docker.com) |
 
-## Type Support for `.vue` Imports in TS
+---
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+## Quick Start
 
-## Customize configuration
+### 1. Start the database
 
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
+```bash
+docker compose up -d
 ```
 
-### Compile and Hot-Reload for Development
+Starts PostgreSQL on `localhost:5432` with database `verd`.
 
-```sh
+### 2. Start the backend
+
+```bash
+cd Verd.Api
+dotnet restore
+
+# First time only — creates and applies DB migrations
+dotnet ef migrations add InitialCreate
+dotnet ef database update
+
+dotnet run
+```
+
+API runs at **http://localhost:5000**
+Swagger UI at **http://localhost:5000/swagger**
+
+### 3. Start the frontend
+
+```bash
+# From repo root
+npm install
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
+Frontend runs at **http://localhost:5173**
 
-```sh
-npm run build
+---
+
+## Environment
+
+The frontend reads `VITE_API_URL` from `.env.development` (already set to `http://localhost:5000`). Change it if your API runs on a different port.
+
+To override the database connection or JWT secret, edit `Verd.Api/appsettings.json`. Never commit production secrets — use `Verd.Api/appsettings.Production.json` (gitignored).
+
+---
+
+## Common Commands
+
+### Frontend
+
+```bash
+npm run dev          # Dev server with HMR
+npm run build        # Type-check + production build
+npm run type-check   # TypeScript check only
+npm run lint         # Fix lint issues (oxlint + eslint)
+npm run format       # Format with Prettier
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+### Backend
 
-```sh
-npm run lint
+```bash
+cd Verd.Api
+dotnet run                              # Start API
+dotnet watch                            # Start with hot reload
+dotnet ef migrations add <Name>         # New migration
+dotnet ef database update               # Apply migrations
+dotnet ef migrations remove             # Remove last migration
+```
+
+### Database
+
+```bash
+docker compose up -d      # Start Postgres
+docker compose down       # Stop Postgres
+docker compose down -v    # Stop and delete data
+```
+
+---
+
+## API Endpoints
+
+| Method | Route | Auth | Description |
+|---|---|---|---|
+| POST | `/api/auth/register` | — | Create account |
+| POST | `/api/auth/login` | — | Sign in, returns JWT |
+| GET | `/api/users/profile` | ✓ | Get current user |
+| PATCH | `/api/users/settings` | ✓ | Update name / location / alerts |
+| GET | `/api/plants` | ✓ | List your plants |
+| POST | `/api/plants` | ✓ | Add a plant |
+| PUT | `/api/plants/:id` | ✓ | Update a plant |
+| DELETE | `/api/plants/:id` | ✓ | Delete a plant |
+| GET | `/api/weather` | ✓ | Current weather + forecast |
+
+Authenticated routes require `Authorization: Bearer <token>` header.
+
+---
+
+## Demo Mode
+
+If the backend isn't running, the register/login pages will offer **Continue in demo mode** — this bypasses auth and lets you explore the app with mock data.
+
+---
+
+## Project Structure
+
+```
+Verd/
+├── src/                  # Vue 3 frontend
+│   ├── views/            # Page components
+│   ├── components/       # UI components
+│   ├── stores/           # Pinia state (user, weather, plants)
+│   └── router/           # Vue Router + auth guards
+├── Verd.Api/             # ASP.NET Core 9 backend
+│   ├── Controllers/      # API controllers
+│   ├── Models/           # EF Core entities
+│   ├── DTOs/             # Request/response types
+│   ├── Services/         # JwtService
+│   └── Data/             # AppDbContext
+├── docker-compose.yml    # PostgreSQL
+└── Verd.sln              # .NET solution
 ```
