@@ -1,6 +1,8 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 
+const API = import.meta.env.VITE_API_URL ?? 'http://localhost:5000'
+
 export const useWeatherStore = defineStore('weather', () => {
   const temp = ref(72)
   const condition = ref('Partly Cloudy')
@@ -26,5 +28,24 @@ export const useWeatherStore = defineStore('weather', () => {
     return 'Low'
   })
 
-  return { temp, condition, humidity, uvIndex, soilMoisture, windSpeed, aqi, feelsLike, forecast, uvLabel }
+  async function fetchWeather() {
+    const token = localStorage.getItem('verd_token')
+    if (!token || token === 'demo') return
+    const res = await fetch(`${API}/api/weather`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (!res.ok) return
+    const data = await res.json()
+    temp.value = data.temp
+    condition.value = data.condition
+    humidity.value = data.humidity
+    uvIndex.value = data.uvIndex
+    soilMoisture.value = data.soilMoisture
+    windSpeed.value = data.windSpeed
+    aqi.value = data.aqi
+    feelsLike.value = data.feelsLike
+    forecast.value = data.forecast
+  }
+
+  return { temp, condition, humidity, uvIndex, soilMoisture, windSpeed, aqi, feelsLike, forecast, uvLabel, fetchWeather }
 })

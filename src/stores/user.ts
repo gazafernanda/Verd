@@ -89,15 +89,31 @@ export const useUserStore = defineStore('user', () => {
     localStorage.removeItem('verd_tier')
   }
 
-  function saveSettings(updates: { displayName?: string; weatherAlertsEnabled?: boolean }) {
+  async function saveSettings(updates: {
+    displayName?: string
+    location?: string
+    weatherAlertsEnabled?: boolean
+  }) {
     if (updates.displayName !== undefined) {
       displayName.value = updates.displayName
       name.value = updates.displayName
       localStorage.setItem('verd_name', updates.displayName)
     }
+    if (updates.location !== undefined) {
+      location.value = updates.location
+      localStorage.setItem('verd_location', updates.location)
+    }
     if (updates.weatherAlertsEnabled !== undefined) {
       weatherAlertsEnabled.value = updates.weatherAlertsEnabled
     }
+
+    const storedToken = token.value
+    if (!storedToken || storedToken === 'demo') return
+    await fetch(`${API}/api/users/settings`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${storedToken}` },
+      body: JSON.stringify(updates),
+    })
   }
 
   return {
