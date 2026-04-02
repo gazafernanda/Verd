@@ -8,6 +8,15 @@ using Verd.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Use AddJsonStream to bypass FileProvider restrictions in certain environments
+// (the PhysicalFileProvider can't resolve paths inside .claude/worktrees/).
+var settingsPath = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.json");
+if (File.Exists(settingsPath))
+    builder.Configuration.AddJsonStream(File.OpenRead(settingsPath));
+var envSettingsPath = Path.Combine(Directory.GetCurrentDirectory(), $"appsettings.{builder.Environment.EnvironmentName}.json");
+if (File.Exists(envSettingsPath))
+    builder.Configuration.AddJsonStream(File.OpenRead(envSettingsPath));
+
 // ── Database ─────────────────────────────────────────────────────────────────
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
