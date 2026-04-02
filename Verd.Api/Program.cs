@@ -36,6 +36,14 @@ builder.Services.AddAuthorization();
 
 // ── Services ──────────────────────────────────────────────────────────────────
 builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<ChatService>();
+
+builder.Services.AddHttpClient("Anthropic", client =>
+{
+    client.BaseAddress = new Uri("https://api.anthropic.com/v1/");
+    client.DefaultRequestHeaders.Add("x-api-key", builder.Configuration["Anthropic:ApiKey"]);
+    client.DefaultRequestHeaders.Add("anthropic-version", "2023-06-01");
+});
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
 builder.Services.AddCors(options =>
