@@ -39,5 +39,6 @@ Verd.Api/bin/
 Verd.Api/obj/
 *.user
 
-# Production secrets only (appsettings.json is committed, production overrides are not)
+# Secrets — base appsettings.json is committed; environment overrides are not
 Verd.Api/appsettings.Production.json
+Verd.Api/appsettings.Development.json

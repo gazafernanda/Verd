@@ -47,11 +47,10 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<ChatService>();
 
-builder.Services.AddHttpClient("Anthropic", client =>
+builder.Services.AddHttpClient("Groq", client =>
 {
-    client.BaseAddress = new Uri("https://api.anthropic.com/v1/");
-    client.DefaultRequestHeaders.Add("x-api-key", builder.Configuration["Anthropic:ApiKey"]);
-    client.DefaultRequestHeaders.Add("anthropic-version", "2023-06-01");
+    client.BaseAddress = new Uri("https://api.groq.com/openai/v1/");
+    client.DefaultRequestHeaders.Add("Authorization", $"Bearer {builder.Configuration["Groq:ApiKey"]}");
 });
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
