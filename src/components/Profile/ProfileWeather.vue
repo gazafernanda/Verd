@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { useWeatherStore } from '../../stores/weather'
+import { SunLight } from '@iconoir/vue'
 const weather = useWeatherStore()
 </script>
 
 <template>
   <div class="bg-success-green rounded-xl p-6 text-white relative overflow-hidden shadow-[0_4px_16px_rgba(55,178,126,0.2)]">
     <div class="flex items-center gap-2 text-base font-bold mb-6 relative z-10">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256"><path fill="currentColor" d="M128,40a8,8,0,0,1,8-8h0a8,8,0,0,1,8,8V64a8,8,0,0,1-16,0V40Zm0,152a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V200A8,8,0,0,0,128,192ZM64,128a8,8,0,0,0-8-8H32a8,8,0,0,0,0,16H56A8,8,0,0,0,64,128Zm160-8H200a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16ZM82.75,82.75a8,8,0,0,0,11.31-11.32l-17-17a8,8,0,0,0-11.31,11.32ZM190.25,179a8,8,0,0,1-11.31,11.32l-17-17A8,8,0,0,1,173.25,162Zm-11.31-96.2A8,8,0,0,0,190.25,71.43l17-17a8,8,0,0,0-11.31-11.32l-17,17A8,8,0,0,0,178.94,82.75ZM65.75,179l-17,17A8,8,0,0,0,60,207.31l17-17A8,8,0,0,0,65.75,179ZM128,72a56,56,0,1,0,56,56A56.06,56.06,0,0,0,128,72Zm0,96a40,40,0,1,1,40-40A40,40,0,0,1,128,168Z"/></svg>
+      <SunLight width="20" height="20" />
       Local Weather
     </div>
 

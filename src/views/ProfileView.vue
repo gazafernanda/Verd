@@ -8,7 +8,7 @@ import AchievementCard from '../components/Profile/AchievementCard.vue'
 </script>
 
 <template>
-  <div class="flex flex-col gap-6 max-w-[1200px]">
+  <div class="flex flex-col gap-6 max-w-[1200px] w-full">
     <ProfileHeader />
 
     <!-- Desktop: 2-col grid with explicit placement; mobile: single column -->

@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 
-const API = import.meta.env.VITE_API_URL ?? 'http://localhost:5000'
+const API = import.meta.env.VITE_API_URL ?? 'http://localhost:5050'
 
 export const useWeatherStore = defineStore('weather', () => {
   const temp = ref(72)

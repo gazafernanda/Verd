@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useUserStore } from '../../stores/user'
+import { Settings } from '@iconoir/vue'
 
 const user = useUserStore()
 const displayNameInput = ref(user.displayName)
@@ -15,10 +16,10 @@ function save() {
 </script>
 
 <template>
-  <div class="bg-surface rounded-2xl p-8 shadow-sm border border-border h-full">
+  <div class="bg-surface rounded-2xl p-8 max-md:p-5 shadow-sm border border-border h-full">
     <div class="mb-6">
       <h2 class="flex items-center gap-3 text-[1.25rem] font-extrabold text-text-main m-0">
-        <svg class="text-success-green" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256"><path fill="currentColor" d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Zm82.25-45.72a78.89,78.89,0,0,0,0-28.56l22.21-13a8,8,0,0,0,2.15-10.89l-22.19-38.4a8,8,0,0,0-10.45-3.23l-24.64,10.6a81.1,81.1,0,0,0-24.71-14.28V41A8,8,0,0,0,144.62,33H111.38a8,8,0,0,0-8,8V56.55a81.1,81.1,0,0,0-24.71,14.28L54,60.23A8,8,0,0,0,43.58,63.5l-22.19,38.4a8,8,0,0,0,2.15,10.89l22.21,13a78.89,78.89,0,0,0,0,28.56l-22.21,13a8,8,0,0,0-2.15,10.89l22.19,38.4a8,8,0,0,0,10.45,3.23l24.64-10.6A81.1,81.1,0,0,0,103.38,199.5V215a8,8,0,0,0,8,8h33.24a8,8,0,0,0,8-8V199.5a81.1,81.1,0,0,0,24.71-14.28l24.64,10.6a8,8,0,0,0,10.45-3.23l22.19-38.4a8,8,0,0,0-2.15-10.89Z"/></svg>
+        <Settings class="text-success-green" width="20" height="20" />
         Account Settings
       </h2>
     </div>
@@ -40,7 +41,7 @@ function save() {
 
     <div class="mb-10">
       <h3 class="text-[0.75rem] font-extrabold text-text-muted tracking-widest mb-4">NOTIFICATIONS</h3>
-      <div class="flex justify-between items-center">
+      <div class="flex justify-between items-center gap-4 flex-wrap">
         <div>
           <h4 class="text-[0.95rem] font-extrabold text-text-main mb-1">Weather-based alerts</h4>
           <p class="text-[0.85rem] text-text-muted m-0">Get advice when local weather changes</p>

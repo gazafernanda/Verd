@@ -3,8 +3,9 @@ import { ref, nextTick } from 'vue'
 import ChatMessage from '../components/Chat/ChatMessage.vue'
 import ChatInput from '../components/Chat/ChatInput.vue'
 import { useUserStore } from '../stores/user'
+import { Flower } from '@iconoir/vue'
 
-const API = import.meta.env.VITE_API_URL ?? 'http://localhost:5000'
+const API = import.meta.env.VITE_API_URL ?? 'http://localhost:5050'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -80,28 +81,29 @@ async function scrollToBottom() {
 </script>
 
 <template>
-  <div class="h-[calc(100vh-80px)] flex flex-col">
-    <div class="flex-1 flex flex-col bg-transparent max-w-[900px] mx-auto w-full relative">
+  <div class="h-[calc(100vh-80px)] max-lg:h-[calc(100dvh-140px)] flex flex-col">
+    <div class="flex-1 flex flex-col bg-transparent max-w-[900px] mx-auto w-full min-h-0">
 
-      <div ref="scrollContainer" class="flex-1 overflow-y-auto px-6 pb-[120px] pt-6 scrollbar-none">
+      <div ref="scrollContainer" class="flex-1 overflow-y-auto px-4 pb-4 pt-6 scrollbar-none">
         <ChatMessage
           v-for="(msg, i) in messages"
           :key="i"
           :isAssistant="msg.role === 'assistant'"
           :time="msg.time"
+          :content="msg.content"
         >
           {{ msg.content }}
         </ChatMessage>
 
-        <div v-if="loading" class="flex gap-4 w-full mb-6">
+        <div v-if="loading" class="flex gap-3 w-full mb-4">
           <div class="shrink-0 flex items-start">
-            <div class="w-9 h-9 rounded-full flex items-center justify-center mt-6 bg-light-green-bg text-success-green">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 256 256"><path fill="currentColor" d="M208,64H176V56a48,48,0,0,0-96,0v8H48A16,16,0,0,0,32,80V192a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V80A16,16,0,0,0,208,64ZM96,56a32,32,0,0,1,64,0v8H96ZM208,192H48V80H208V192Zm-48-56a32,32,0,1,1-32-32A32,32,0,0,1,160,136Zm-16,0a16,16,0,1,0-16-16A16,16,0,0,0,144,136Z"/></svg>
+            <div class="w-8 h-8 rounded-full flex items-center justify-center mt-[1.4rem] bg-light-green-bg text-success-green">
+              <Flower width="16" height="16" />
             </div>
           </div>
-          <div class="flex flex-col max-w-[80%]">
+          <div class="flex flex-col max-w-[80%] max-sm:max-w-[90%]">
             <span class="text-[0.65rem] font-extrabold text-text-muted tracking-[0.5px] mb-2 uppercase">VERD ASSISTANT</span>
-            <div class="p-6 rounded-lg bg-surface border border-border rounded-tl-[4px] flex gap-1.5 items-center">
+            <div class="p-4 max-sm:p-3 rounded-lg bg-surface border border-border rounded-tl-[4px] flex gap-1.5 items-center">
               <span class="w-2 h-2 bg-text-muted rounded-full animate-bounce [animation-delay:0ms]"></span>
               <span class="w-2 h-2 bg-text-muted rounded-full animate-bounce [animation-delay:150ms]"></span>
               <span class="w-2 h-2 bg-text-muted rounded-full animate-bounce [animation-delay:300ms]"></span>
@@ -110,7 +112,7 @@ async function scrollToBottom() {
         </div>
       </div>
 
-      <div class="absolute bottom-0 left-0 right-0 px-6">
+      <div class="px-4 pb-4 pt-2">
         <ChatInput :disabled="loading" @send="handleSend" />
       </div>
 

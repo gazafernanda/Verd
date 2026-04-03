@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Leaf } from '@iconoir/vue'
 </script>
 
 <template>
@@ -19,7 +20,7 @@
       <ul class="list-none p-0 m-0">
         <li class="flex items-start gap-3">
           <div class="mt-1 text-primary shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 256 256"><path fill="currentColor" d="M128,24a8,8,0,0,1,8,8v88H224a8,8,0,0,1,0,16H136v88a8,8,0,0,1-16,0V136H32a8,8,0,0,1,0-16H120V32A8,8,0,0,1,128,24Z" transform="translate(128, -53) rotate(45) "/></svg>
+            <Leaf width="16" height="16" />
           </div>
           <p class="text-[0.95rem] text-text-muted leading-relaxed font-medium m-0">
             Stomata are currently wide open to facilitate cooling, leading to rapid water loss from soil surface.

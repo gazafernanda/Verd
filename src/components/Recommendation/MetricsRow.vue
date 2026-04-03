@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useWeatherStore } from '../../stores/weather'
+import { DropletHalf, SunLight, Droplet, NavArrowDown, NavArrowUp } from '@iconoir/vue'
 const weather = useWeatherStore()
 </script>
 
@@ -10,7 +11,7 @@ const weather = useWeatherStore()
       <div class="flex justify-between items-center mb-2">
         <span class="text-[0.65rem] font-extrabold text-text-muted tracking-[1px]">HYDRATION</span>
         <div class="w-8 h-8 rounded-full flex items-center justify-center bg-[#e6f6ef] text-success-green">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 256 256"><path fill="currentColor" d="M174.55,101.44a80,80,0,1,1-93.1,0A153.25,153.25,0,0,1,128,31.76a153.25,153.25,0,0,1,46.55,69.68Z"/></svg>
+          <DropletHalf width="16" height="16" />
         </div>
       </div>
       <h3 class="text-[1.1rem] font-extrabold text-text-main mb-4">Soil Moisture</h3>
@@ -18,7 +19,8 @@ const weather = useWeatherStore()
         <span class="text-[3rem] font-extrabold text-text-main leading-none tracking-[-1px]">{{ weather.soilMoisture }}%</span>
         <span class="flex items-center gap-0.5 text-[0.85rem] font-bold"
           :class="weather.soilMoisture < 25 ? 'text-red-500' : 'text-success-green'">
-          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 256 256"><path fill="currentColor" d="M205.66,202.34a8,8,0,0,1-11.32,11.32l-96-96a8,8,0,0,1,0-11.32l96-96a8,8,0,0,1,11.32,11.32L115.31,112Z" transform="rotate(-90 128 128)"/></svg>
+          <NavArrowDown v-if="weather.soilMoisture < 25" width="12" height="12" />
+          <NavArrowUp v-else width="12" height="12" />
           {{ weather.soilMoisture < 25 ? '5%' : '2%' }}
         </span>
       </div>
@@ -38,7 +40,7 @@ const weather = useWeatherStore()
       <div class="flex justify-between items-center mb-2">
         <span class="text-[0.65rem] font-extrabold text-text-muted tracking-[1px]">EXPOSURE</span>
         <div class="w-8 h-8 rounded-full flex items-center justify-center bg-[#fff4e5] text-[#f59e0b]">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 256 256"><path fill="currentColor" d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm8,24a64,64,0,1,0,64,64A64.07,64.07,0,0,0,128,64Zm0,112a48,48,0,1,1,48-48A48.05,48.05,0,0,1,128,176ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-17-17a8,8,0,0,0-11.32,11.32Zm0,116.68-17,17a8,8,0,0,0,11.32,11.32l17-17a8,8,0,0,0-11.32-11.32ZM203.31,197.66a8,8,0,0,0,11.33-11.32l-17-17a8,8,0,0,0-11.32,11.32ZM216,120a8,8,0,0,0,8-8V88a8,8,0,0,0-16,0v24A8,8,0,0,0,216,120ZM40,120a8,8,0,0,0,8-8V88a8,8,0,0,0-16,0v24A8,8,0,0,0,40,120ZM183,52.48a8,8,0,0,0-5.63-13.68H144a8,8,0,0,0,0,16h33.35A8,8,0,0,0,183,52.48Z"/></svg>
+          <SunLight width="16" height="16" />
         </div>
       </div>
       <h3 class="text-[1.1rem] font-extrabold text-text-main mb-4">UV Index</h3>
@@ -58,14 +60,14 @@ const weather = useWeatherStore()
       <div class="flex justify-between items-center mb-2">
         <span class="text-[0.65rem] font-extrabold text-text-muted tracking-[1px]">ATMOSPHERE</span>
         <div class="w-8 h-8 rounded-full flex items-center justify-center bg-[#ebf5ff] text-[#3b82f6]">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 256 256"><path fill="currentColor" d="M176.81,95A64.12,64.12,0,0,0,128,64a64.12,64.12,0,0,0-48.81,31C61.85,123,54.7,159.08,71,185.81a64,64,0,0,0,114,0C201.3,159.08,194.15,123,176.81,95Z"/></svg>
+          <Droplet width="16" height="16" />
         </div>
       </div>
       <h3 class="text-[1.1rem] font-extrabold text-text-main mb-4">Humidity</h3>
       <div class="flex items-center gap-3 mb-6 flex-1">
         <span class="text-[3rem] font-extrabold text-text-main leading-none tracking-[-1px]">{{ weather.humidity }}%</span>
         <span class="flex items-center gap-0.5 text-[0.85rem] font-bold text-success-green">
-          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 256 256"><path fill="currentColor" d="M205.66,202.34a8,8,0,0,1-11.32,11.32l-96-96a8,8,0,0,1,0-11.32l96-96a8,8,0,0,1,11.32,11.32L115.31,112Z" transform="rotate(90 128 128)"/></svg>
+          <NavArrowUp width="12" height="12" />
           1%
         </span>
       </div>

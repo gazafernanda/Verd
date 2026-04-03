@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { usePlantsStore } from '../../stores/plants'
+import { Leaf } from '@iconoir/vue'
 
 const plants = usePlantsStore()
 
@@ -24,7 +25,7 @@ const alertMessage = computed(() => {
   <div class="bg-light-green-bg rounded-xl p-6 border border-[rgba(55,178,126,0.2)] mb-6">
     <div class="flex items-center gap-3 mb-4">
       <div class="w-8 h-8 bg-success-green rounded-full flex items-center justify-center text-white shrink-0">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 256 256"><path fill="currentColor" d="M222.14,58.87A8,8,0,0,0,216,56H168A88.1,88.1,0,0,0,80,144v7.35l-19.58,19.58a8,8,0,0,0,11.31,11.31L88,165.83A87.27,87.27,0,0,0,144,192c48.52,0,88-39.48,88-88V64A8,8,0,0,0,222.14,58.87ZM216,104a72.08,72.08,0,0,1-72,72,71.29,71.29,0,0,1-36.43-9.87L172,101.66a8,8,0,0,0-11.31-11.32L91.43,159.54A72.31,72.31,0,0,1,96,144a72.08,72.08,0,0,1,72-72h48Z"/></svg>
+        <Leaf width="16" height="16" />
       </div>
       <h3 class="text-[1.1rem] font-bold text-text-main m-0">Plant Care Alert</h3>
     </div>
