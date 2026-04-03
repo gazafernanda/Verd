@@ -13,34 +13,40 @@ public class ChatService(IHttpClientFactory httpFactory)
 
     public async Task<string> SendAsync(string message, IEnumerable<ChatMessageDto>? history)
     {
-        var client = httpFactory.CreateClient("Anthropic");
+        var client = httpFactory.CreateClient("Groq");
 
-        var messages = (history ?? [])
-            .Select(m => new { role = m.Role, content = m.Content })
-            .Append(new { role = "user", content = message })
-            .ToList<object>();
+        var messages = new List<object>
+        {
+            new { role = "system", content = SystemPrompt }
+        };
+
+        foreach (var m in history ?? [])
+            messages.Add(new { role = m.Role, content = m.Content });
+
+        messages.Add(new { role = "user", content = message });
 
         var body = new
         {
-            model = "claude-opus-4-6",
-            max_tokens = 1024,
-            system = SystemPrompt,
+            model = "llama-3.3-70b-versatile",
             messages
         };
 
-        var response = await client.PostAsJsonAsync("messages", body);
+        var response = await client.PostAsJsonAsync("chat/completions", body);
         response.EnsureSuccessStatusCode();
 
-        var result = await response.Content.ReadFromJsonAsync<AnthropicResponse>();
-        return result!.Content[0].Text;
+        var result = await response.Content.ReadFromJsonAsync<GroqResponse>();
+        return result!.Choices[0].Message.Content;
     }
 }
 
-file record AnthropicResponse(
-    [property: JsonPropertyName("content")] List<AnthropicContent> Content
+file record GroqResponse(
+    [property: JsonPropertyName("choices")] List<GroqChoice> Choices
 );
 
-file record AnthropicContent(
-    [property: JsonPropertyName("type")] string Type,
-    [property: JsonPropertyName("text")] string Text
+file record GroqChoice(
+    [property: JsonPropertyName("message")] GroqMessage Message
+);
+
+file record GroqMessage(
+    [property: JsonPropertyName("content")] string Content
 );

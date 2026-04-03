@@ -8,6 +8,15 @@ using Verd.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Use AddJsonStream to bypass FileProvider restrictions in certain environments
+// (the PhysicalFileProvider can't resolve paths inside .claude/worktrees/).
+var settingsPath = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.json");
+if (File.Exists(settingsPath))
+    builder.Configuration.AddJsonStream(File.OpenRead(settingsPath));
+var envSettingsPath = Path.Combine(Directory.GetCurrentDirectory(), $"appsettings.{builder.Environment.EnvironmentName}.json");
+if (File.Exists(envSettingsPath))
+    builder.Configuration.AddJsonStream(File.OpenRead(envSettingsPath));
+
 // ── Database ─────────────────────────────────────────────────────────────────
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -38,11 +47,10 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<ChatService>();
 
-builder.Services.AddHttpClient("Anthropic", client =>
+builder.Services.AddHttpClient("Groq", client =>
 {
-    client.BaseAddress = new Uri("https://api.anthropic.com/v1/");
-    client.DefaultRequestHeaders.Add("x-api-key", builder.Configuration["Anthropic:ApiKey"]);
-    client.DefaultRequestHeaders.Add("anthropic-version", "2023-06-01");
+    client.BaseAddress = new Uri("https://api.groq.com/openai/v1/");
+    client.DefaultRequestHeaders.Add("Authorization", $"Bearer {builder.Configuration["Groq:ApiKey"]}");
 });
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
