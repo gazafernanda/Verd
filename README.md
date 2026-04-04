@@ -2,7 +2,18 @@
 
 A plant care companion app with AI chat, real-time weather integration, and personalized care recommendations.
 
-**Stack:** Vue 3 + TypeScript (frontend) · ASP.NET Core 9 (backend) · PostgreSQL · JWT auth
+**Stack:** Vue 3 + TypeScript · Tailwind CSS · Iconoir (frontend) · ASP.NET Core 10 (backend) · PostgreSQL · JWT auth
+
+---
+
+## Features
+
+- Dashboard with plant status overview and live weather summary
+- Real-time weather + 7-day forecast via Open-Meteo (no API key required)
+- AI chat powered by Groq (llama-3.3-70b-versatile)
+- Personalized plant care recommendations based on current conditions
+- Plant management — add plants, set watering schedules, track care history
+- Demo mode — explore the full UI without a running backend
 
 ---
 
@@ -11,7 +22,7 @@ A plant care companion app with AI chat, real-time weather integration, and pers
 | Tool | Version | Install |
 |---|---|---|
 | Node.js | ^20.19 or ≥22.12 | [nodejs.org](https://nodejs.org) |
-| .NET SDK | 9.x | `brew install --cask dotnet-sdk` |
+| .NET SDK | 10.x | [dot.net](https://dot.net) |
 | Docker | any | [docker.com](https://docker.com) |
 
 ---
@@ -39,8 +50,8 @@ dotnet ef database update
 dotnet run
 ```
 
-API runs at **http://localhost:5000**
-Swagger UI at **http://localhost:5000/swagger**
+API runs at **http://localhost:5050**
+Swagger UI at **http://localhost:5050/swagger**
 
 ### 3. Start the frontend
 
@@ -56,7 +67,7 @@ Frontend runs at **http://localhost:5173**
 
 ## Environment
 
-The frontend reads `VITE_API_URL` from `.env.development` (already set to `http://localhost:5000`). Change it if your API runs on a different port.
+The frontend reads `VITE_API_URL` from `.env.development` (set to `http://localhost:5050`). Change it if your API runs on a different port.
 
 To override the database connection or JWT secret, edit `Verd.Api/appsettings.json`. Never commit production secrets — use `Verd.Api/appsettings.Production.json` (gitignored).
 
@@ -108,6 +119,7 @@ docker compose down -v    # Stop and delete data
 | PUT | `/api/plants/:id` | ✓ | Update a plant |
 | DELETE | `/api/plants/:id` | ✓ | Delete a plant |
 | GET | `/api/weather` | ✓ | Current weather + forecast |
+| POST | `/api/chat` | — | AI chat (Groq) |
 
 Authenticated routes require `Authorization: Bearer <token>` header.
 
@@ -125,10 +137,18 @@ If the backend isn't running, the register/login pages will offer **Continue in 
 Verd/
 ├── src/                  # Vue 3 frontend
 │   ├── views/            # Page components
+│   │   ├── DashboardView.vue
+│   │   ├── WeatherView.vue
+│   │   ├── RecommendationView.vue
+│   │   ├── ChatView.vue
+│   │   ├── ProfileView.vue
+│   │   ├── AddPlantView.vue
+│   │   ├── LoginView.vue
+│   │   └── RegisterView.vue
 │   ├── components/       # UI components
 │   ├── stores/           # Pinia state (user, weather, plants)
 │   └── router/           # Vue Router + auth guards
-├── Verd.Api/             # ASP.NET Core 9 backend
+├── Verd.Api/             # ASP.NET Core 10 backend
 │   ├── Controllers/      # API controllers
 │   ├── Models/           # EF Core entities
 │   ├── DTOs/             # Request/response types
@@ -137,3 +157,16 @@ Verd/
 ├── docker-compose.yml    # PostgreSQL
 └── Verd.sln              # .NET solution
 ```
+
+### Frontend Routes
+
+| Path | View | Auth |
+|---|---|---|
+| `/login` | LoginView | Guest only |
+| `/register` | RegisterView | Guest only |
+| `/` | DashboardView | ✓ |
+| `/weather` | WeatherView | ✓ |
+| `/recommendation` | RecommendationView | ✓ |
+| `/chat` | ChatView | ✓ |
+| `/profile` | ProfileView | ✓ |
+| `/plants/new` | AddPlantView | ✓ |
