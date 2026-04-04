@@ -116,6 +116,20 @@ export const useUserStore = defineStore('user', () => {
     })
   }
 
+  async function detectLocationFromIP() {
+    if (location.value) return
+    try {
+      const res = await fetch('https://ipwho.is/')
+      const data = await res.json()
+      if (data.success && data.city) {
+        const detected = data.region ? `${data.city}, ${data.region}` : data.city
+        await saveSettings({ location: detected })
+      }
+    } catch {
+      // silent fail — user can set manually
+    }
+  }
+
   return {
     token,
     name,
@@ -131,5 +145,6 @@ export const useUserStore = defineStore('user', () => {
     loginDemo,
     logout,
     saveSettings,
+    detectLocationFromIP,
   }
 })

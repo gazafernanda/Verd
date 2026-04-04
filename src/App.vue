@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import Sidebar from './components/Sidebar.vue'
 import { RouterView, useRoute } from 'vue-router'
 import { useUserStore } from './stores/user'
@@ -8,6 +8,12 @@ import { Menu } from '@iconoir/vue'
 const route = useRoute()
 const sidebarOpen = ref(false)
 const user = useUserStore()
+
+onMounted(() => {
+  if (user.isAuthenticated && !user.location) {
+    user.detectLocationFromIP()
+  }
+})
 </script>
 
 <template>

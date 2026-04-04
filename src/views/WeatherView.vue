@@ -1,13 +1,16 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import CurrentConditions from '../components/Weather/CurrentConditions.vue'
 import Forecast from '../components/Weather/Forecast.vue'
 import PlantCareAlert from '../components/Weather/PlantCareAlert.vue'
 import RainfallOutlook from '../components/Weather/RainfallOutlook.vue'
 import GardenContext from '../components/Weather/GardenContext.vue'
+import LocationSearch from '../components/LocationSearch.vue'
 import { useUserStore } from '../stores/user'
 import { MapPin, EditPencil } from '@iconoir/vue'
 
 const user = useUserStore()
+const showLocationSearch = ref(false)
 </script>
 
 <template>
@@ -23,7 +26,10 @@ const user = useUserStore()
             {{ user.location }} • Updated 2 mins ago
           </p>
         </div>
-        <button class="flex items-center gap-2 px-5 py-[10px] bg-surface text-text-main border border-border rounded-[24px] font-semibold text-[0.95rem] shadow-sm hover:bg-bg-app transition-colors">
+        <button
+          @click="showLocationSearch = true"
+          class="flex items-center gap-2 px-5 py-[10px] bg-surface text-text-main border border-border rounded-[24px] font-semibold text-[0.95rem] shadow-sm hover:bg-bg-app transition-colors"
+        >
           <EditPencil width="20" height="20" />
           Change Location
         </button>
@@ -91,4 +97,6 @@ const user = useUserStore()
       </div>
     </div>
   </div>
+
+  <LocationSearch v-if="showLocationSearch" @close="showLocationSearch = false" />
 </template>
