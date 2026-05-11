@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Trophy } from '@iconoir/vue'
+import { Trophy } from 'lucide-vue-next'
 </script>
 
 <template>

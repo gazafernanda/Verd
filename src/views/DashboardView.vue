@@ -1,14 +1,21 @@
 <script setup lang="ts">
-import StatusBanner from '../components/StatusBanner.vue'
-import LocationCard from '../components/LocationCard.vue'
-import WeatherCard from '../components/WeatherCard.vue'
-import CareRecommendations from '../components/CareRecommendations.vue'
-import { useUserStore } from '../stores/user'
-import { useRouter } from 'vue-router'
-import { Calendar, Plus } from '@iconoir/vue'
+import { onMounted } from "vue";
+import StatusBanner from "../components/StatusBanner.vue";
+import LocationCard from "../components/LocationCard.vue";
+import WeatherCard from "../components/WeatherCard.vue";
+import CareRecommendations from "../components/CareRecommendations.vue";
+import { useUserStore } from "../stores/user";
+import { useWeatherStore } from "../stores/weather";
+import { useRouter } from "vue-router";
+import { Calendar, Plus } from "lucide-vue-next";
 
-const user = useUserStore()
-const router = useRouter()
+const user = useUserStore();
+const weather = useWeatherStore();
+const router = useRouter();
+
+onMounted(() => {
+  weather.fetchWeather();
+});
 </script>
 
 <template>
@@ -18,19 +25,33 @@ const router = useRouter()
       <div class="max-lg:hidden flex justify-between items-center mb-6">
         <div></div>
         <div class="flex items-center gap-3">
-          <span class="font-semibold text-[0.95rem] text-text-main">{{ user.name }}</span>
-          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#f08b5e] to-[#e85d46] shadow-sm"></div>
+          <span class="font-semibold text-[0.95rem] text-text-main">{{
+            user.name
+          }}</span>
+          <div
+            class="w-10 h-10 rounded-full bg-gradient-to-br from-[#f08b5e] to-[#e85d46] shadow-sm"
+          ></div>
         </div>
       </div>
 
       <!-- Title + actions -->
-      <div class="flex justify-between items-end mb-4 max-lg:flex-col max-lg:items-start max-lg:gap-4">
+      <div
+        class="flex justify-between items-end mb-4 max-lg:flex-col max-lg:items-start max-lg:gap-4"
+      >
         <div>
-          <h1 class="text-[2rem] max-lg:text-[1.6rem] font-bold text-text-main mb-1 tracking-[-0.5px]">Main Dashboard</h1>
-          <p class="text-text-muted text-[0.95rem]">Monitoring your indoor sanctuary</p>
+          <h1
+            class="text-[2rem] max-lg:text-[1.6rem] font-bold text-text-main mb-1 tracking-[-0.5px]"
+          >
+            Main Dashboard
+          </h1>
+          <p class="text-text-muted text-[0.95rem]">
+            Monitoring your indoor sanctuary
+          </p>
         </div>
         <div class="flex gap-3">
-          <button class="flex items-center gap-2 px-4 py-2.5 bg-surface border border-border rounded-md text-text-main font-semibold text-[0.9rem] transition-colors duration-200 hover:bg-bg-app max-lg:hidden">
+          <button
+            class="flex items-center gap-2 px-4 py-2.5 bg-surface border border-border rounded-md text-text-main font-semibold text-[0.9rem] transition-colors duration-200 hover:bg-bg-app max-lg:hidden"
+          >
             <Calendar width="20" height="20" />
             Oct 27, 2023
           </button>

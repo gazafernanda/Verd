@@ -2,7 +2,7 @@
 
 A plant care companion app with AI chat, real-time weather integration, and personalized care recommendations.
 
-**Stack:** Vue 3 + TypeScript · Tailwind CSS · Iconoir (frontend) · ASP.NET Core 10 (backend) · PostgreSQL · JWT auth
+**Stack:** Vue 3 + TypeScript · Tailwind CSS · ASP.NET Core 10 (backend) · PostgreSQL · JWT auth
 
 ---
 

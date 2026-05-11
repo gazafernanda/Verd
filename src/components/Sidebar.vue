@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user'
-import { Xmark, HomeSimple, SunLight, Leaf, ChatBubble, User, LogOut } from '@iconoir/vue'
+import { X, Home, Sun, Leaf, MessageCircle, User, LogOut } from 'lucide-vue-next'
 
 const router = useRouter()
 const user = useUserStore()
@@ -20,7 +20,7 @@ function logout() {
       @click="emit('close')"
       class="lg:hidden absolute top-4 right-4 p-1.5 rounded-lg text-text-muted hover:bg-bg-app transition-colors"
     >
-      <Xmark width="20" height="20" />
+      <X width="20" height="20" />
     </button>
 
     <div class="px-8 mb-10">
@@ -39,7 +39,7 @@ function logout() {
             active-class="bg-light-green-bg !text-primary"
             @click="emit('close')"
           >
-            <HomeSimple class="shrink-0" width="24" height="24" />
+            <Home class="shrink-0" width="24" height="24" />
             Dashboard
           </router-link>
         </li>
@@ -50,7 +50,7 @@ function logout() {
             active-class="bg-light-green-bg !text-primary"
             @click="emit('close')"
           >
-            <SunLight class="shrink-0" width="24" height="24" />
+            <Sun class="shrink-0" width="24" height="24" />
             Weather
           </router-link>
         </li>
@@ -72,7 +72,7 @@ function logout() {
             active-class="bg-light-green-bg !text-primary"
             @click="emit('close')"
           >
-            <ChatBubble class="shrink-0" width="24" height="24" />
+            <MessageCircle class="shrink-0" width="24" height="24" />
             Chat AI
           </router-link>
         </li>

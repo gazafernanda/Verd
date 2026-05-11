@@ -17,4 +17,14 @@ export default defineConfig({
     include: ['vue', 'vue-router', 'pinia', 'marked'],
     exclude: ['vite-plugin-vue-devtools'],
   },
+  server: {
+    warmup: {
+      clientFiles: [
+        './src/main.ts',
+        './src/App.vue',
+        './src/views/DashboardView.vue',
+        './src/components/Sidebar.vue',
+      ],
+    },
+  },
 })

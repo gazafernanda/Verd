@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user'
-import { WarningTriangle, Eye, EyeClosed, Refresh, CheckCircle } from '@iconoir/vue'
+import { TriangleAlert, Eye, EyeOff, RefreshCw, CheckCircle } from 'lucide-vue-next'
 
 const router = useRouter()
 const user = useUserStore()
@@ -22,7 +22,7 @@ async function submit() {
   loading.value = true
   try {
     await user.register(displayName.value, email.value, password.value)
-    router.push({ name: 'dashboard' })
+    window.location.replace('/')
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : 'Something went wrong.'
     error.value = msg
@@ -105,7 +105,7 @@ function continueDemo() {
           :class="isServerError ? 'border-amber-200 bg-amber-50' : 'border-red-200 bg-red-50'">
           <div class="px-4 py-3 flex items-start gap-2"
             :class="isServerError ? 'text-amber-700' : 'text-red-600'">
-            <WarningTriangle width="16" height="16" class="shrink-0 mt-px" />
+            <TriangleAlert width="16" height="16" class="shrink-0 mt-px" />
             {{ error }}
           </div>
           <div v-if="isServerError" class="px-4 pb-3">
@@ -162,7 +162,7 @@ function continueDemo() {
                 class="absolute right-4 top-1/2 -translate-y-1/2 text-text-light hover:text-text-muted transition-colors"
               >
                 <Eye v-if="!showPassword" width="18" height="18" />
-                <EyeClosed v-else width="18" height="18" />
+                <EyeOff v-else width="18" height="18" />
               </button>
             </div>
 
@@ -179,7 +179,7 @@ function continueDemo() {
             :disabled="loading"
             class="mt-2 w-full py-3.5 bg-accent-green text-white rounded-xl font-bold text-[0.95rem] shadow-[0_4px_12px_rgba(41,156,119,0.3)] transition-all duration-200 hover:bg-accent-green-hover hover:-translate-y-px disabled:opacity-60 disabled:cursor-not-allowed disabled:translate-y-0 flex items-center justify-center gap-2"
           >
-            <Refresh v-if="loading" class="animate-spin" width="18" height="18" />
+            <RefreshCw v-if="loading" class="animate-spin" width="18" height="18" />
             {{ loading ? 'Creating account…' : 'Create account' }}
           </button>
         </form>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useWeatherStore } from '../stores/weather'
-import { SunLight, Droplet, Wind } from '@iconoir/vue'
+import { Sun, Droplet, Wind } from 'lucide-vue-next'
 const weather = useWeatherStore()
 </script>
 
@@ -12,7 +12,7 @@ const weather = useWeatherStore()
         <h3 class="text-2xl font-bold text-text-main">{{ weather.condition }}</h3>
       </div>
       <div class="w-12 h-12 bg-[#fff9eb] rounded-full flex items-center justify-center shrink-0">
-        <SunLight width="32" height="32" color="#fbbd06" />
+        <Sun width="32" height="32" color="#fbbd06" />
       </div>
     </div>
 

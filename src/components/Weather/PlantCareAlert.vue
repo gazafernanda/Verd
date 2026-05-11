@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { usePlantsStore } from '../../stores/plants'
-import { Leaf } from '@iconoir/vue'
+import { Leaf } from 'lucide-vue-next'
 
 const plants = usePlantsStore()
 

@@ -1,5 +1,30 @@
 <script setup lang="ts">
-import { Droplet, SunLight } from '@iconoir/vue'
+import { Droplet, Sun, Scissors, Leaf, Sprout } from 'lucide-vue-next'
+import { useRecommendationsStore } from '../../stores/recommendations'
+
+const recs = useRecommendationsStore()
+
+const priorityColors: Record<string, string> = {
+  IMMEDIATE: 'bg-primary text-white',
+  RECOMMENDED: 'bg-[#f59e0b] text-white',
+  OPTIONAL: 'bg-surface text-text-muted border border-border',
+}
+
+const typeColors: Record<string, { bg: string; icon: string }> = {
+  water:     { bg: 'bg-light-green-bg text-success-green', icon: 'green' },
+  mist:      { bg: 'bg-[#ebf5ff] text-[#3b82f6]', icon: 'blue' },
+  shade:     { bg: 'bg-[#fff4e5] text-[#f59e0b]', icon: 'amber' },
+  fertilize: { bg: 'bg-[#f3e8ff] text-[#9333ea]', icon: 'purple' },
+  prune:     { bg: 'bg-[#fce8e8] text-[#ef4444]', icon: 'red' },
+}
+
+const borderColors: Record<string, string> = {
+  water:     'border-[rgba(55,178,126,0.5)]',
+  mist:      'border-[rgba(59,130,246,0.4)]',
+  shade:     'border-[rgba(251,146,60,0.4)]',
+  fertilize: 'border-[rgba(147,51,234,0.3)]',
+  prune:     'border-[rgba(239,68,68,0.3)]',
+}
 </script>
 
 <template>
@@ -9,53 +34,42 @@ import { Droplet, SunLight } from '@iconoir/vue'
       <div class="flex-1 h-0.5 bg-border"></div>
     </div>
 
-    <div class="flex flex-col gap-5">
-      <!-- Water Action -->
-      <div class="flex gap-4 bg-surface rounded-xl p-5 shadow-sm border border-[rgba(55,178,126,0.5)]">
-        <div class="shrink-0">
-          <div class="w-10 h-10 rounded-full flex items-center justify-center bg-light-green-bg text-success-green">
-            <Droplet width="20" height="20" />
-          </div>
-        </div>
-        <div class="flex-1 min-w-0 flex flex-col">
-          <div class="flex flex-wrap justify-between items-start gap-2 mb-2">
-            <h3 class="text-[1.05rem] font-extrabold text-text-main m-0">Water deeply at base</h3>
-            <span class="text-[0.65rem] font-extrabold px-2.5 py-1 rounded tracking-[0.5px] bg-primary text-white shrink-0">IMMEDIATE</span>
-          </div>
-          <p class="text-[0.9rem] text-text-muted leading-relaxed mb-4 m-0">
-            Apply roughly 2 liters per m² specifically for tomatoes and zucchini to prevent heat-stress wilting.
-          </p>
-          <div class="flex flex-wrap gap-2">
-            <button class="py-2 px-4 rounded-[20px] text-[0.85rem] font-bold cursor-pointer transition-colors duration-200 border-2 bg-primary text-white border-primary hover:bg-primary-hover">
-              Mark Completed
-            </button>
-            <button class="py-2 px-4 rounded-[20px] text-[0.85rem] font-bold cursor-pointer transition-colors duration-200 border-2 bg-transparent text-text-main border-border hover:bg-surface">
-              Set Reminder
-            </button>
-          </div>
-        </div>
-      </div>
+    <div v-if="recs.loading" class="flex flex-col gap-5">
+      <div v-for="i in 2" :key="i" class="h-28 bg-surface rounded-xl border border-border animate-pulse"></div>
+    </div>
 
-      <!-- Shade Cloth Action -->
-      <div class="flex gap-4 bg-surface rounded-xl p-5 shadow-sm border border-[rgba(251,146,60,0.4)]">
+    <div v-else-if="recs.priorityActions.length === 0" class="py-8 text-center text-text-muted text-[0.9rem]">
+      No actions needed right now. Your garden looks great!
+    </div>
+
+    <div v-else class="flex flex-col gap-5">
+      <div
+        v-for="action in recs.priorityActions"
+        :key="action.id"
+        class="flex gap-4 bg-surface rounded-xl p-5 shadow-sm border"
+        :class="borderColors[action.type] ?? 'border-border'"
+      >
         <div class="shrink-0">
-          <div class="w-10 h-10 rounded-full flex items-center justify-center bg-[#fff4e5] text-[#f59e0b]">
-            <SunLight width="20" height="20" />
+          <div class="w-10 h-10 rounded-full flex items-center justify-center"
+            :class="typeColors[action.type]?.bg ?? 'bg-surface text-text-muted'">
+            <Droplet v-if="action.type === 'water' || action.type === 'mist'" width="20" height="20" />
+            <Sun v-else-if="action.type === 'shade'" width="20" height="20" />
+            <Scissors v-else-if="action.type === 'prune'" width="20" height="20" />
+            <Sprout v-else-if="action.type === 'fertilize'" width="20" height="20" />
+            <Leaf v-else width="20" height="20" />
           </div>
         </div>
         <div class="flex-1 min-w-0 flex flex-col">
           <div class="flex flex-wrap justify-between items-start gap-2 mb-2">
-            <h3 class="text-[1.05rem] font-extrabold text-text-main m-0">Deploy 30% Shade Cloth</h3>
-            <span class="text-[0.65rem] font-extrabold px-2.5 py-1 rounded tracking-[0.5px] bg-[#f59e0b] text-white shrink-0">RECOMMENDED</span>
+            <h3 class="text-[1.05rem] font-extrabold text-text-main m-0">{{ action.title }}</h3>
+            <span class="text-[0.65rem] font-extrabold px-2.5 py-1 rounded tracking-[0.5px] shrink-0"
+              :class="priorityColors[action.priority] ?? 'bg-surface text-text-muted'">
+              {{ action.priority }}
+            </span>
           </div>
-          <p class="text-[0.9rem] text-text-muted leading-relaxed mb-4 m-0">
-            Protect leafy greens from intense afternoon sun to prevent tip burn and bolting.
+          <p class="text-[0.9rem] text-text-muted leading-relaxed m-0">
+            {{ action.description }}
           </p>
-          <div class="flex flex-wrap gap-2">
-            <button class="py-2 px-4 rounded-[20px] text-[0.85rem] font-bold cursor-pointer transition-colors duration-200 border-2 border-transparent bg-[#fff4e5] text-[#f59e0b] hover:bg-[#fde6c6]">
-              View Instructions
-            </button>
-          </div>
         </div>
       </div>
     </div>

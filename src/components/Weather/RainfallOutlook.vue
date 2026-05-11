@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { HeavyRain } from '@iconoir/vue'
+import { CloudRain } from 'lucide-vue-next'
 </script>
 
 <template>
   <div class="bg-surface rounded-xl p-6 shadow-sm mb-6">
     <div class="flex items-center gap-3 mb-6">
       <div class="w-6 h-6 bg-[#e6f0ff] rounded-full flex items-center justify-center text-[#3b82f6] shrink-0">
-        <HeavyRain width="16" height="16" />
+        <CloudRain width="16" height="16" />
       </div>
       <h3 class="text-base font-bold text-text-main m-0">Rainfall Outlook</h3>
     </div>

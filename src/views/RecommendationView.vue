@@ -1,8 +1,14 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
 import MetricsRow from '../components/Recommendation/MetricsRow.vue'
 import PriorityActions from '../components/Recommendation/PriorityActions.vue'
 import BotanicalInsights from '../components/Recommendation/BotanicalInsights.vue'
-import { Calendar, Refresh } from '@iconoir/vue'
+import { Calendar, RefreshCw } from 'lucide-vue-next'
+import { useRecommendationsStore } from '../stores/recommendations'
+
+const recs = useRecommendationsStore()
+
+onMounted(() => recs.fetchRecommendations())
 </script>
 
 <template>
@@ -25,8 +31,10 @@ import { Calendar, Refresh } from '@iconoir/vue'
           <Calendar width="16" height="16" />
           Switch Category
         </button>
-        <button class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[0.9rem] font-semibold cursor-pointer transition-colors duration-200 bg-primary text-white border border-primary shadow-[0_4px_12px_rgba(26,86,65,0.2)] hover:bg-primary-hover">
-          <Refresh width="16" height="16" />
+        <button
+          @click="recs.fetchRecommendations()"
+          class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[0.9rem] font-semibold cursor-pointer transition-colors duration-200 bg-primary text-white border border-primary shadow-[0_4px_12px_rgba(26,86,65,0.2)] hover:bg-primary-hover">
+          <RefreshCw width="16" height="16" :class="{ 'animate-spin': recs.loading }" />
           Update Data
         </button>
       </div>

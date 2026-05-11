@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useWeatherStore } from '../../stores/weather'
-import { DropletHalf, SunLight, Droplet, NavArrowDown, NavArrowUp } from '@iconoir/vue'
+import { Droplets, Sun, Droplet, ChevronDown, ChevronUp } from 'lucide-vue-next'
 const weather = useWeatherStore()
 </script>
 
@@ -11,7 +11,7 @@ const weather = useWeatherStore()
       <div class="flex justify-between items-center mb-2">
         <span class="text-[0.65rem] font-extrabold text-text-muted tracking-[1px]">HYDRATION</span>
         <div class="w-8 h-8 rounded-full flex items-center justify-center bg-[#e6f6ef] text-success-green">
-          <DropletHalf width="16" height="16" />
+          <Droplets width="16" height="16" />
         </div>
       </div>
       <h3 class="text-[1.1rem] font-extrabold text-text-main mb-4">Soil Moisture</h3>
@@ -19,8 +19,8 @@ const weather = useWeatherStore()
         <span class="text-[3rem] font-extrabold text-text-main leading-none tracking-[-1px]">{{ weather.soilMoisture }}%</span>
         <span class="flex items-center gap-0.5 text-[0.85rem] font-bold"
           :class="weather.soilMoisture < 25 ? 'text-red-500' : 'text-success-green'">
-          <NavArrowDown v-if="weather.soilMoisture < 25" width="12" height="12" />
-          <NavArrowUp v-else width="12" height="12" />
+          <ChevronDown v-if="weather.soilMoisture < 25" width="12" height="12" />
+          <ChevronUp v-else width="12" height="12" />
           {{ weather.soilMoisture < 25 ? '5%' : '2%' }}
         </span>
       </div>
@@ -40,7 +40,7 @@ const weather = useWeatherStore()
       <div class="flex justify-between items-center mb-2">
         <span class="text-[0.65rem] font-extrabold text-text-muted tracking-[1px]">EXPOSURE</span>
         <div class="w-8 h-8 rounded-full flex items-center justify-center bg-[#fff4e5] text-[#f59e0b]">
-          <SunLight width="16" height="16" />
+          <Sun width="16" height="16" />
         </div>
       </div>
       <h3 class="text-[1.1rem] font-extrabold text-text-main mb-4">UV Index</h3>
@@ -67,7 +67,7 @@ const weather = useWeatherStore()
       <div class="flex items-center gap-3 mb-6 flex-1">
         <span class="text-[3rem] font-extrabold text-text-main leading-none tracking-[-1px]">{{ weather.humidity }}%</span>
         <span class="flex items-center gap-0.5 text-[0.85rem] font-bold text-success-green">
-          <NavArrowUp width="12" height="12" />
+          <ChevronUp width="12" height="12" />
           1%
         </span>
       </div>

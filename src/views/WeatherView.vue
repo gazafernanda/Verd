@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import CurrentConditions from '../components/Weather/CurrentConditions.vue'
 import Forecast from '../components/Weather/Forecast.vue'
 import PlantCareAlert from '../components/Weather/PlantCareAlert.vue'
@@ -7,10 +7,16 @@ import RainfallOutlook from '../components/Weather/RainfallOutlook.vue'
 import GardenContext from '../components/Weather/GardenContext.vue'
 import LocationSearch from '../components/LocationSearch.vue'
 import { useUserStore } from '../stores/user'
-import { MapPin, EditPencil } from '@iconoir/vue'
+import { useWeatherStore } from '../stores/weather'
+import { MapPin, Pencil } from 'lucide-vue-next'
 
 const user = useUserStore()
+const weather = useWeatherStore()
 const showLocationSearch = ref(false)
+
+onMounted(() => {
+  weather.fetchWeather()
+})
 </script>
 
 <template>
@@ -30,7 +36,7 @@ const showLocationSearch = ref(false)
           @click="showLocationSearch = true"
           class="flex items-center gap-2 px-5 py-[10px] bg-surface text-text-main border border-border rounded-[24px] font-semibold text-[0.95rem] shadow-sm hover:bg-bg-app transition-colors"
         >
-          <EditPencil width="20" height="20" />
+          <Pencil width="20" height="20" />
           Change Location
         </button>
       </div>
@@ -96,7 +102,6 @@ const showLocationSearch = ref(false)
         </div>
       </div>
     </div>
+    <LocationSearch v-if="showLocationSearch" @close="showLocationSearch = false" />
   </div>
-
-  <LocationSearch v-if="showLocationSearch" @close="showLocationSearch = false" />
 </template>

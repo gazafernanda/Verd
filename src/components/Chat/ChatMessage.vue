@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { marked } from 'marked'
-import { Flower, UserCircle } from '@iconoir/vue'
+import { Flower2, CircleUser } from 'lucide-vue-next'
 
 const props = defineProps({
   isAssistant: {
@@ -27,7 +27,7 @@ function renderMarkdown(text: string): string {
 
     <div v-if="isAssistant" class="shrink-0 flex items-start">
       <div class="w-8 h-8 rounded-full flex items-center justify-center mt-[1.4rem] bg-light-green-bg text-success-green">
-        <Flower width="16" height="16" />
+        <Flower2 width="16" height="16" />
       </div>
     </div>
 
@@ -51,7 +51,7 @@ function renderMarkdown(text: string): string {
 
     <div v-if="!isAssistant" class="shrink-0 flex items-start">
       <div class="w-8 h-8 rounded-full flex items-center justify-center mt-[1.4rem] bg-[#f1ebd8] text-[#c4a77d]">
-        <UserCircle width="16" height="16" />
+        <CircleUser width="16" height="16" />
       </div>
     </div>
 

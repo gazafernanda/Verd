@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useUserStore } from '../stores/user'
-import { MapPin, Search, Refresh, Check, Xmark, LocateUser } from '@iconoir/vue'
+import { MapPin, Search, RefreshCw, Check, X, Crosshair } from 'lucide-vue-next'
 
 const emit = defineEmits<{ close: [] }>()
 const user = useUserStore()
@@ -94,7 +94,7 @@ async function selectResult(r: { name: string; admin1: string; country: string }
           @click="emit('close')"
           class="w-8 h-8 rounded-full bg-bg-app flex items-center justify-center text-text-muted hover:bg-[#e6e8eb] transition-colors"
         >
-          <Xmark width="16" height="16" />
+          <X width="16" height="16" />
         </button>
       </div>
 
@@ -109,7 +109,7 @@ async function selectResult(r: { name: string; admin1: string; country: string }
               : 'text-text-muted hover:text-text-main',
           ]"
         >
-          <LocateUser width="16" height="16" />
+          <Crosshair width="16" height="16" />
           Auto-detect
         </button>
         <button
@@ -139,8 +139,8 @@ async function selectResult(r: { name: string; admin1: string; country: string }
             :disabled="detecting"
             class="w-full flex items-center justify-center gap-2 py-3 bg-primary text-white rounded-xl font-semibold text-[0.9rem] hover:opacity-90 transition-opacity disabled:opacity-60"
           >
-            <Refresh v-if="detecting" width="18" height="18" class="animate-spin" />
-            <LocateUser v-else width="18" height="18" />
+            <RefreshCw v-if="detecting" width="18" height="18" class="animate-spin" />
+            <Crosshair v-else width="18" height="18" />
             {{ detecting ? 'Detecting…' : 'Detect my location' }}
           </button>
           <p v-if="detectError" class="mt-3 text-[0.8rem] text-red-500 text-center">{{ detectError }}</p>
@@ -183,7 +183,7 @@ async function selectResult(r: { name: string; admin1: string; country: string }
             class="flex-1 bg-transparent text-[0.9rem] text-text-main placeholder-text-light outline-none"
             autofocus
           />
-          <Refresh v-if="searching" width="14" height="14" class="text-text-muted animate-spin shrink-0" />
+          <RefreshCw v-if="searching" width="14" height="14" class="text-text-muted animate-spin shrink-0" />
         </div>
 
         <!-- Results -->

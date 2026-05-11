@@ -11,6 +11,11 @@ public class Plant
     public string Category { get; set; } = string.Empty;
     public string IconBg { get; set; } = "#f0f9f4";
 
+    // Care preferences
+    public string WateringFrequency { get; set; } = "every-2-days"; // daily | every-2-days | weekly | biweekly | monthly
+    public string Sunlight { get; set; } = "indirect"; // full-sun | partial | indirect | low
+    public string Notes { get; set; } = string.Empty;
+
     // Care card
     public string CareCategory { get; set; } = string.Empty;
     public string CareTitle { get; set; } = string.Empty;
@@ -19,4 +24,5 @@ public class Plant
     public string CareBgType { get; set; } = "green"; // blue | yellow | green
 
     public User User { get; set; } = null!;
+    public ICollection<PlantLog> Logs { get; set; } = [];
 }

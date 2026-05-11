@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600" fill="none">
+  <rect width="1200" height="600" rx="18" fill="#eef1f4"/>
+  <g transform="translate(60,60)">
+    <rect x="0" y="0" width="1080" height="480" rx="12" fill="#dfe6e9" />
+    <text x="540" y="240" text-anchor="middle" alignment-baseline="middle" fill="#9aa5ab" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="36">Map</text>
+  </g>
+</svg>

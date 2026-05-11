@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { Leaf } from '@iconoir/vue'
+import { Leaf } from 'lucide-vue-next'
+import { useRecommendationsStore } from '../../stores/recommendations'
+
+const recs = useRecommendationsStore()
 </script>
 
 <template>
@@ -8,13 +11,13 @@ import { Leaf } from '@iconoir/vue'
       <h2 class="text-[1.35rem] font-extrabold text-text-main m-0">Botanical Insights</h2>
     </div>
 
-    <div class="bg-light-green-bg rounded-xl py-8 px-7 border border-[rgba(55,178,126,0.15)]">
+    <div v-if="recs.loading" class="bg-light-green-bg rounded-xl py-8 px-7 border border-[rgba(55,178,126,0.15)] animate-pulse h-48"></div>
+
+    <div v-else-if="recs.insight" class="bg-light-green-bg rounded-xl py-8 px-7 border border-[rgba(55,178,126,0.15)]">
       <span class="block text-[0.7rem] font-extrabold text-success-green tracking-[1px] mb-6">WHY THESE ACTIONS?</span>
 
       <p class="text-[1.15rem] font-bold text-text-main leading-relaxed mb-8">
-        High solar radiation (UV 8+) significantly increases the
-        <span class="italic text-success-green border-b-2 border-success-green">transpiration rate</span>
-        of vegetable crops.
+        {{ recs.insight.headline }}
       </p>
 
       <ul class="list-none p-0 m-0">
@@ -23,10 +26,14 @@ import { Leaf } from '@iconoir/vue'
             <Leaf width="16" height="16" />
           </div>
           <p class="text-[0.95rem] text-text-muted leading-relaxed font-medium m-0">
-            Stomata are currently wide open to facilitate cooling, leading to rapid water loss from soil surface.
+            {{ recs.insight.detail }}
           </p>
         </li>
       </ul>
+    </div>
+
+    <div v-else class="bg-light-green-bg rounded-xl py-8 px-7 border border-[rgba(55,178,126,0.15)] text-text-muted text-[0.9rem]">
+      No insights available yet. Add some plants to get personalised recommendations.
     </div>
   </div>
 </template>

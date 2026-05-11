@@ -19,7 +19,7 @@ if (File.Exists(envSettingsPath))
 
 // ── Database ─────────────────────────────────────────────────────────────────
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // ── JWT Authentication ────────────────────────────────────────────────────────
 var jwt = builder.Configuration.GetSection("Jwt");
@@ -57,9 +57,17 @@ builder.Services.AddHttpClient("Groq", client =>
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("VueDev", policy =>
-        policy.WithOrigins("http://localhost:5173")
-              .AllowAnyHeader()
-              .AllowAnyMethod());
+        policy
+          .SetIsOriginAllowed(origin => {
+              try {
+                  return new Uri(origin).Host == "localhost";
+              } catch {
+                  return false;
+              }
+          })
+          .AllowAnyHeader()
+          .AllowAnyMethod()
+    );
 });
 
 // ── Controllers & Swagger ─────────────────────────────────────────────────────

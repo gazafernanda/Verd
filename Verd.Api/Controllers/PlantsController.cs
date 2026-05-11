@@ -45,6 +45,9 @@ public class PlantsController(AppDbContext db) : ControllerBase
             LastWatered = dto.LastWatered,
             Category = dto.Category,
             IconBg = dto.IconBg,
+            WateringFrequency = dto.WateringFrequency,
+            Sunlight = dto.Sunlight,
+            Notes = dto.Notes,
             CareCategory = dto.CareCategory,
             CareTitle = dto.CareTitle,
             CareDescription = dto.CareDescription,
@@ -70,6 +73,9 @@ public class PlantsController(AppDbContext db) : ControllerBase
         plant.LastWatered = dto.LastWatered;
         plant.Category = dto.Category;
         plant.IconBg = dto.IconBg;
+        plant.WateringFrequency = dto.WateringFrequency;
+        plant.Sunlight = dto.Sunlight;
+        plant.Notes = dto.Notes;
         plant.CareCategory = dto.CareCategory;
         plant.CareTitle = dto.CareTitle;
         plant.CareDescription = dto.CareDescription;
@@ -99,6 +105,9 @@ public class PlantsController(AppDbContext db) : ControllerBase
         LastWatered: p.LastWatered,
         Category: p.Category,
         IconBg: p.IconBg,
+        WateringFrequency: p.WateringFrequency,
+        Sunlight: p.Sunlight,
+        Notes: p.Notes,
         CareCard: new CareCardDto(
             Category: p.CareCategory,
             Title: p.CareTitle,

@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { useWeatherStore } from '../../stores/weather'
-import { SunLight } from '@iconoir/vue'
+import { Sun } from 'lucide-vue-next'
 const weather = useWeatherStore()
 </script>
 
 <template>
   <div class="bg-success-green rounded-xl p-6 text-white relative overflow-hidden shadow-[0_4px_16px_rgba(55,178,126,0.2)]">
     <div class="flex items-center gap-2 text-base font-bold mb-6 relative z-10">
-      <SunLight width="20" height="20" />
+      <Sun width="20" height="20" />
       Local Weather
     </div>
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { usePlantsStore } from '../../stores/plants'
 import { useRouter } from 'vue-router'
-import { Leaf, Flower, Plus } from '@iconoir/vue'
+import { Leaf, Flower2, Plus, Trash2 } from 'lucide-vue-next'
 const plants = usePlantsStore()
 const router = useRouter()
 
@@ -53,11 +53,11 @@ function barClass(status: string) {
       <div
         v-for="plant in plants.plants"
         :key="plant.id"
-        class="basis-[calc(50%-8px)] min-w-[200px] bg-bg-app rounded-lg p-4 flex gap-4 border border-[rgba(26,86,65,0.05)] shrink-0"
+        class="basis-[calc(50%-8px)] min-w-[200px] bg-bg-app rounded-lg p-4 flex gap-4 border border-[rgba(26,86,65,0.05)] shrink-0 relative group"
       >
         <div class="w-16 h-16 rounded-md shrink-0 flex items-center justify-center border border-border"
           :style="{ backgroundColor: plant.iconBg }">
-          <Flower width="32" height="32" style="color: #1a5641" />
+          <Flower2 width="32" height="32" style="color: #1a5641" />
         </div>
         <div class="flex-1 flex flex-col min-w-0">
           <div class="flex justify-between items-start mb-2 gap-2">
@@ -72,8 +72,16 @@ function barClass(status: string) {
               :style="`width: ${plant.wateringLevel}%`"></div>
           </div>
         </div>
+
+        <!-- Delete button -->
+        <button
+          @click.stop="plants.deletePlant(plant.id)"
+          class="absolute top-2 right-2 w-6 h-6 rounded-full bg-red-50 text-red-400 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-100"
+          title="Remove plant"
+        >
+          <Trash2 width="12" height="12" />
+        </button>
       </div>
     </div>
   </div>
 </template>
-

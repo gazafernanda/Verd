@@ -3,21 +3,16 @@
   "configurations": [
     {
       "name": "Verd Frontend",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeExecutable": "/usr/local/bin/node",
+      "runtimeArgs": ["node_modules/.bin/vite"],
       "port": 5173
     },
     {
       "name": "Verd API (.NET)",
-      "runtimeExecutable": "dotnet",
+      "runtimeExecutable": "/usr/local/share/dotnet/dotnet",
       "runtimeArgs": ["run", "--project", "Verd.Api"],
-      "port": 5000
+      "port": 5050,
+      "autoPort": false
     },
-    {
-      "name": "PostgreSQL (Docker)",
-      "runtimeExecutable": "docker",
-      "runtimeArgs": ["compose", "up", "-d"],
-      "port": 5432
-    }
   ]
 }

@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useUserStore } from '../stores/user'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -59,12 +58,12 @@ const router = createRouter({
 })
 
 router.beforeEach((to) => {
-  const user = useUserStore()
+  const isAuthenticated = !!localStorage.getItem('verd_token')
 
-  if (to.meta.requiresAuth && !user.isAuthenticated) {
+  if (to.meta.requiresAuth && !isAuthenticated) {
     return { name: 'login' }
   }
-  if (to.meta.guestOnly && user.isAuthenticated) {
+  if (to.meta.guestOnly && isAuthenticated) {
     return { name: 'dashboard' }
   }
 })

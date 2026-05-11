@@ -7,6 +7,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 {
     public DbSet<User> Users => Set<User>();
     public DbSet<Plant> Plants => Set<Plant>();
+    public DbSet<PlantLog> PlantLogs => Set<PlantLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -18,6 +19,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .HasOne(p => p.User)
             .WithMany(u => u.Plants)
             .HasForeignKey(p => p.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<PlantLog>()
+            .HasOne(l => l.Plant)
+            .WithMany(p => p.Logs)
+            .HasForeignKey(l => l.PlantId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

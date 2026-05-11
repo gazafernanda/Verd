@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useUserStore } from '../../stores/user'
-import { Check, MapPin } from '@iconoir/vue'
+import { Check, MapPin } from 'lucide-vue-next'
 const user = useUserStore()
 </script>
 

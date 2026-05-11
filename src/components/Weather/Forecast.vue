@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useWeatherStore } from '../../stores/weather'
-import { NavArrowLeft, NavArrowRight, SunLight, CloudSunny, HeavyRain, Cloud } from '@iconoir/vue'
+import { ChevronLeft, ChevronRight, Sun, CloudSun, CloudRain, Cloud } from 'lucide-vue-next'
 const weather = useWeatherStore()
 </script>
 
@@ -10,10 +10,10 @@ const weather = useWeatherStore()
       <h2 class="text-[1.4rem] font-bold text-text-main m-0">7-Day Forecast</h2>
       <div class="flex gap-2">
         <button class="w-8 h-8 rounded-full border border-border bg-surface flex items-center justify-center text-text-muted shadow-sm transition-colors duration-200 hover:bg-bg-app hover:text-text-main">
-          <NavArrowLeft width="16" height="16" />
+          <ChevronLeft width="16" height="16" />
         </button>
         <button class="w-8 h-8 rounded-full border border-border bg-surface flex items-center justify-center text-text-muted shadow-sm transition-colors duration-200 hover:bg-bg-app hover:text-text-main">
-          <NavArrowRight width="16" height="16" />
+          <ChevronRight width="16" height="16" />
         </button>
       </div>
     </div>
@@ -33,9 +33,9 @@ const weather = useWeatherStore()
         </div>
 
         <div>
-          <SunLight v-if="item.icon === 'sun'" width="32" height="32" color="#fbbd06" />
-          <CloudSunny v-else-if="item.icon === 'cloud-sun'" width="32" height="32" color="#4b8ae6" />
-          <HeavyRain v-else-if="item.icon === 'rain'" width="32" height="32" color="#3b82f6" />
+          <Sun v-if="item.icon === 'sun'" width="32" height="32" color="#fbbd06" />
+          <CloudSun v-else-if="item.icon === 'cloud-sun'" width="32" height="32" color="#4b8ae6" />
+          <CloudRain v-else-if="item.icon === 'rain'" width="32" height="32" color="#3b82f6" />
           <Cloud v-else-if="item.icon === 'cloud'" width="32" height="32" color="#9caaa4" />
         </div>
 

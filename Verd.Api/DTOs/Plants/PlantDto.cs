@@ -8,6 +8,9 @@ public record PlantDto(
     string LastWatered,
     string Category,
     string IconBg,
+    string WateringFrequency,
+    string Sunlight,
+    string Notes,
     CareCardDto CareCard
 );
 

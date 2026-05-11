@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { SendDiagonal } from '@iconoir/vue'
+import { Send } from 'lucide-vue-next'
 
 const emit = defineEmits<{ send: [text: string] }>()
 
@@ -33,7 +33,7 @@ function submit() {
         class="flex items-center justify-center bg-success-green text-white w-11 h-11 rounded-full shadow-[0_4px_12px_rgba(55,178,126,0.3)] transition-all duration-200 hover:bg-[#2ea06e] hover:-translate-y-px disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
         @click="submit"
       >
-        <SendDiagonal width="20" height="20" />
+        <Send width="20" height="20" />
       </button>
     </div>
   </div>

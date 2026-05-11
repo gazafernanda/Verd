@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { usePlantsStore } from '../stores/plants'
-import { CheckCircle, WarningTriangle } from '@iconoir/vue'
+import { CheckCircle, TriangleAlert } from 'lucide-vue-next'
 
 const plants = usePlantsStore()
 
@@ -46,7 +46,7 @@ const statusConfig = computed(() => {
     <div class="px-6 py-5 flex items-start gap-4 max-lg:flex-wrap">
       <div class="w-11 h-11 rounded-full flex items-center justify-center shrink-0 mt-0.5" :class="statusConfig.iconBg">
         <CheckCircle v-if="plants.overallStatus === 'safe'" width="24" height="24" :style="`color: ${statusConfig.iconColor}`" />
-        <WarningTriangle v-else width="24" height="24" :style="`color: ${statusConfig.iconColor}`" />
+        <TriangleAlert v-else width="24" height="24" :style="`color: ${statusConfig.iconColor}`" />
       </div>
       <div class="flex-1 min-w-0">
         <h3 class="text-[1.05rem] font-bold text-text-main flex items-center gap-2 mb-1">

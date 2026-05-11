@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useUserStore } from '../../stores/user'
-import { Settings } from '@iconoir/vue'
+import { Settings } from 'lucide-vue-next'
 
 const user = useUserStore()
 const displayNameInput = ref(user.displayName)
