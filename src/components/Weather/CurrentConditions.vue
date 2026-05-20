@@ -23,7 +23,7 @@ const metrics = computed(() => [
   },
   {
     label: "WIND SPEED",
-    value: `${weather.windSpeed} mph`,
+    value: `${weather.windSpeed} km/h`,
     icon: markRaw(Wind),
   },
 ]);
@@ -55,7 +55,7 @@ const metrics = computed(() => [
         >
         <span
           class="text-[2.5rem] max-lg:text-[1.8rem] font-semibold text-text-main mt-2"
-          >F</span
+          >C</span
         >
       </div>
       <Sun
@@ -67,7 +67,7 @@ const metrics = computed(() => [
     </div>
 
     <p class="text-xl text-text-muted font-medium mb-8">
-      {{ weather.condition }} • Feels like {{ weather.feelsLike }}°F
+      {{ weather.condition }} • Feels like {{ weather.feelsLike }}°C
     </p>
 
     <div class="grid grid-cols-4 max-lg:grid-cols-2 gap-4">

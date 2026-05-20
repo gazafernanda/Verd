@@ -16,8 +16,8 @@ const WMO_ICONS: Record<number, string> = {
 const DAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-function cToF(c: number) {
-  return Math.round((c * 9) / 5 + 32);
+function round(n: number) {
+  return Math.round(n);
 }
 
 export const useWeatherStore = defineStore("weather", () => {
@@ -25,56 +25,21 @@ export const useWeatherStore = defineStore("weather", () => {
   const lastFetched = ref<number | null>(null);
   const CACHE_MS = 5 * 60 * 1000; // 5 minutes
 
-  const temp = ref(72);
+  const temp = ref(22);
   const condition = ref("Partly Cloudy");
   const humidity = ref(45);
   const uvIndex = ref(6);
   const soilMoisture = ref(32);
-  const windSpeed = ref(8);
+  const windSpeed = ref(13);
   const aqi = ref(24);
-  const feelsLike = ref(75);
+  const feelsLike = ref(24);
 
   const forecast = ref([
-    {
-      day: "TODAY",
-      date: "May 12",
-      icon: "sun",
-      tempHi: 72,
-      tempLo: 54,
-      active: true,
-    },
-    {
-      day: "MON",
-      date: "May 13",
-      icon: "cloud-sun",
-      tempHi: 68,
-      tempLo: 51,
-      active: false,
-    },
-    {
-      day: "TUE",
-      date: "May 14",
-      icon: "rain",
-      tempHi: 62,
-      tempLo: 49,
-      active: false,
-    },
-    {
-      day: "WED",
-      date: "May 15",
-      icon: "cloud",
-      tempHi: 65,
-      tempLo: 50,
-      active: false,
-    },
-    {
-      day: "THU",
-      date: "May 16",
-      icon: "sun",
-      tempHi: 70,
-      tempLo: 52,
-      active: false,
-    },
+    { day: "TODAY", date: "May 12", icon: "sun",       tempHi: 22, tempLo: 12, active: true  },
+    { day: "MON",   date: "May 13", icon: "cloud-sun", tempHi: 20, tempLo: 11, active: false },
+    { day: "TUE",   date: "May 14", icon: "rain",      tempHi: 17, tempLo: 9,  active: false },
+    { day: "WED",   date: "May 15", icon: "cloud",     tempHi: 18, tempLo: 10, active: false },
+    { day: "THU",   date: "May 16", icon: "sun",       tempHi: 21, tempLo: 11, active: false },
   ]);
 
   const uvLabel = computed(() => {
@@ -105,8 +70,8 @@ export const useWeatherStore = defineStore("weather", () => {
           day: isToday ? "TODAY" : DAYS[d.getDay()],
           date: `${MONTHS[d.getMonth()]} ${d.getDate()}`,
           icon: WMO_ICONS[daily.weathercode[i]] ?? "cloud-sun",
-          tempHi: cToF(daily.temperature_2m_max[i]),
-          tempLo: cToF(daily.temperature_2m_min[i]),
+          tempHi: round(daily.temperature_2m_max[i]),
+          tempLo: round(daily.temperature_2m_min[i]),
           active: isToday,
         };
       });
@@ -116,10 +81,10 @@ export const useWeatherStore = defineStore("weather", () => {
       const hourIndex = now.getHours();
       const hourly = data.hourly;
       if (hourly) {
-        temp.value = cToF(hourly.temperature_2m[hourIndex]);
-        feelsLike.value = cToF(hourly.apparent_temperature[hourIndex]);
+        temp.value = round(hourly.temperature_2m[hourIndex]);
+        feelsLike.value = round(hourly.apparent_temperature[hourIndex]);
         humidity.value = Math.round(hourly.relativehumidity_2m[hourIndex]);
-        windSpeed.value = Math.round(hourly.windspeed_10m[hourIndex] * 0.621371);
+        windSpeed.value = Math.round(hourly.windspeed_10m[hourIndex]);
         uvIndex.value = Math.round(hourly.uv_index[hourIndex] ?? 0);
       }
 

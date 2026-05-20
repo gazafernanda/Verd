@@ -42,3 +42,7 @@ Verd.Api/obj/
 # Secrets — base appsettings.json is committed; environment overrides are not
 Verd.Api/appsettings.Production.json
 Verd.Api/appsettings.Development.json
+
+# SQLite WAL files
+Verd.Api/verd.db-shm
+Verd.Api/verd.db-wal

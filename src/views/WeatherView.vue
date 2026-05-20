@@ -14,19 +14,45 @@ const user = useUserStore()
 const weather = useWeatherStore()
 const showLocationSearch = ref(false)
 
+const resolvedLat = ref<number | null>(user.lat)
+const resolvedLon = ref<number | null>(user.lon)
+
 const mapSrc = computed(() => {
-  if (user.lat == null || user.lon == null) return null
+  if (resolvedLat.value == null || resolvedLon.value == null) return null
   const d = 0.15
-  const w = user.lon - d
-  const s = user.lat - d
-  const e = user.lon + d
-  const n = user.lat + d
-  return `https://www.openstreetmap.org/export/embed.html?bbox=${w},${s},${e},${n}&layer=mapnik&marker=${user.lat},${user.lon}`
+  const w = resolvedLon.value - d
+  const s = resolvedLat.value - d
+  const e = resolvedLon.value + d
+  const n = resolvedLat.value + d
+  return `https://www.openstreetmap.org/export/embed.html?bbox=${w},${s},${e},${n}&layer=mapnik&marker=${resolvedLat.value},${resolvedLon.value}`
 })
 
-function loadWeather() {
+async function resolveCoords() {
   if (user.lat != null && user.lon != null) {
-    weather.fetchWeatherByCoords(user.lat, user.lon)
+    resolvedLat.value = user.lat
+    resolvedLon.value = user.lon
+    return
+  }
+  if (!user.location) return
+  try {
+    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(user.location)}&count=1&language=en&format=json`
+    const res = await fetch(url)
+    const data = await res.json()
+    const r = data.results?.[0]
+    if (r) {
+      resolvedLat.value = r.latitude
+      resolvedLon.value = r.longitude
+      await user.saveSettings({ lat: r.latitude, lon: r.longitude })
+    }
+  } catch {
+    // silent fail
+  }
+}
+
+async function loadWeather() {
+  await resolveCoords()
+  if (resolvedLat.value != null && resolvedLon.value != null) {
+    weather.fetchWeatherByCoords(resolvedLat.value, resolvedLon.value)
   } else {
     weather.fetchWeather()
   }
@@ -43,7 +69,11 @@ onMounted(() => {
 watch(
   () => user.location,
   (newLoc) => {
-    if (newLoc) loadWeather()
+    if (newLoc) {
+      resolvedLat.value = user.lat
+      resolvedLon.value = user.lon
+      loadWeather()
+    }
   }
 )
 </script>
