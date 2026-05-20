@@ -7,6 +7,12 @@ export const useUserStore = defineStore("user", () => {
   const token = ref<string | null>(localStorage.getItem("verd_token"));
   const name = ref(localStorage.getItem("verd_name") ?? "");
   const location = ref(localStorage.getItem("verd_location") ?? "");
+  const lat = ref<number | null>(
+    localStorage.getItem("verd_lat") ? Number(localStorage.getItem("verd_lat")) : null
+  );
+  const lon = ref<number | null>(
+    localStorage.getItem("verd_lon") ? Number(localStorage.getItem("verd_lon")) : null
+  );
   const tier = ref(localStorage.getItem("verd_tier") ?? "Green Thumb");
   const memberSince = ref("");
   const displayName = ref(name.value);
@@ -110,6 +116,8 @@ export const useUserStore = defineStore("user", () => {
   async function saveSettings(updates: {
     displayName?: string;
     location?: string;
+    lat?: number;
+    lon?: number;
     weatherAlertsEnabled?: boolean;
   }) {
     if (updates.displayName !== undefined) {
@@ -120,6 +128,14 @@ export const useUserStore = defineStore("user", () => {
     if (updates.location !== undefined) {
       location.value = updates.location;
       localStorage.setItem("verd_location", updates.location);
+    }
+    if (updates.lat !== undefined) {
+      lat.value = updates.lat;
+      localStorage.setItem("verd_lat", String(updates.lat));
+    }
+    if (updates.lon !== undefined) {
+      lon.value = updates.lon;
+      localStorage.setItem("verd_lon", String(updates.lon));
     }
     if (updates.weatherAlertsEnabled !== undefined) {
       weatherAlertsEnabled.value = updates.weatherAlertsEnabled;
@@ -171,7 +187,11 @@ export const useUserStore = defineStore("user", () => {
         const detected = data.region
           ? `${data.city}, ${data.region}`
           : data.city;
-        await saveSettings({ location: detected });
+        await saveSettings({
+          location: detected,
+          lat: data.latitude,
+          lon: data.longitude,
+        });
       }
     } catch {
       // silent fail — user can set manually
@@ -182,6 +202,8 @@ export const useUserStore = defineStore("user", () => {
     token,
     name,
     location,
+    lat,
+    lon,
     tier,
     memberSince,
     displayName,

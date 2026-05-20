@@ -13,6 +13,8 @@ const activeTab = ref<'detect' | 'search'>('detect')
 const detecting = ref(false)
 const detected = ref('')
 const detectError = ref('')
+let detectedLat = 0
+let detectedLon = 0
 
 async function runDetect() {
   detecting.value = true
@@ -23,6 +25,8 @@ async function runDetect() {
     const data = await res.json()
     if (data.success && data.city) {
       detected.value = data.region ? `${data.city}, ${data.region}` : data.city
+      detectedLat = data.latitude
+      detectedLon = data.longitude
     } else {
       detectError.value = 'Could not detect location. Try searching instead.'
     }
@@ -35,13 +39,13 @@ async function runDetect() {
 
 async function confirmDetected() {
   if (!detected.value) return
-  await user.saveSettings({ location: detected.value })
+  await user.saveSettings({ location: detected.value, lat: detectedLat, lon: detectedLon })
   emit('close')
 }
 
 // search state
 const query = ref('')
-const results = ref<{ name: string; admin1: string; country: string }[]>([])
+const results = ref<{ name: string; admin1: string; country: string; lat: number; lon: number }[]>([])
 const searching = ref(false)
 let debounceTimer: ReturnType<typeof setTimeout>
 
@@ -55,10 +59,12 @@ async function onQueryInput() {
       const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query.value.trim())}&count=6&language=en&format=json`
       const res = await fetch(url)
       const data = await res.json()
-      results.value = (data.results ?? []).map((r: { name: string; admin1?: string; country: string }) => ({
+      results.value = (data.results ?? []).map((r: { name: string; admin1?: string; country: string; latitude: number; longitude: number }) => ({
         name: r.name,
         admin1: r.admin1 ?? '',
         country: r.country,
+        lat: r.latitude,
+        lon: r.longitude,
       }))
     } catch {
       // silent fail
@@ -68,9 +74,9 @@ async function onQueryInput() {
   }, 400)
 }
 
-async function selectResult(r: { name: string; admin1: string; country: string }) {
+async function selectResult(r: { name: string; admin1: string; country: string; lat: number; lon: number }) {
   const loc = r.admin1 ? `${r.name}, ${r.admin1}` : `${r.name}, ${r.country}`
-  await user.saveSettings({ location: loc })
+  await user.saveSettings({ location: loc, lat: r.lat, lon: r.lon })
   emit('close')
 }
 </script>

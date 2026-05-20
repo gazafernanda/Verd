@@ -22,7 +22,8 @@ async function submit() {
   loading.value = true
   try {
     await user.register(displayName.value, email.value, password.value)
-    window.location.replace('/')
+    user.logout()
+    router.push({ name: 'login' })
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : 'Something went wrong.'
     error.value = msg

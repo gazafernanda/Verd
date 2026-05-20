@@ -3,6 +3,23 @@ import { defineStore } from "pinia";
 
 const API = import.meta.env.VITE_API_URL ?? "http://localhost:5000";
 
+const WMO_ICONS: Record<number, string> = {
+  0: "sun", 1: "sun", 2: "cloud-sun", 3: "cloud",
+  45: "cloud", 48: "cloud",
+  51: "rain", 53: "rain", 55: "rain", 56: "rain", 57: "rain",
+  61: "rain", 63: "rain", 65: "rain", 66: "rain", 67: "rain",
+  71: "cloud", 73: "cloud", 75: "cloud", 77: "cloud",
+  80: "rain", 81: "rain", 82: "rain", 85: "cloud", 86: "cloud",
+  95: "rain", 96: "rain", 99: "rain",
+};
+
+const DAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+function cToF(c: number) {
+  return Math.round((c * 9) / 5 + 32);
+}
+
 export const useWeatherStore = defineStore("weather", () => {
   const loading = ref(false);
   const lastFetched = ref<number | null>(null);
@@ -67,10 +84,56 @@ export const useWeatherStore = defineStore("weather", () => {
     return "Low";
   });
 
+  async function fetchWeatherByCoords(latitude: number, longitude: number) {
+    if (loading.value) return;
+    loading.value = true;
+    try {
+      const url =
+        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}` +
+        `&daily=weathercode,temperature_2m_max,temperature_2m_min` +
+        `&hourly=temperature_2m,relativehumidity_2m,windspeed_10m,uv_index,apparent_temperature` +
+        `&timezone=auto&forecast_days=7`;
+      const res = await fetch(url);
+      if (!res.ok) return;
+      const data = await res.json();
+
+      const daily = data.daily;
+      forecast.value = daily.time.map((dateStr: string, i: number) => {
+        const d = new Date(dateStr + "T00:00:00");
+        const isToday = i === 0;
+        return {
+          day: isToday ? "TODAY" : DAYS[d.getDay()],
+          date: `${MONTHS[d.getMonth()]} ${d.getDate()}`,
+          icon: WMO_ICONS[daily.weathercode[i]] ?? "cloud-sun",
+          tempHi: cToF(daily.temperature_2m_max[i]),
+          tempLo: cToF(daily.temperature_2m_min[i]),
+          active: isToday,
+        };
+      });
+
+      // use current hour's hourly data for current conditions
+      const now = new Date();
+      const hourIndex = now.getHours();
+      const hourly = data.hourly;
+      if (hourly) {
+        temp.value = cToF(hourly.temperature_2m[hourIndex]);
+        feelsLike.value = cToF(hourly.apparent_temperature[hourIndex]);
+        humidity.value = Math.round(hourly.relativehumidity_2m[hourIndex]);
+        windSpeed.value = Math.round(hourly.windspeed_10m[hourIndex] * 0.621371);
+        uvIndex.value = Math.round(hourly.uv_index[hourIndex] ?? 0);
+      }
+
+      lastFetched.value = Date.now();
+    } catch {
+      // silent fail
+    } finally {
+      loading.value = false;
+    }
+  }
+
   async function fetchWeather(force = false) {
     const token = localStorage.getItem("verd_token");
     if (!token || token === "demo") return;
-    // skip if recently fetched and not forced
     if (
       !force &&
       lastFetched.value &&
@@ -115,5 +178,6 @@ export const useWeatherStore = defineStore("weather", () => {
     forecast,
     uvLabel,
     fetchWeather,
+    fetchWeatherByCoords,
   };
 });
