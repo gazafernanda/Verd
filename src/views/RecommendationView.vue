@@ -8,7 +8,9 @@ import { useRecommendationsStore } from '../stores/recommendations'
 
 const recs = useRecommendationsStore()
 
-onMounted(() => recs.fetchRecommendations())
+onMounted(() => {
+  if (!recs.generatingFor) recs.fetchRecommendations()
+})
 </script>
 
 <template>
@@ -20,10 +22,12 @@ onMounted(() => recs.fetchRecommendations())
       </div>
 
       <h1 class="text-[3rem] max-lg:text-[2rem] font-extrabold text-text-main leading-[1.1] tracking-[-1px] m-0">
-        Vegetables<br>Recommendations
+        <template v-if="recs.generatingFor">{{ recs.generatingFor }}<br></template>
+        Care Recommendations
       </h1>
       <p class="text-base font-medium text-text-muted leading-relaxed mb-2 m-0">
-        Hyper-local agricultural insights based on real-time soil and weather sensors.
+        <template v-if="recs.generatingFor">AI-generated care plan for your {{ recs.generatingFor }} based on current weather conditions.</template>
+        <template v-else>Hyper-local agricultural insights based on your plants and real-time weather.</template>
       </p>
 
       <div class="flex gap-4">

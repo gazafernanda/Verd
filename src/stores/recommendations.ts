@@ -20,6 +20,7 @@ export const useRecommendationsStore = defineStore("recommendations", () => {
   const priorityActions = ref<PriorityAction[]>([]);
   const insight = ref<BotanicalInsight | null>(null);
   const loading = ref(false);
+  const generatingFor = ref<string | null>(null); // plant name currently generating for
 
   async function fetchRecommendations() {
     const token = localStorage.getItem("verd_token");
@@ -67,5 +68,28 @@ export const useRecommendationsStore = defineStore("recommendations", () => {
     }
   }
 
-  return { priorityActions, insight, loading, fetchRecommendations };
+  async function generateForPlant(plantId: number, plantName: string) {
+    const token = localStorage.getItem("verd_token");
+    if (!token || token === "demo") return false;
+    generatingFor.value = plantName;
+    loading.value = true;
+    try {
+      const res = await fetch(`${API}/api/recommendations/generate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ plantId }),
+      });
+      if (!res.ok) return false;
+      const data = await res.json();
+      priorityActions.value = data.priorityActions;
+      insight.value = data.insight;
+      return true;
+    } catch {
+      return false;
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  return { priorityActions, insight, loading, generatingFor, fetchRecommendations, generateForPlant };
 });

@@ -4,16 +4,32 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using Verd.Api.Data;
 using Verd.Api.DTOs.Recommendations;
+using Verd.Api.Services;
 
 namespace Verd.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class RecommendationsController(AppDbContext db) : ControllerBase
+public class RecommendationsController(AppDbContext db, RecommendationAiService aiService) : ControllerBase
 {
     private int UserId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)
         ?? User.FindFirstValue("sub")!);
+
+    [HttpPost("generate")]
+    public async Task<ActionResult<RecommendationDto>> Generate([FromBody] GeneratePlantRecommendationDto dto)
+    {
+        var plant = await db.Plants.FindAsync(dto.PlantId);
+        if (plant is null || plant.UserId != UserId) return NotFound();
+
+        var user = await db.Users.FindAsync(UserId);
+        if (user is null) return NotFound();
+
+        var result = await aiService.GenerateAsync(plant, user.Location);
+        if (result is null) return StatusCode(502, "AI recommendation service unavailable.");
+
+        return Ok(result);
+    }
 
     [HttpGet]
     public async Task<ActionResult<RecommendationDto>> Get()

@@ -1,5 +1,7 @@
 namespace Verd.Api.DTOs.Recommendations;
 
+public record GeneratePlantRecommendationDto(int PlantId);
+
 public record RecommendationDto(
     IEnumerable<PriorityActionDto> PriorityActions,
     BotanicalInsightDto Insight

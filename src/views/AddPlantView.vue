@@ -2,6 +2,7 @@
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { usePlantsStore } from "../stores/plants";
+import { useRecommendationsStore } from "../stores/recommendations";
 import {
   ChevronLeft,
   Sun,
@@ -10,10 +11,12 @@ import {
   Check,
   Plus,
   Flower2,
+  Sparkles,
 } from "lucide-vue-next";
 
 const router = useRouter();
 const plants = usePlantsStore();
+const recs = useRecommendationsStore();
 
 // Form state
 const name = ref("");
@@ -131,12 +134,13 @@ async function submit() {
       plants.plants.unshift(newPlant);
     }
     saved.value = true;
-    setTimeout(() => router.push({ name: "dashboard" }), 800);
+    const savedId = plants.plants[0]?.id ?? newPlant.id;
+    await recs.generateForPlant(savedId, newPlant.name);
+    router.push({ name: "recommendation" });
   } catch {
-    // Still add optimistically in demo / offline
     plants.plants.unshift(newPlant);
     saved.value = true;
-    setTimeout(() => router.push({ name: "dashboard" }), 800);
+    router.push({ name: "recommendation" });
   } finally {
     saving.value = false;
   }
@@ -397,24 +401,13 @@ async function submit() {
               : 'bg-primary text-white hover:bg-primary-hover shadow-[0_4px_12px_rgba(26,86,65,0.2)] hover:-translate-y-px'
           "
         >
-          <Check v-if="saved" width="18" height="18" stroke-width="2.5" />
+          <Sparkles v-if="saved && recs.loading" width="18" height="18" class="animate-pulse" />
+          <Check v-else-if="saved" width="18" height="18" stroke-width="2.5" />
           <Plus v-else-if="!saving" width="18" height="18" />
-          <svg
-            v-else
-            class="animate-spin"
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
+          <svg v-else class="animate-spin" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 12a9 9 0 1 1-6.22-8.56" />
           </svg>
-          {{ saved ? "Plant added!" : saving ? "Saving…" : "Add Plant" }}
+          {{ saved && recs.loading ? "Getting AI recommendations…" : saved ? "Plant added!" : saving ? "Saving…" : "Add Plant" }}
         </button>
       </div>
     </form>

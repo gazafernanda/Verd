@@ -47,6 +47,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<ChatService>();
 builder.Services.AddScoped<WeatherService>();
+builder.Services.AddScoped<RecommendationAiService>();
 builder.Services.AddHttpClient();
 
 builder.Services.AddHttpClient("Groq", client =>

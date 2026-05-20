@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user'
-import { X, Home, Sun, Leaf, MessageCircle, User, LogOut } from 'lucide-vue-next'
+import { X, Home, Sun, Leaf, Sprout, MessageCircle, User, LogOut } from 'lucide-vue-next'
 
 const router = useRouter()
 const user = useUserStore()
@@ -52,6 +52,17 @@ function logout() {
           >
             <Sun class="shrink-0" width="24" height="24" />
             Weather
+          </router-link>
+        </li>
+        <li>
+          <router-link
+            to="/plants"
+            class="flex items-center gap-4 px-5 py-[14px] rounded-lg text-text-muted font-medium transition-colors hover:bg-bg-app hover:text-text-main"
+            active-class="bg-light-green-bg !text-primary"
+            @click="emit('close')"
+          >
+            <Sprout class="shrink-0" width="24" height="24" />
+            My Plants
           </router-link>
         </li>
         <li>

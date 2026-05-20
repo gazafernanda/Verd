@@ -49,6 +49,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/plants',
+      name: 'plants',
+      component: () => import('../views/PlantsView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/plants/new',
       name: 'add-plant',
       component: () => import('../views/AddPlantView.vue'),
