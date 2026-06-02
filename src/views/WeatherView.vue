@@ -197,18 +197,6 @@ watch(
           <RainfallOutlook />
           <GardenContext />
 
-          <!-- Regional Radar placeholder -->
-          <div class="h-[200px] rounded-2xl overflow-hidden relative bg-[#e5e7eb]">
-            <img src="/src/assets/radar.png" alt="Map Radar" class="w-full h-full object-cover opacity-80" />
-            <div class="absolute inset-0 flex flex-col items-center justify-center bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.7)_0%,transparent_70%)]">
-              <div class="relative w-12 h-12 flex items-center justify-center mb-2">
-                <div class="absolute inset-0 border-2 border-success-green rounded-full opacity-50 animate-ping-slow"></div>
-                <div class="w-3 h-3 bg-success-green rounded-full border-2 border-white z-10"></div>
-              </div>
-              <h4 class="text-[0.8rem] font-bold text-text-main tracking-widest m-0">REGIONAL RADAR</h4>
-              <p class="text-[0.65rem] text-text-muted">Interactive Map View</p>
-            </div>
-          </div>
         </div>
       </div>
     </template>

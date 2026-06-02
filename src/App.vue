@@ -3,15 +3,18 @@ import { ref, onMounted } from "vue";
 import Sidebar from "./components/Sidebar.vue";
 import { RouterView, useRoute } from "vue-router";
 import { useUserStore } from "./stores/user";
+import { usePlantsStore } from "./stores/plants";
 import { Menu } from "lucide-vue-next";
 
 const route = useRoute();
 const sidebarOpen = ref(false);
 const user = useUserStore();
+const plants = usePlantsStore();
 
 onMounted(() => {
   if (user.isAuthenticated) {
     user.fetchProfile();
+    plants.fetchPlants();
     if (!user.location) user.detectLocationFromIP();
   }
 });

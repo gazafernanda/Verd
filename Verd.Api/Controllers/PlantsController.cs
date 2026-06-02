@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using System.Text.Json.Serialization;
 using Verd.Api.Data;
 using Verd.Api.DTOs.Plants;
 using Verd.Api.Models;
@@ -11,7 +12,7 @@ namespace Verd.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class PlantsController(AppDbContext db) : ControllerBase
+public class PlantsController(AppDbContext db, IHttpClientFactory httpFactory) : ControllerBase
 {
     private int UserId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)
         ?? User.FindFirstValue("sub")!);
@@ -31,6 +32,43 @@ public class PlantsController(AppDbContext db) : ControllerBase
     {
         var plant = await db.Plants.FirstOrDefaultAsync(p => p.Id == id && p.UserId == UserId);
         return plant is null ? NotFound() : Ok(ToDto(plant));
+    }
+
+    [HttpPost("validate")]
+    public async Task<ActionResult<PlantValidationResult>> Validate([FromBody] ValidatePlantNameDto dto)
+    {
+        if (string.IsNullOrWhiteSpace(dto.Name))
+            return Ok(new PlantValidationResult(false));
+
+        var client = httpFactory.CreateClient("Groq");
+        var body = new
+        {
+            model = "llama-3.3-70b-versatile",
+            messages = new[]
+            {
+                new
+                {
+                    role = "user",
+                    content = $"Is \"{dto.Name.Trim()}\" a real plant, plant species, or plant variety? Reply with only \"yes\" or \"no\"."
+                }
+            },
+            temperature = 0,
+            max_tokens = 5
+        };
+
+        try
+        {
+            var response = await client.PostAsJsonAsync("chat/completions", body);
+            response.EnsureSuccessStatusCode();
+            var result = await response.Content.ReadFromJsonAsync<GroqValidationResponse>();
+            var answer = result?.Choices?[0].Message.Content.Trim().ToLower() ?? "";
+            return Ok(new PlantValidationResult(answer.StartsWith("yes")));
+        }
+        catch
+        {
+            // If Groq is unavailable, allow the plant through
+            return Ok(new PlantValidationResult(true));
+        }
     }
 
     [HttpPost]
@@ -117,3 +155,16 @@ public class PlantsController(AppDbContext db) : ControllerBase
         )
     );
 }
+
+public record ValidatePlantNameDto(string Name);
+public record PlantValidationResult(bool IsValid);
+
+file record GroqValidationResponse(
+    [property: JsonPropertyName("choices")] List<GroqValidationChoice>? Choices
+);
+file record GroqValidationChoice(
+    [property: JsonPropertyName("message")] GroqValidationMessage Message
+);
+file record GroqValidationMessage(
+    [property: JsonPropertyName("content")] string Content
+);

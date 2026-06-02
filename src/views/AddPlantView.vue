@@ -24,10 +24,12 @@ const category = ref("");
 const customCategory = ref("");
 const wateringFrequency = ref("every-2-days");
 const sunlight = ref("indirect");
+const wateringLevel = ref(80);
 const notes = ref("");
 const selectedIcon = ref(0);
 const saving = ref(false);
 const saved = ref(false);
+const validating = ref(false);
 const error = ref("");
 
 const categories = [
@@ -74,10 +76,54 @@ const isValid = computed(
     (category.value !== "" || customCategory.value.trim().length > 0),
 );
 
+const waterStatus = computed(() => {
+  if (wateringLevel.value <= 25) return "NEEDS WATER";
+  if (wateringLevel.value <= 50) return "NEEDS MISTING";
+  return "HEALTHY";
+});
+
+const waterStatusColor = computed(() => {
+  if (wateringLevel.value <= 25) return "#ef4444";
+  if (wateringLevel.value <= 50) return "#f59e0b";
+  return "#37b27e";
+});
+
+const waterStatusLabel = computed(() => {
+  if (wateringLevel.value <= 25) return "Needs water";
+  if (wateringLevel.value <= 50) return "Needs misting";
+  return "Well watered";
+});
+
 async function submit() {
   if (!isValid.value) return;
-  saving.value = true;
   error.value = "";
+
+  const token = localStorage.getItem("verd_token");
+  if (token && token !== "demo") {
+    validating.value = true;
+    try {
+      const API = import.meta.env.VITE_API_URL ?? "http://localhost:5000";
+      const res = await fetch(`${API}/api/plants/validate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ name: name.value.trim() }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (!data.isValid) {
+          error.value = `"${name.value.trim()}" doesn't seem to be a real plant. Please enter a valid plant name.`;
+          validating.value = false;
+          return;
+        }
+      }
+    } catch {
+      // If validation fails to reach server, allow through
+    } finally {
+      validating.value = false;
+    }
+  }
+
+  saving.value = true;
 
   const finalCategory =
     category.value === "__custom__"
@@ -88,9 +134,9 @@ async function submit() {
   const newPlant = {
     id: Date.now(),
     name: name.value.trim(),
-    status: "HEALTHY" as const,
-    wateringLevel: 80,
-    lastWatered: "Just now",
+    status: waterStatus.value as "HEALTHY" | "NEEDS WATER" | "NEEDS MISTING",
+    wateringLevel: wateringLevel.value,
+    lastWatered: wateringLevel.value >= 80 ? "Just now" : "A while ago",
     category: finalCategory,
     iconBg: iconOptions[selectedIcon.value].bg,
     careCard: {
@@ -116,6 +162,9 @@ async function submit() {
         },
         body: JSON.stringify({
           name: newPlant.name,
+          status: newPlant.status,
+          wateringLevel: newPlant.wateringLevel,
+          lastWatered: newPlant.lastWatered,
           category: newPlant.category,
           wateringFrequency: wateringFrequency.value,
           sunlight: sunlight.value,
@@ -316,6 +365,34 @@ async function submit() {
           </div>
         </div>
 
+        <!-- Water Level -->
+        <div class="mb-6">
+          <div class="flex items-center gap-2 mb-3">
+            <Droplet width="16" height="16" class="text-[#37b27e]" />
+            <label class="text-[0.9rem] font-bold text-text-main">Current Water Level</label>
+          </div>
+          <div class="flex items-center gap-4 mb-2">
+            <span class="text-[2rem] font-extrabold text-text-main leading-none">{{ wateringLevel }}%</span>
+            <span
+              class="px-2.5 py-1 rounded-full text-[0.72rem] font-bold"
+              :style="{ backgroundColor: waterStatusColor + '20', color: waterStatusColor }"
+            >{{ waterStatusLabel }}</span>
+          </div>
+          <input
+            v-model.number="wateringLevel"
+            type="range"
+            min="0"
+            max="100"
+            step="5"
+            class="water-slider w-full h-2 rounded-full appearance-none cursor-pointer"
+            :style="`--fill: ${waterStatusColor}; background: linear-gradient(to right, ${waterStatusColor} ${wateringLevel}%, #e2e8e4 ${wateringLevel}%)`"
+          />
+          <div class="flex justify-between text-[0.72rem] text-text-muted mt-1.5">
+            <span>Needs water</span>
+            <span>Well watered</span>
+          </div>
+        </div>
+
         <!-- Sunlight -->
         <div>
           <div class="flex items-center gap-2 mb-3">
@@ -393,7 +470,7 @@ async function submit() {
         </button>
         <button
           type="submit"
-          :disabled="!isValid || saving || saved"
+          :disabled="!isValid || validating || saving || saved"
           class="flex-1 py-3.5 rounded-[24px] text-[0.95rem] font-bold flex items-center justify-center gap-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           :class="
             saved
@@ -403,13 +480,35 @@ async function submit() {
         >
           <Sparkles v-if="saved && recs.loading" width="18" height="18" class="animate-pulse" />
           <Check v-else-if="saved" width="18" height="18" stroke-width="2.5" />
-          <Plus v-else-if="!saving" width="18" height="18" />
+          <Plus v-else-if="!validating && !saving" width="18" height="18" />
           <svg v-else class="animate-spin" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 12a9 9 0 1 1-6.22-8.56" />
           </svg>
-          {{ saved && recs.loading ? "Getting AI recommendations…" : saved ? "Plant added!" : saving ? "Saving…" : "Add Plant" }}
+          {{ saved && recs.loading ? "Getting AI recommendations…" : saved ? "Plant added!" : validating ? "Checking plant…" : saving ? "Saving…" : "Add Plant" }}
         </button>
       </div>
     </form>
   </div>
 </template>
+
+<style scoped>
+.water-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  border: 2.5px solid var(--fill, #37b27e);
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+}
+.water-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  border: 2.5px solid var(--fill, #37b27e);
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+}
+</style>

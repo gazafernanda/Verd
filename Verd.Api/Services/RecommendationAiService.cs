@@ -9,9 +9,13 @@ public class RecommendationAiService(IHttpClientFactory factory, WeatherService 
 {
     private static readonly JsonSerializerOptions JsonOpts = new() { PropertyNameCaseInsensitive = true };
 
-    public async Task<RecommendationDto?> GenerateAsync(Plant plant, string userLocation)
+    public Task<RecommendationDto?> GenerateAsync(Plant plant, string userLocation) =>
+        GenerateForGardenAsync([plant], userLocation);
+
+    public async Task<RecommendationDto?> GenerateForGardenAsync(IEnumerable<Plant> plants, string userLocation)
     {
-        // Fetch real weather for context
+        var plantList = plants.ToList();
+
         string weatherContext = "Weather data unavailable.";
         var weather = await weatherService.GetForLocationAsync(userLocation);
         if (weather is not null)
@@ -21,27 +25,27 @@ public class RecommendationAiService(IHttpClientFactory factory, WeatherService 
                              $"Conditions: {weather.Condition}";
         }
 
+        var plantSummary = string.Join("\n", plantList.Select(p =>
+            $"- {p.Name} ({p.Category}): watering {p.WateringFrequency}, sunlight {p.Sunlight}, status {p.Status}" +
+            (string.IsNullOrWhiteSpace(p.Notes) ? "" : $", notes: {p.Notes}")));
+
         var jsonTemplate = """
             {
               "priorityActions": [
                 { "id": "string", "title": "string", "description": "string", "priority": "IMMEDIATE|RECOMMENDED|OPTIONAL", "type": "water|mist|shade|fertilize|prune" }
               ],
               "insight": {
-                "headline": "A single insightful botanical fact relevant to this plant and the current weather",
-                "detail": "2-3 sentences with specific actionable advice for this plant right now"
+                "headline": "A single insightful botanical fact relevant to this garden and current weather",
+                "detail": "2-3 sentences with specific actionable advice for these plants right now"
               }
             }
             """;
 
         var prompt = $"""
-            You are a plant care specialist. Generate specific care recommendations for the following plant given current weather conditions.
+            You are a plant care specialist. Generate care recommendations for this garden given current weather conditions.
 
-            Plant Details:
-            - Name: {plant.Name}
-            - Category: {plant.Category}
-            - Watering Frequency: {plant.WateringFrequency}
-            - Sunlight Needs: {plant.Sunlight}
-            - Notes: {(string.IsNullOrWhiteSpace(plant.Notes) ? "None" : plant.Notes)}
+            Garden ({plantList.Count} plant{(plantList.Count == 1 ? "" : "s")}):
+            {plantSummary}
 
             Current Weather at {userLocation}:
             {weatherContext}
@@ -49,17 +53,14 @@ public class RecommendationAiService(IHttpClientFactory factory, WeatherService 
             Return ONLY valid JSON (no markdown, no extra text) in this exact format:
             {jsonTemplate}
 
-            Generate 3-4 priority actions that are highly specific to this plant and current weather. Be practical and concise.
+            Generate 3-5 priority actions specific to these plants and current weather. Prioritize any plants with status NEEDS WATER or NEEDS MISTING. Be practical and concise.
             """;
 
         var client = factory.CreateClient("Groq");
         var body = new
         {
             model = "llama-3.3-70b-versatile",
-            messages = new[]
-            {
-                new { role = "user", content = prompt }
-            },
+            messages = new[] { new { role = "user", content = prompt } },
             temperature = 0.4,
             response_format = new { type = "json_object" }
         };

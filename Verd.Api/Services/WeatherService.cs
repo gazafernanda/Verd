@@ -26,7 +26,7 @@ public class WeatherService(IHttpClientFactory factory)
         var url = $"https://api.open-meteo.com/v1/forecast" +
             $"?latitude={place.Latitude}&longitude={place.Longitude}" +
             "&daily=weathercode,temperature_2m_max,temperature_2m_min" +
-            "&hourly=temperature_2m,relativehumidity_2m,windspeed_10m,uv_index,apparent_temperature" +
+            "&hourly=temperature_2m,relativehumidity_2m,windspeed_10m,uv_index,apparent_temperature,soil_moisture_0_to_1cm" +
             "&timezone=auto&forecast_days=7";
 
         var weatherJson = await http.GetStringAsync(url);
@@ -40,6 +40,7 @@ public class WeatherService(IHttpClientFactory factory)
         var humidity = (int)Math.Round(hourly.Relativehumidity2m[hourIndex]);
         var windSpeed = (int)Math.Round(hourly.Windspeed10m[hourIndex]);
         var uvIndex = (int)Math.Round(hourly.UvIndex[hourIndex]);
+        var soilMoisture = (int)Math.Min(100, Math.Round(hourly.SoilMoisture0To1Cm[hourIndex] * 100));
 
         var daily = w.Daily;
         var forecast = daily.Time.Select((dateStr, i) =>
@@ -65,7 +66,7 @@ public class WeatherService(IHttpClientFactory factory)
             Humidity: humidity,
             UvIndex: uvIndex,
             UvLabel: uvLabel,
-            SoilMoisture: 0,
+            SoilMoisture: soilMoisture,
             WindSpeed: windSpeed,
             Aqi: 0,
             FeelsLike: feelsLike,
@@ -113,7 +114,8 @@ file record OpenMeteoHourly(
     [property: JsonPropertyName("apparent_temperature")] double[] ApparentTemperature,
     [property: JsonPropertyName("relativehumidity_2m")] double[] Relativehumidity2m,
     [property: JsonPropertyName("windspeed_10m")] double[] Windspeed10m,
-    [property: JsonPropertyName("uv_index")] double[] UvIndex
+    [property: JsonPropertyName("uv_index")] double[] UvIndex,
+    [property: JsonPropertyName("soil_moisture_0_to_1cm")] double[] SoilMoisture0To1Cm
 );
 
 file record OpenMeteoDaily(

@@ -56,7 +56,7 @@ export const useWeatherStore = defineStore("weather", () => {
       const url =
         `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}` +
         `&daily=weathercode,temperature_2m_max,temperature_2m_min` +
-        `&hourly=temperature_2m,relativehumidity_2m,windspeed_10m,uv_index,apparent_temperature` +
+        `&hourly=temperature_2m,relativehumidity_2m,windspeed_10m,uv_index,apparent_temperature,soil_moisture_0_to_1cm` +
         `&timezone=auto&forecast_days=7`;
       const res = await fetch(url);
       if (!res.ok) return;
@@ -86,6 +86,7 @@ export const useWeatherStore = defineStore("weather", () => {
         humidity.value = Math.round(hourly.relativehumidity_2m[hourIndex]);
         windSpeed.value = Math.round(hourly.windspeed_10m[hourIndex]);
         uvIndex.value = Math.round(hourly.uv_index[hourIndex] ?? 0);
+        soilMoisture.value = Math.min(100, Math.round((hourly.soil_moisture_0_to_1cm?.[hourIndex] ?? 0) * 100));
       }
 
       lastFetched.value = Date.now();
