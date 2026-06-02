@@ -89,16 +89,6 @@ export const useUserStore = defineStore("user", () => {
     persist(await res.json());
   }
 
-  function loginDemo(displayNameInput = "Alex Rivera") {
-    persist({
-      token: "demo",
-      displayName: displayNameInput,
-      email: `${displayNameInput.toLowerCase().replace(" ", ".")}@demo.com`,
-      location: "San Francisco, CA",
-      tier: "Green Thumb",
-    });
-  }
-
   function logout() {
     token.value = null;
     name.value = "";
@@ -142,7 +132,7 @@ export const useUserStore = defineStore("user", () => {
     }
 
     const storedToken = token.value;
-    if (!storedToken || storedToken === "demo") return;
+    if (!storedToken) return;
     await fetch(`${API}/api/users/settings`, {
       method: "PATCH",
       headers: {
@@ -155,7 +145,7 @@ export const useUserStore = defineStore("user", () => {
 
   async function fetchProfile() {
     const storedToken = token.value;
-    if (!storedToken || storedToken === "demo") return;
+    if (!storedToken) return;
     try {
       const res = await fetch(`${API}/api/users/profile`, {
         headers: { Authorization: `Bearer ${storedToken}` },
@@ -212,7 +202,6 @@ export const useUserStore = defineStore("user", () => {
     isAuthenticated,
     login,
     register,
-    loginDemo,
     logout,
     saveSettings,
     fetchProfile,

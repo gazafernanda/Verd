@@ -99,7 +99,7 @@ async function submit() {
   error.value = "";
 
   const token = localStorage.getItem("verd_token");
-  if (token && token !== "demo") {
+  if (token) {
     validating.value = true;
     try {
       const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
@@ -155,7 +155,7 @@ async function submit() {
 
   try {
     const token = localStorage.getItem("verd_token");
-    if (token && token !== "demo") {
+    if (token) {
       const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
       const res = await fetch(`${API}/api/plants`, {
         method: "POST",
@@ -182,7 +182,7 @@ async function submit() {
         plants.plants.unshift(newPlant);
       }
     } else {
-      // Demo mode — just push locally
+      // No token — push locally as a fallback
       plants.plants.unshift(newPlant);
     }
     saved.value = true;

@@ -99,7 +99,7 @@ export const useWeatherStore = defineStore("weather", () => {
 
   async function fetchWeather(force = false) {
     const token = localStorage.getItem("verd_token");
-    if (!token || token === "demo") return;
+    if (!token) return;
     if (
       !force &&
       lastFetched.value &&

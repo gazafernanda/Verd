@@ -17,7 +17,7 @@ const weather = useWeatherStore();
 onMounted(async () => {
   if (user.isAuthenticated) {
     const ok = await plants.fetchPlants();
-    if (!ok && localStorage.getItem("verd_token") !== "demo") {
+    if (!ok) {
       user.logout();
       router.replace({ name: "login" });
       return;

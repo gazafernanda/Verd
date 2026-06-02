@@ -24,34 +24,7 @@ export const useRecommendationsStore = defineStore("recommendations", () => {
 
   async function fetchRecommendations() {
     const token = localStorage.getItem("verd_token");
-    if (!token || token === "demo") {
-      // Default data for demo mode
-      priorityActions.value = [
-        {
-          id: "water-plants",
-          title: "Water deeply at base",
-          description:
-            "Apply roughly 2 liters per m² specifically for tomatoes and zucchini to prevent heat-stress wilting.",
-          priority: "IMMEDIATE",
-          type: "water",
-        },
-        {
-          id: "shade-cloth",
-          title: "Deploy 30% Shade Cloth",
-          description:
-            "Protect leafy greens from intense afternoon sun to prevent tip burn and bolting.",
-          priority: "RECOMMENDED",
-          type: "shade",
-        },
-      ];
-      insight.value = {
-        headline:
-          "High solar radiation increases the transpiration rate of your crops.",
-        detail:
-          "Stomata are currently wide open to facilitate cooling, leading to rapid water loss from soil surface.",
-      };
-      return;
-    }
+    if (!token) return;
 
     loading.value = true;
     try {
@@ -70,7 +43,7 @@ export const useRecommendationsStore = defineStore("recommendations", () => {
 
   async function generateForPlant(plantId: number, plantName: string) {
     const token = localStorage.getItem("verd_token");
-    if (!token || token === "demo") return false;
+    if (!token) return false;
     generatingFor.value = plantName;
     loading.value = true;
     try {

@@ -67,7 +67,7 @@ export const usePlantsStore = defineStore("plants", () => {
 
   async function fetchPlants(): Promise<boolean> {
     const token = localStorage.getItem("verd_token");
-    if (!token || token === "demo") return false;
+    if (!token) return false;
     try {
       const res = await fetch(`${API}/api/plants`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -80,10 +80,7 @@ export const usePlantsStore = defineStore("plants", () => {
 
   async function deletePlant(id: number) {
     const token = localStorage.getItem("verd_token");
-    if (!token || token === "demo") {
-      plants.value = plants.value.filter((p) => p.id !== id);
-      return;
-    }
+    if (!token) return;
     const res = await fetch(`${API}/api/plants/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
@@ -100,10 +97,7 @@ export const usePlantsStore = defineStore("plants", () => {
 
     const merged = { ...plant, ...data };
 
-    if (!token || token === "demo") {
-      Object.assign(plant, data);
-      return;
-    }
+    if (!token) return;
 
     const res = await fetch(`${API}/api/plants/${id}`, {
       method: "PUT",
@@ -134,20 +128,7 @@ export const usePlantsStore = defineStore("plants", () => {
 
   async function logCare(plantId: number, action: string, notes = "") {
     const token = localStorage.getItem("verd_token");
-    if (!token || token === "demo") {
-      // Optimistic update in demo mode
-      const plant = plants.value.find((p) => p.id === plantId);
-      if (plant) {
-        if (action === "watered") {
-          plant.wateringLevel = 100;
-          plant.lastWatered = "Just now";
-          if (plant.status === "NEEDS WATER") plant.status = "HEALTHY";
-        } else if (action === "misted" && plant.status === "NEEDS MISTING") {
-          plant.status = "HEALTHY";
-        }
-      }
-      return;
-    }
+    if (!token) return;
     const res = await fetch(`${API}/api/plants/${plantId}/logs`, {
       method: "POST",
       headers: authHeaders(),
@@ -168,7 +149,7 @@ export const usePlantsStore = defineStore("plants", () => {
 
   async function fetchLogs(plantId: number): Promise<PlantLog[]> {
     const token = localStorage.getItem("verd_token");
-    if (!token || token === "demo") return [];
+    if (!token) return [];
     const res = await fetch(`${API}/api/plants/${plantId}/logs`, {
       headers: { Authorization: `Bearer ${token}` },
     });

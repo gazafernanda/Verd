@@ -32,11 +32,6 @@ async function submit() {
     loading.value = false
   }
 }
-
-function continueDemo() {
-  user.loginDemo(displayName.value || 'Alex Rivera')
-  router.push({ name: 'dashboard' })
-}
 </script>
 
 <template>
@@ -108,12 +103,6 @@ function continueDemo() {
             :class="isServerError ? 'text-amber-700' : 'text-red-600'">
             <TriangleAlert width="16" height="16" class="shrink-0 mt-px" />
             {{ error }}
-          </div>
-          <div v-if="isServerError" class="px-4 pb-3">
-            <button @click="continueDemo"
-              class="text-amber-700 font-bold underline underline-offset-2 hover:text-amber-800 transition-colors">
-              Continue in demo mode instead →
-            </button>
           </div>
         </div>
 
