@@ -18,7 +18,7 @@ async function submit() {
   loading.value = true
   try {
     await user.login(email.value, password.value)
-    window.location.replace('/')
+    router.replace({ name: 'dashboard' })
   } catch (e: unknown) {
     error.value = e instanceof Error ? e.message : 'Something went wrong.'
   } finally {
