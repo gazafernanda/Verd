@@ -41,7 +41,7 @@ const metrics = computed(() => [
         <span class="text-[0.6rem] font-bold text-text-muted tracking-[0.5px]"
           >AQI INDEX</span
         >
-        <span class="text-[0.85rem] font-bold text-success-green"
+        <span class="text-[0.85rem] font-bold text-success-green whitespace-nowrap"
           >{{ weather.aqi }} - Excellent</span
         >
       </div>
