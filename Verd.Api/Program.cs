@@ -19,9 +19,15 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     {
         var uri = new Uri(databaseUrl);
         var userInfo = uri.UserInfo.Split(':');
-        var connStr = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};" +
+        // Neon (and most managed Postgres) omit the port in the URL — default to 5432.
+        var port = uri.Port > 0 ? uri.Port : 5432;
+        // Railway's internal host doesn't use SSL; external hosts (Neon, etc.) require it.
+        var sslMode = uri.Host.EndsWith(".railway.internal") || uri.Host == "localhost"
+            ? "Allow"
+            : "Require";
+        var connStr = $"Host={uri.Host};Port={port};Database={uri.AbsolutePath.TrimStart('/')};" +
                       $"Username={userInfo[0]};Password={Uri.UnescapeDataString(userInfo[1])};" +
-                      "SSL Mode=Allow;Trust Server Certificate=true";
+                      $"SSL Mode={sslMode};Trust Server Certificate=true";
         options.UseNpgsql(connStr);
     }
     else
