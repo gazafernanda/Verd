@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: verd-api
+    runtime: docker
+    region: singapore
+    plan: free
+    dockerfilePath: ./Verd.Api/Dockerfile
+    dockerContext: ./Verd.Api
+    autoDeploy: true
+    envVars:
+      # Neon Postgres connection string — set manually in the Render dashboard.
+      - key: DATABASE_URL
+        sync: false
+      # Groq API key for the AI chat/recommendations — set manually.
+      - key: GROQ_API_KEY
+        sync: false
+      # JWT signing secret — Render generates a strong random value on first deploy.
+      - key: Jwt__Secret
+        generateValue: true
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
