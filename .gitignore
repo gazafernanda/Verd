@@ -43,6 +43,7 @@ Verd.Api/obj/
 Verd.Api/appsettings.Production.json
 Verd.Api/appsettings.Development.json
 
-# SQLite WAL files
+# SQLite database and WAL files
+Verd.Api/verd.db
 Verd.Api/verd.db-shm
 Verd.Api/verd.db-wal
