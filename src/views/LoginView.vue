@@ -13,27 +13,17 @@ const showPassword = ref(false)
 const loading = ref(false)
 const error = ref('')
 
-const isServerError = ref(false)
-
 async function submit() {
   error.value = ''
-  isServerError.value = false
   loading.value = true
   try {
     await user.login(email.value, password.value)
     window.location.replace('/')
   } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : 'Something went wrong.'
-    error.value = msg
-    isServerError.value = msg.includes('server') || msg.includes('reach')
+    error.value = e instanceof Error ? e.message : 'Something went wrong.'
   } finally {
     loading.value = false
   }
-}
-
-function continueDemo() {
-  user.loginDemo()
-  router.push({ name: 'dashboard' })
 }
 </script>
 
@@ -99,19 +89,9 @@ function continueDemo() {
         <p class="text-text-muted mb-8">Sign in to your garden dashboard</p>
 
         <!-- Error -->
-        <div v-if="error" class="mb-6 rounded-xl overflow-hidden border text-sm font-medium"
-          :class="isServerError ? 'border-amber-200 bg-amber-50' : 'border-red-200 bg-red-50'">
-          <div class="px-4 py-3 flex items-start gap-2"
-            :class="isServerError ? 'text-amber-700' : 'text-red-600'">
-            <TriangleAlert width="16" height="16" class="shrink-0 mt-px" />
-            {{ error }}
-          </div>
-          <div v-if="isServerError" class="px-4 pb-3">
-            <button @click="continueDemo"
-              class="text-amber-700 font-bold underline underline-offset-2 hover:text-amber-800 transition-colors">
-              Continue in demo mode instead →
-            </button>
-          </div>
+        <div v-if="error" class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 flex items-start gap-2 text-sm font-medium text-red-600">
+          <TriangleAlert width="16" height="16" class="shrink-0 mt-px" />
+          {{ error }}
         </div>
 
         <form @submit.prevent="submit" class="flex flex-col gap-5">
