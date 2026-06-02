@@ -59,10 +59,15 @@ builder.Services.AddScoped<WeatherService>();
 builder.Services.AddScoped<RecommendationAiService>();
 builder.Services.AddHttpClient();
 
+var groqApiKey = Environment.GetEnvironmentVariable("GROQ_API_KEY")
+    ?? Environment.GetEnvironmentVariable("Groq__ApiKey")
+    ?? builder.Configuration["Groq:ApiKey"]
+    ?? "";
+
 builder.Services.AddHttpClient("Groq", client =>
 {
     client.BaseAddress = new Uri("https://api.groq.com/openai/v1/");
-    client.DefaultRequestHeaders.Add("Authorization", $"Bearer {builder.Configuration["Groq:ApiKey"]}");
+    client.DefaultRequestHeaders.Add("Authorization", $"Bearer {groqApiKey}");
 });
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
