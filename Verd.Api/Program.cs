@@ -19,6 +19,8 @@ if (File.Exists(envSettingsPath))
 
 // ── Database ─────────────────────────────────────────────────────────────────
 var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+if (string.IsNullOrWhiteSpace(databaseUrl)) databaseUrl = null;
+
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     if (databaseUrl != null)
