@@ -138,7 +138,10 @@ async function submit() {
     wateringLevel: wateringLevel.value,
     lastWatered: wateringLevel.value >= 80 ? "Just now" : "A while ago",
     category: finalCategory,
-    iconBg: iconOptions[selectedIcon.value].bg,
+    iconBg: iconOptions[selectedIcon.value]!.bg,
+    wateringFrequency: wateringFrequency.value,
+    sunlight: sunlight.value,
+    notes: notes.value.trim(),
     careCard: {
       category: finalCategory,
       title: `Care for ${name.value.trim()}`,
@@ -183,7 +186,7 @@ async function submit() {
       plants.plants.unshift(newPlant);
     }
     saved.value = true;
-    const savedId = plants.plants[0]?.id ?? newPlant.id;
+    const savedId = plants.plants[0]?.id ?? newPlant.id ?? 0;
     await recs.generateForPlant(savedId, newPlant.name);
     router.push({ name: "recommendation" });
   } catch {
@@ -234,7 +237,7 @@ async function submit() {
             <span class="text-[0.8rem] font-bold text-text-main">Color</span>
             <div
               class="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 border border-border"
-              :style="{ backgroundColor: iconOptions[selectedIcon].bg }"
+              :style="{ backgroundColor: iconOptions[selectedIcon]!.bg }"
             >
               <Flower2 width="32" height="32" style="color: #1a5641" />
             </div>
