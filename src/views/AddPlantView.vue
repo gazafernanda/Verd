@@ -102,7 +102,7 @@ async function submit() {
   if (token && token !== "demo") {
     validating.value = true;
     try {
-      const API = import.meta.env.VITE_API_URL ?? "http://localhost:5000";
+      const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
       const res = await fetch(`${API}/api/plants/validate`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -156,7 +156,7 @@ async function submit() {
   try {
     const token = localStorage.getItem("verd_token");
     if (token && token !== "demo") {
-      const API = import.meta.env.VITE_API_URL ?? "http://localhost:5000";
+      const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
       const res = await fetch(`${API}/api/plants`, {
         method: "POST",
         headers: {

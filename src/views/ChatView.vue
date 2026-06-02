@@ -5,7 +5,7 @@ import ChatInput from "../components/Chat/ChatInput.vue";
 import { useUserStore } from "../stores/user";
 import { Flower2 } from "lucide-vue-next";
 
-const API = import.meta.env.VITE_API_URL ?? "http://localhost:5000";
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 interface Message {
   role: "user" | "assistant";

@@ -1,7 +1,7 @@
 import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 
-const API = import.meta.env.VITE_API_URL ?? "http://localhost:5000";
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const WMO_ICONS: Record<number, string> = {
   0: "sun", 1: "sun", 2: "cloud-sun", 3: "cloud",
