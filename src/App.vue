@@ -1,20 +1,29 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import Sidebar from "./components/Sidebar.vue";
-import { RouterView, useRoute } from "vue-router";
+import { RouterView, useRoute, useRouter } from "vue-router";
 import { useUserStore } from "./stores/user";
 import { usePlantsStore } from "./stores/plants";
+import { useWeatherStore } from "./stores/weather";
 import { Menu } from "lucide-vue-next";
 
 const route = useRoute();
+const router = useRouter();
 const sidebarOpen = ref(false);
 const user = useUserStore();
 const plants = usePlantsStore();
+const weather = useWeatherStore();
 
-onMounted(() => {
+onMounted(async () => {
   if (user.isAuthenticated) {
+    const ok = await plants.fetchPlants();
+    if (!ok && localStorage.getItem("verd_token") !== "demo") {
+      user.logout();
+      router.replace({ name: "login" });
+      return;
+    }
     user.fetchProfile();
-    plants.fetchPlants();
+    weather.fetchWeather();
     if (!user.location) user.detectLocationFromIP();
   }
 });

@@ -65,13 +65,17 @@ export const usePlantsStore = defineStore("plants", () => {
     return "attention";
   });
 
-  async function fetchPlants() {
+  async function fetchPlants(): Promise<boolean> {
     const token = localStorage.getItem("verd_token");
-    if (!token || token === "demo") return;
-    const res = await fetch(`${API}/api/plants`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (res.ok) plants.value = await res.json();
+    if (!token || token === "demo") return false;
+    try {
+      const res = await fetch(`${API}/api/plants`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) { plants.value = await res.json(); return true; }
+      if (res.status === 401) return false;
+    } catch { /* silent fail */ }
+    return false;
   }
 
   async function deletePlant(id: number) {
