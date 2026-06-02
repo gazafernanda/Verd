@@ -21,7 +21,7 @@ onMounted(() => {
         <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse-dot"></span>
       </div>
 
-      <h1 class="text-[3rem] max-lg:text-[2rem] font-extrabold text-text-main leading-[1.1] tracking-[-1px] m-0">
+      <h1 class="text-[3rem] max-lg:text-[2rem] max-sm:text-[1.6rem] font-extrabold text-text-main leading-[1.1] tracking-[-1px] m-0">
         <template v-if="recs.generatingFor">{{ recs.generatingFor }}<br></template>
         Care Recommendations
       </h1>
@@ -30,7 +30,7 @@ onMounted(() => {
         <template v-else>Hyper-local agricultural insights based on your plants and real-time weather.</template>
       </p>
 
-      <div class="flex gap-4">
+      <div class="flex gap-3 max-sm:flex-col max-sm:w-full">
         <button class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[0.9rem] font-semibold cursor-pointer transition-colors duration-200 bg-transparent text-text-main border border-border hover:bg-surface">
           <Calendar width="16" height="16" />
           Switch Category
@@ -46,7 +46,7 @@ onMounted(() => {
 
     <MetricsRow />
 
-    <div class="grid grid-cols-[2fr_1fr] gap-8 max-lg:grid-cols-1">
+    <div class="grid grid-cols-[2fr_1fr] gap-8 max-lg:grid-cols-1 max-lg:gap-6">
       <PriorityActions />
       <BotanicalInsights />
     </div>

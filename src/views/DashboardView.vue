@@ -40,7 +40,7 @@ onMounted(() => {
       >
         <div>
           <h1
-            class="text-[2rem] max-lg:text-[1.6rem] font-bold text-text-main mb-1 tracking-[-0.5px]"
+            class="text-[2rem] max-lg:text-[1.6rem] max-sm:text-[1.3rem] font-bold text-text-main mb-1 tracking-[-0.5px]"
           >
             Main Dashboard
           </h1>

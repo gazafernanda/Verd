@@ -88,7 +88,7 @@ function continueDemo() {
     </div>
 
     <!-- Right panel -->
-    <div class="flex-1 flex items-center justify-center px-8 py-12 bg-bg-app">
+    <div class="flex-1 flex items-center justify-center px-8 max-sm:px-5 py-12 bg-bg-app">
       <div class="w-full max-w-[420px]">
         <!-- Mobile logo -->
         <div class="flex items-center gap-2 mb-10 lg:hidden">
@@ -98,7 +98,7 @@ function continueDemo() {
           <span class="text-xl font-bold text-primary">Verd</span>
         </div>
 
-        <h2 class="text-[2rem] font-extrabold text-text-main mb-2 tracking-tight">Create your account</h2>
+        <h2 class="text-[2rem] max-sm:text-[1.6rem] font-extrabold text-text-main mb-2 tracking-tight">Create your account</h2>
         <p class="text-text-muted mb-8">Start your plant care journey today</p>
 
         <!-- Error -->

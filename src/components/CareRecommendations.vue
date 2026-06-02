@@ -28,7 +28,7 @@ const plants = usePlantsStore();
         <div
           v-for="plant in plants.plants"
           :key="plant.id"
-          class="w-[300px] shrink-0 self-stretch"
+          class="w-[min(300px,80vw)] shrink-0 self-stretch"
         >
           <CareCard
             :category="plant.careCard.category"

@@ -53,7 +53,7 @@ function barClass(status: string) {
       <div
         v-for="plant in plants.plants"
         :key="plant.id"
-        class="basis-[calc(50%-8px)] min-w-[200px] bg-bg-app rounded-lg p-4 flex gap-4 border border-[rgba(26,86,65,0.05)] shrink-0 relative group"
+        class="basis-[calc(50%-8px)] min-w-[min(200px,75vw)] bg-bg-app rounded-lg p-4 flex gap-4 border border-[rgba(26,86,65,0.05)] shrink-0 relative group"
       >
         <div class="w-16 h-16 rounded-md shrink-0 flex items-center justify-center border border-border"
           :style="{ backgroundColor: plant.iconBg }">
@@ -76,7 +76,7 @@ function barClass(status: string) {
         <!-- Delete button -->
         <button
           @click.stop="plants.deletePlant(plant.id)"
-          class="absolute top-2 right-2 w-6 h-6 rounded-full bg-red-50 text-red-400 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-100"
+          class="absolute top-2 right-2 w-6 h-6 rounded-full bg-red-50 text-red-400 flex items-center justify-center opacity-0 group-hover:opacity-100 max-sm:opacity-100 transition-opacity hover:bg-red-100"
           title="Remove plant"
         >
           <Trash2 width="12" height="12" />

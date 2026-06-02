@@ -42,7 +42,7 @@ onMounted(() => plants.fetchPlants())
     <div class="flex justify-between items-end max-lg:flex-col max-lg:items-start max-lg:gap-4">
       <div>
         <span class="font-semibold text-success-green text-[0.9rem]">Home / My Plants</span>
-        <h1 class="text-[2.2rem] font-extrabold text-text-main mb-2 mt-2 tracking-[-0.5px]">My Plants</h1>
+        <h1 class="text-[2.2rem] max-sm:text-[1.6rem] font-extrabold text-text-main mb-2 mt-2 tracking-[-0.5px]">My Plants</h1>
         <p class="text-text-muted text-[0.95rem] font-medium">
           {{ plants.totalPlants }} plant{{ plants.totalPlants !== 1 ? 's' : '' }} in your garden
         </p>
@@ -119,7 +119,7 @@ onMounted(() => plants.fetchPlants())
         <!-- Delete -->
         <button
           @click="plants.deletePlant(plant.id)"
-          class="absolute top-3 right-3 w-7 h-7 rounded-full bg-red-50 text-red-400 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-100"
+          class="absolute top-3 right-3 w-7 h-7 rounded-full bg-red-50 text-red-400 flex items-center justify-center opacity-0 group-hover:opacity-100 max-sm:opacity-100 transition-opacity hover:bg-red-100"
         >
           <Trash2 width="13" height="13" />
         </button>
