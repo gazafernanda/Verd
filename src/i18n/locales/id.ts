@@ -38,7 +38,7 @@ export default {
     },
     copyright: "© 2025 Verd. Hak cipta dilindungi.",
     emailLabel: "Alamat email",
-    emailPlaceholder: "anda@contoh.com",
+    emailPlaceholder: "anda{'@'}contoh.com",
     passwordLabel: "Kata sandi",
     somethingWrong: "Terjadi kesalahan.",
     login: {

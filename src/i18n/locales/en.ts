@@ -38,7 +38,7 @@ export default {
     },
     copyright: "© 2025 Verd. All rights reserved.",
     emailLabel: "Email address",
-    emailPlaceholder: "you@example.com",
+    emailPlaceholder: "you{'@'}example.com",
     passwordLabel: "Password",
     somethingWrong: "Something went wrong.",
     login: {
