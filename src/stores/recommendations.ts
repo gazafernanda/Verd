@@ -16,9 +16,18 @@ export interface BotanicalInsight {
   detail: string;
 }
 
+export interface DayPlan {
+  day: string;
+  date: string;
+  weather: string;
+  action: string;
+  type: "water" | "mist" | "shade" | "fertilize" | "prune" | "none";
+}
+
 export const useRecommendationsStore = defineStore("recommendations", () => {
   const priorityActions = ref<PriorityAction[]>([]);
   const insight = ref<BotanicalInsight | null>(null);
+  const weeklyPlan = ref<DayPlan[]>([]);
   const loading = ref(false);
   const generatingFor = ref<string | null>(null); // plant name currently generating for
 
@@ -33,8 +42,9 @@ export const useRecommendationsStore = defineStore("recommendations", () => {
       });
       if (res.ok) {
         const data = await res.json();
-        priorityActions.value = data.priorityActions;
+        priorityActions.value = data.priorityActions ?? [];
         insight.value = data.insight;
+        weeklyPlan.value = data.weeklyPlan ?? [];
       }
     } finally {
       loading.value = false;
@@ -45,6 +55,7 @@ export const useRecommendationsStore = defineStore("recommendations", () => {
     const token = localStorage.getItem("verd_token");
     if (!token) return false;
     generatingFor.value = plantName;
+    weeklyPlan.value = [];
     loading.value = true;
     try {
       const res = await fetch(`${API}/api/recommendations/generate`, {
@@ -54,8 +65,9 @@ export const useRecommendationsStore = defineStore("recommendations", () => {
       });
       if (!res.ok) return false;
       const data = await res.json();
-      priorityActions.value = data.priorityActions;
+      priorityActions.value = data.priorityActions ?? [];
       insight.value = data.insight;
+      weeklyPlan.value = data.weeklyPlan ?? [];
       return true;
     } catch {
       return false;
@@ -64,5 +76,5 @@ export const useRecommendationsStore = defineStore("recommendations", () => {
     }
   }
 
-  return { priorityActions, insight, loading, generatingFor, fetchRecommendations, generateForPlant };
+  return { priorityActions, insight, weeklyPlan, loading, generatingFor, fetchRecommendations, generateForPlant };
 });

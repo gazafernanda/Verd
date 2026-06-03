@@ -4,7 +4,16 @@ public record GeneratePlantRecommendationDto(int PlantId);
 
 public record RecommendationDto(
     IEnumerable<PriorityActionDto> PriorityActions,
-    BotanicalInsightDto Insight
+    BotanicalInsightDto Insight,
+    IEnumerable<DayPlanDto>? WeeklyPlan = null
+);
+
+public record DayPlanDto(
+    string Day,       // TODAY | MON | TUE ...
+    string Date,      // e.g. "Jun 5"
+    string Weather,   // short summary e.g. "29°/22°C, sunny"
+    string Action,    // the care action / note for that day
+    string Type       // water | mist | shade | fertilize | prune | none
 );
 
 public record PriorityActionDto(

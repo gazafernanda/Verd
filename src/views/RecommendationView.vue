@@ -4,11 +4,25 @@ import { useI18n } from 'vue-i18n'
 import MetricsRow from '../components/Recommendation/MetricsRow.vue'
 import PriorityActions from '../components/Recommendation/PriorityActions.vue'
 import BotanicalInsights from '../components/Recommendation/BotanicalInsights.vue'
-import { Calendar, RefreshCw } from 'lucide-vue-next'
+import { Calendar, RefreshCw, Droplet, Sun, Scissors, Sprout, Leaf, CalendarDays } from 'lucide-vue-next'
 import { useRecommendationsStore } from '../stores/recommendations'
 
-const { t } = useI18n()
+const { t, te } = useI18n()
 const recs = useRecommendationsStore()
+
+function dayLabel(day: string) {
+  const key = `recommendation.days.${day}`
+  return te(key) ? t(key) : day
+}
+
+const typeStyle: Record<string, string> = {
+  water: 'bg-light-green-bg text-success-green',
+  mist: 'bg-[#ebf5ff] text-[#3b82f6]',
+  shade: 'bg-[#fff4e5] text-[#f59e0b]',
+  fertilize: 'bg-[#f3e8ff] text-[#9333ea]',
+  prune: 'bg-[#fce8e8] text-[#ef4444]',
+  none: 'bg-bg-app text-text-muted',
+}
 
 onMounted(() => {
   if (!recs.generatingFor) recs.fetchRecommendations()
@@ -43,6 +57,51 @@ onMounted(() => {
           <RefreshCw width="16" height="16" :class="{ 'animate-spin': recs.loading }" />
           {{ t('recommendation.updateData') }}
         </button>
+      </div>
+    </div>
+
+    <!-- 7-Day Care Plan -->
+    <div v-if="recs.loading || recs.weeklyPlan.length > 0" class="flex flex-col gap-5">
+      <div class="flex items-center gap-3">
+        <CalendarDays class="text-success-green shrink-0" width="22" height="22" />
+        <div>
+          <h2 class="text-[1.35rem] font-extrabold text-text-main m-0">{{ t('recommendation.weeklyPlanTitle') }}</h2>
+          <p v-if="recs.generatingFor" class="text-[0.85rem] text-text-muted m-0 mt-0.5">
+            {{ t('recommendation.weeklyPlanSubtitle', { name: recs.generatingFor }) }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Loading skeleton -->
+      <div v-if="recs.loading" class="grid grid-cols-7 max-lg:grid-cols-2 max-sm:grid-cols-1 gap-3">
+        <div v-for="i in 7" :key="i" class="h-40 bg-surface rounded-xl border border-border animate-pulse"></div>
+      </div>
+
+      <!-- Day cards -->
+      <div v-else class="grid grid-cols-7 max-lg:grid-cols-2 max-sm:grid-cols-1 gap-3">
+        <div
+          v-for="(d, i) in recs.weeklyPlan"
+          :key="i"
+          class="bg-surface rounded-xl border border-border shadow-sm p-4 flex flex-col gap-2"
+          :class="{ 'border-success-green': i === 0 }"
+        >
+          <div class="flex flex-col">
+            <span class="text-[0.7rem] font-extrabold tracking-[0.5px]" :class="i === 0 ? 'text-success-green' : 'text-text-muted'">{{ dayLabel(d.day) }}</span>
+            <span class="text-[0.75rem] text-text-light font-medium">{{ d.date }}</span>
+          </div>
+          <span class="text-[0.7rem] font-semibold text-text-muted">{{ d.weather }}</span>
+          <div
+            class="w-7 h-7 rounded-full flex items-center justify-center mt-1"
+            :class="typeStyle[d.type] ?? typeStyle.none"
+          >
+            <Droplet v-if="d.type === 'water' || d.type === 'mist'" width="14" height="14" />
+            <Sun v-else-if="d.type === 'shade'" width="14" height="14" />
+            <Scissors v-else-if="d.type === 'prune'" width="14" height="14" />
+            <Sprout v-else-if="d.type === 'fertilize'" width="14" height="14" />
+            <Leaf v-else width="14" height="14" />
+          </div>
+          <p class="text-[0.8rem] text-text-main leading-snug m-0 flex-1">{{ d.action }}</p>
+        </div>
       </div>
     </div>
 

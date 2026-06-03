@@ -2,12 +2,20 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { usePlantsStore } from '../stores/plants'
+import { usePlantsStore, type Plant } from '../stores/plants'
+import { useRecommendationsStore } from '../stores/recommendations'
 import { Plus, Leaf, Flower2, Droplet, Sun, Trash2, Search } from 'lucide-vue-next'
 
 const router = useRouter()
 const { t } = useI18n()
 const plants = usePlantsStore()
+const recs = useRecommendationsStore()
+
+function openPlant(plant: Plant) {
+  // Kick off the AI 7-day plan for this plant, then show the recommendation page.
+  recs.generateForPlant(plant.id, plant.name)
+  router.push({ name: 'recommendation' })
+}
 
 const wateringId = ref<number | null>(null)
 
@@ -154,11 +162,12 @@ onMounted(() => plants.fetchPlants())
       <div
         v-for="plant in filtered"
         :key="plant.id"
-        class="bg-surface rounded-2xl p-5 shadow-sm border border-border flex flex-col gap-4 relative group hover:shadow-md transition-shadow"
+        @click="openPlant(plant)"
+        class="bg-surface rounded-2xl p-5 shadow-sm border border-border flex flex-col gap-4 relative group hover:shadow-md transition-shadow cursor-pointer"
       >
         <!-- Delete -->
         <button
-          @click="plants.deletePlant(plant.id)"
+          @click.stop="plants.deletePlant(plant.id)"
           class="absolute top-3 right-3 w-7 h-7 rounded-full bg-red-50 text-red-400 flex items-center justify-center opacity-0 group-hover:opacity-100 max-sm:opacity-100 transition-opacity hover:bg-red-100"
         >
           <Trash2 width="13" height="13" />
@@ -213,7 +222,7 @@ onMounted(() => plants.fetchPlants())
 
         <!-- Mark as watered -->
         <button
-          @click="waterPlant(plant.id)"
+          @click.stop="waterPlant(plant.id)"
           :disabled="wateringId === plant.id"
           class="mt-1 flex items-center justify-center gap-1.5 w-full py-2.5 rounded-xl text-[0.8rem] font-semibold bg-light-green-bg text-primary hover:bg-[#d1ebe2] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
         >

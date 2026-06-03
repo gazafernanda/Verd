@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Verd.Api.DTOs.Weather;
@@ -22,9 +23,13 @@ public class WeatherService(IHttpClientFactory factory)
         var place = geo?.Results?.FirstOrDefault();
         if (place is null) return null;
 
-        // 2. Fetch weather
+        // 2. Fetch weather. Format coords with invariant culture so the decimal
+        // separator is always "." — a comma (in some locales) produces an invalid
+        // URL and a 400 from open-meteo.
+        var lat = place.Latitude.ToString(CultureInfo.InvariantCulture);
+        var lon = place.Longitude.ToString(CultureInfo.InvariantCulture);
         var url = $"https://api.open-meteo.com/v1/forecast" +
-            $"?latitude={place.Latitude}&longitude={place.Longitude}" +
+            $"?latitude={lat}&longitude={lon}" +
             "&daily=weathercode,temperature_2m_max,temperature_2m_min" +
             "&hourly=temperature_2m,relativehumidity_2m,windspeed_10m,uv_index,apparent_temperature,soil_moisture_0_to_1cm" +
             "&timezone=auto&forecast_days=7";

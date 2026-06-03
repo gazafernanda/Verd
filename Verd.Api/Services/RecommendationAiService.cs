@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Verd.Api.DTOs.Recommendations;
+using Verd.Api.DTOs.Weather;
 using Verd.Api.Models;
 
 namespace Verd.Api.Services;
@@ -17,12 +18,24 @@ public class RecommendationAiService(IHttpClientFactory factory, WeatherService 
         var plantList = plants.ToList();
 
         string weatherContext = "Weather data unavailable.";
-        var weather = await weatherService.GetForLocationAsync(userLocation);
+        string forecastContext = "7-day forecast unavailable.";
+        WeatherDto? weather = null;
+        try
+        {
+            weather = await weatherService.GetForLocationAsync(userLocation);
+        }
+        catch
+        {
+            // Weather is best-effort — fall back to a generic plan if it fails.
+        }
         if (weather is not null)
         {
             weatherContext = $"Temperature: {weather.Temp}°C, Humidity: {weather.Humidity}%, " +
                              $"UV Index: {weather.UvIndex}, Wind: {weather.WindSpeed} km/h, " +
                              $"Conditions: {weather.Condition}";
+
+            forecastContext = string.Join("\n", weather.Forecast.Select(f =>
+                $"- {f.Day} ({f.Date}): high {f.TempHi}°C / low {f.TempLo}°C, {f.Icon}"));
         }
 
         var plantSummary = string.Join("\n", plantList.Select(p =>
@@ -37,12 +50,15 @@ public class RecommendationAiService(IHttpClientFactory factory, WeatherService 
               "insight": {
                 "headline": "A single insightful botanical fact relevant to this garden and current weather",
                 "detail": "2-3 sentences with specific actionable advice for these plants right now"
-              }
+              },
+              "weeklyPlan": [
+                { "day": "TODAY", "date": "Jun 5", "weather": "29°/22°C, sunny", "action": "Concise care task for this plant on this specific day, tied to that day's weather.", "type": "water|mist|shade|fertilize|prune|none" }
+              ]
             }
             """;
 
         var prompt = $"""
-            You are a plant care specialist. Generate care recommendations for this garden given current weather conditions.
+            You are a plant care specialist. Generate care recommendations for this garden given the current weather and the 7-day forecast.
 
             Garden ({plantList.Count} plant{(plantList.Count == 1 ? "" : "s")}):
             {plantSummary}
@@ -50,10 +66,16 @@ public class RecommendationAiService(IHttpClientFactory factory, WeatherService 
             Current Weather at {userLocation}:
             {weatherContext}
 
+            7-Day Forecast at {userLocation}:
+            {forecastContext}
+
             Return ONLY valid JSON (no markdown, no extra text) in this exact format:
             {jsonTemplate}
 
-            Generate 3-5 priority actions specific to these plants and current weather. Prioritize any plants with status NEEDS WATER or NEEDS MISTING. Be practical and concise.
+            Requirements:
+            - "priorityActions": 3-5 actions for right now, specific to these plants and current weather. Prioritize plants with status NEEDS WATER or NEEDS MISTING.
+            - "weeklyPlan": EXACTLY one entry per day for all 7 forecast days, in order. Use the same "day" and "date" labels as the forecast above. For each day, give ONE concise care action tied to that day's predicted weather (e.g. skip watering before/on rainy days, water more on hot dry days, add shade on high-UV days). If no action is needed that day, use action like "No action needed — monitor" and type "none".
+            - Be practical and concise.
             """;
 
         var client = factory.CreateClient("Groq");
