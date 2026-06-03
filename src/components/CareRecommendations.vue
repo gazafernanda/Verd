@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import CareCard from "./CareCard.vue";
 import { useI18n } from "vue-i18n";
+import { useRouter } from "vue-router";
 import { usePlantsStore } from "../stores/plants";
 
 const { t } = useI18n();
+const router = useRouter();
 const plants = usePlantsStore();
 </script>
 
@@ -18,10 +20,11 @@ const plants = usePlantsStore();
           {{ t('careRecommendations.title') }}
         </h2>
       </div>
-      <a
-        href="#"
+      <button
+        type="button"
+        @click="router.push({ name: 'recommendation' })"
         class="text-[0.95rem] font-bold text-primary transition-colors duration-200 hover:underline hover:text-primary-hover shrink-0"
-        >{{ t('careRecommendations.viewSchedule') }}</a
+        >{{ t('careRecommendations.viewSchedule') }}</button
       >
     </div>
 

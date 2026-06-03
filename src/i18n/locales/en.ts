@@ -107,6 +107,8 @@ export default {
     emptyTitle: "No plants yet",
     emptyDesc: "Add your first plant to start tracking your garden.",
     noResults: "No plants match your search.",
+    markWatered: "I watered this today",
+    watering: "Saving…",
   },
   chat: {
     greeting:

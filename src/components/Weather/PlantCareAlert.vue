@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import { usePlantsStore } from '../../stores/plants'
 import { Leaf } from 'lucide-vue-next'
 
 const { t, locale } = useI18n()
+const router = useRouter()
 const plants = usePlantsStore()
 
 const mistingPlants = computed(() => plants.plantsMistingNeeded)
@@ -38,7 +40,7 @@ const alertMessage = computed(() => {
 
     <p class="text-[0.9rem] leading-relaxed text-text-main mb-6" v-html="alertMessage"></p>
 
-    <button class="w-full py-3.5 bg-success-green text-white rounded-xl font-semibold text-[0.95rem] shadow-[0_4px_12px_rgba(55,178,126,0.2)] transition-all duration-200 hover:bg-[#2ea06e] hover:-translate-y-px">
+    <button @click="router.push({ name: 'recommendation' })" class="w-full py-3.5 bg-success-green text-white rounded-xl font-semibold text-[0.95rem] shadow-[0_4px_12px_rgba(55,178,126,0.2)] transition-all duration-200 hover:bg-[#2ea06e] hover:-translate-y-px">
       {{ t('weather.viewCareSchedule') }}
     </button>
   </div>

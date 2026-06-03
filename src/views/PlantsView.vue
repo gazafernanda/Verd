@@ -9,6 +9,18 @@ const router = useRouter()
 const { t } = useI18n()
 const plants = usePlantsStore()
 
+const wateringId = ref<number | null>(null)
+
+async function waterPlant(id: number) {
+  if (wateringId.value !== null) return
+  wateringId.value = id
+  try {
+    await plants.logCare(id, 'watered')
+  } finally {
+    wateringId.value = null
+  }
+}
+
 const query = ref('')
 const activeFilter = ref<'all' | 'healthy' | 'needs-care'>('all')
 
@@ -198,6 +210,16 @@ onMounted(() => plants.fetchPlants())
         </div>
 
         <p class="text-[0.75rem] text-text-muted -mt-1">{{ t('common.lastWatered', { time: plant.lastWatered }) }}</p>
+
+        <!-- Mark as watered -->
+        <button
+          @click="waterPlant(plant.id)"
+          :disabled="wateringId === plant.id"
+          class="mt-1 flex items-center justify-center gap-1.5 w-full py-2.5 rounded-xl text-[0.8rem] font-semibold bg-light-green-bg text-primary hover:bg-[#d1ebe2] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          <Droplet width="14" height="14" />
+          {{ wateringId === plant.id ? t('plants.watering') : t('plants.markWatered') }}
+        </button>
       </div>
     </div>
   </div>

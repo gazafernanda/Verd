@@ -106,6 +106,8 @@ export default {
     emptyTitle: "Belum ada tanaman",
     emptyDesc: "Tambahkan tanaman pertama Anda untuk mulai memantau taman.",
     noResults: "Tidak ada tanaman yang cocok dengan pencarian Anda.",
+    markWatered: "Sudah saya siram hari ini",
+    watering: "Menyimpan…",
   },
   chat: {
     greeting:

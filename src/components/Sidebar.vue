@@ -10,9 +10,15 @@ const { t, locale } = useI18n()
 const user = useUserStore()
 const emit = defineEmits(['close'])
 
-function logout() {
+async function logout() {
   user.logout()
-  router.push({ name: 'login' })
+  emit('close')
+  try {
+    await router.replace({ name: 'login' })
+  } catch {
+    // Fallback if the router navigation is interrupted for any reason.
+    window.location.assign(`${import.meta.env.BASE_URL}#/login`)
+  }
 }
 
 function changeLanguage(code: LocaleCode) {

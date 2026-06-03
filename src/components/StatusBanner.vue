@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import { usePlantsStore } from '../stores/plants'
 import { CheckCircle, TriangleAlert } from 'lucide-vue-next'
 
 const { t } = useI18n()
+const router = useRouter()
 const plants = usePlantsStore()
 
 const statusConfig = computed(() => {
@@ -59,7 +61,7 @@ const statusConfig = computed(() => {
         <p class="text-text-muted text-[0.9rem]">{{ statusConfig.message }}</p>
       </div>
       <div class="max-lg:w-full max-lg:pl-[3.75rem]">
-        <button class="px-5 py-2 rounded-[20px] font-semibold text-[0.85rem] transition-colors duration-200 whitespace-nowrap" :class="statusConfig.btnClass">
+        <button @click="router.push({ name: 'recommendation' })" class="px-5 py-2 rounded-[20px] font-semibold text-[0.85rem] transition-colors duration-200 whitespace-nowrap" :class="statusConfig.btnClass">
           {{ t('statusBanner.viewReport') }}
         </button>
       </div>
