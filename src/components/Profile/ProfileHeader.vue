@@ -35,7 +35,6 @@ const user = useUserStore()
     <!-- Action Buttons -->
     <div class="flex gap-3 max-md:w-full max-md:flex-col">
       <button class="px-6 py-3 rounded-[24px] text-[0.9rem] font-bold cursor-pointer bg-transparent text-text-main border border-border hover:bg-bg-app transition-colors max-md:w-full">{{ t('profile.editProfile') }}</button>
-      <button class="px-6 py-3 rounded-[24px] text-[0.9rem] font-bold cursor-pointer bg-primary text-white border border-primary shadow-[0_4px_12px_rgba(26,86,65,0.2)] hover:bg-primary-hover transition-colors max-md:w-full">{{ t('profile.shareProfile') }}</button>
     </div>
   </div>
 </template>
