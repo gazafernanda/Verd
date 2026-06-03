@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { usePlantsStore } from '../stores/plants'
 import { CheckCircle, TriangleAlert } from 'lucide-vue-next'
 
+const { t } = useI18n()
 const plants = usePlantsStore()
 
 const statusConfig = computed(() => {
@@ -12,19 +14,20 @@ const statusConfig = computed(() => {
       iconBg: 'bg-light-green-bg',
       iconColor: '#37b27e',
       dotColor: 'bg-success-green',
-      title: 'Status: Safe',
-      message: 'Your garden is thriving! Current environment matches all plant requirements.',
+      title: t('statusBanner.safeTitle'),
+      message: t('statusBanner.safeMessage'),
       btnClass: 'bg-light-green-bg text-primary hover:bg-[#d1ebe2]',
     }
   }
+  const names = plants.plantsNeedingCare.map((p) => p.name).join(', ')
   if (plants.overallStatus === 'warning') {
     return {
       borderColor: 'bg-[#f59e0b]',
       iconBg: 'bg-[#fff4e5]',
       iconColor: '#f59e0b',
       dotColor: 'bg-[#f59e0b]',
-      title: 'Attention Needed',
-      message: `${plants.plantsNeedingCare.length} plant${plants.plantsNeedingCare.length > 1 ? 's' : ''} need${plants.plantsNeedingCare.length === 1 ? 's' : ''} care: ${plants.plantsNeedingCare.map((p) => p.name).join(', ')}.`,
+      title: t('statusBanner.warningTitle'),
+      message: t('statusBanner.warningMessage', { names }),
       btnClass: 'bg-[#fff4e5] text-[#f59e0b] hover:bg-[#fde6c6]',
     }
   }
@@ -33,8 +36,8 @@ const statusConfig = computed(() => {
     iconBg: 'bg-[#ebf5ff]',
     iconColor: '#3b82f6',
     dotColor: 'bg-[#3b82f6]',
-    title: 'Action Required',
-    message: `${plants.plantsNeedingCare.map((p) => p.name).join(', ')} need${plants.plantsNeedingCare.length === 1 ? 's' : ''} attention soon.`,
+    title: t('statusBanner.actionTitle'),
+    message: t('statusBanner.actionMessage', { names }),
     btnClass: 'bg-[#ebf5ff] text-[#3b82f6] hover:bg-[#daeeff]',
   }
 })
@@ -57,7 +60,7 @@ const statusConfig = computed(() => {
       </div>
       <div class="max-lg:w-full max-lg:pl-[3.75rem]">
         <button class="px-5 py-2 rounded-[20px] font-semibold text-[0.85rem] transition-colors duration-200 whitespace-nowrap" :class="statusConfig.btnClass">
-          View Full Report
+          {{ t('statusBanner.viewReport') }}
         </button>
       </div>
     </div>

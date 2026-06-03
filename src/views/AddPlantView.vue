@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
 import { usePlantsStore } from "../stores/plants";
 import { useRecommendationsStore } from "../stores/recommendations";
 import {
@@ -15,6 +16,7 @@ import {
 } from "lucide-vue-next";
 
 const router = useRouter();
+const { t } = useI18n();
 const plants = usePlantsStore();
 const recs = useRecommendationsStore();
 
@@ -32,34 +34,30 @@ const saved = ref(false);
 const validating = ref(false);
 const error = ref("");
 
-const categories = [
-  "Indoor Plants",
-  "Outdoor Plants",
-  "Succulents",
-  "Herbs",
-  "Vegetables",
-  "Flowers",
-  "Trees & Shrubs",
-];
+const categories = computed(() => [
+  { value: "Indoor Plants", label: t("addPlant.categories.indoor") },
+  { value: "Outdoor Plants", label: t("addPlant.categories.outdoor") },
+  { value: "Succulents", label: t("addPlant.categories.succulents") },
+  { value: "Herbs", label: t("addPlant.categories.herbs") },
+  { value: "Vegetables", label: t("addPlant.categories.vegetables") },
+  { value: "Flowers", label: t("addPlant.categories.flowers") },
+  { value: "Trees & Shrubs", label: t("addPlant.categories.trees") },
+]);
 
-const wateringOptions = [
-  { value: "daily", label: "Daily" },
-  { value: "every-2-days", label: "Every 2 days" },
-  { value: "weekly", label: "Weekly" },
-  { value: "biweekly", label: "Every 2 weeks" },
-  { value: "monthly", label: "Monthly" },
-];
+const wateringOptions = computed(() => [
+  { value: "daily", label: t("addPlant.watering.daily") },
+  { value: "every-2-days", label: t("addPlant.watering.every-2-days") },
+  { value: "weekly", label: t("addPlant.watering.weekly") },
+  { value: "biweekly", label: t("addPlant.watering.biweekly") },
+  { value: "monthly", label: t("addPlant.watering.monthly") },
+]);
 
-const sunlightOptions = [
-  { value: "full-sun", label: "Full Sun", desc: "6+ hours direct sunlight" },
-  { value: "partial", label: "Partial Sun", desc: "3–6 hours direct sunlight" },
-  {
-    value: "indirect",
-    label: "Indirect Light",
-    desc: "Bright but no direct rays",
-  },
-  { value: "low", label: "Low Light", desc: "Shade tolerant" },
-];
+const sunlightOptions = computed(() => [
+  { value: "full-sun", label: t("addPlant.sunlight.fullSunLabel"), desc: t("addPlant.sunlight.fullSunDesc") },
+  { value: "partial", label: t("addPlant.sunlight.partialLabel"), desc: t("addPlant.sunlight.partialDesc") },
+  { value: "indirect", label: t("addPlant.sunlight.indirectLabel"), desc: t("addPlant.sunlight.indirectDesc") },
+  { value: "low", label: t("addPlant.sunlight.lowLabel"), desc: t("addPlant.sunlight.lowDesc") },
+]);
 
 const iconOptions = [
   { bg: "#e6f3ef", label: "Green" },
@@ -89,9 +87,9 @@ const waterStatusColor = computed(() => {
 });
 
 const waterStatusLabel = computed(() => {
-  if (wateringLevel.value <= 25) return "Needs water";
-  if (wateringLevel.value <= 50) return "Needs misting";
-  return "Well watered";
+  if (wateringLevel.value <= 25) return t("addPlant.needsWater");
+  if (wateringLevel.value <= 50) return t("addPlant.needsMisting");
+  return t("addPlant.wellWatered");
 });
 
 async function submit() {
@@ -111,7 +109,7 @@ async function submit() {
       if (res.ok) {
         const data = await res.json();
         if (!data.isValid) {
-          error.value = `"${name.value.trim()}" doesn't seem to be a real plant. Please enter a valid plant name.`;
+          error.value = t("addPlant.invalidPlant", { name: name.value.trim() });
           validating.value = false;
           return;
         }
@@ -213,10 +211,10 @@ async function submit() {
         <h1
           class="text-[1.8rem] max-sm:text-[1.4rem] font-extrabold text-text-main leading-none"
         >
-          Add New Plant
+          {{ t('addPlant.title') }}
         </h1>
         <p class="text-text-muted text-[0.9rem] mt-1">
-          Track a new plant in your garden
+          {{ t('addPlant.subtitle') }}
         </p>
       </div>
     </div>
@@ -227,14 +225,14 @@ async function submit() {
         <h2
           class="text-[0.65rem] font-extrabold text-text-muted tracking-[1px] mb-5"
         >
-          PLANT IDENTITY
+          {{ t('addPlant.identity') }}
         </h2>
 
         <!-- Icon picker + Name row -->
         <div class="flex gap-5 mb-6 max-sm:flex-col">
           <!-- Icon preview -->
           <div class="flex flex-col gap-2 shrink-0">
-            <span class="text-[0.8rem] font-bold text-text-main">Color</span>
+            <span class="text-[0.8rem] font-bold text-text-main">{{ t('addPlant.color') }}</span>
             <div
               class="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 border border-border"
               :style="{ backgroundColor: iconOptions[selectedIcon]!.bg }"
@@ -246,7 +244,7 @@ async function submit() {
           <!-- Color swatches -->
           <div class="flex flex-col gap-2 flex-1">
             <span class="text-[0.8rem] font-bold text-text-main"
-              >Pick a color</span
+              >{{ t('addPlant.pickColor') }}</span
             >
             <div class="flex flex-wrap gap-2 mt-1">
               <button
@@ -277,12 +275,12 @@ async function submit() {
         <!-- Plant name -->
         <div class="flex flex-col gap-2 mb-5">
           <label class="text-[0.85rem] font-bold text-text-main"
-            >Plant Name <span class="text-red-400">*</span></label
+            >{{ t('addPlant.nameLabel') }} <span class="text-red-400">*</span></label
           >
           <input
             v-model="name"
             type="text"
-            placeholder="e.g. Cherry Tomato, Monstera, Basil…"
+            :placeholder="t('addPlant.namePlaceholder')"
             required
             class="px-4 py-3 rounded-xl border border-border bg-bg-app text-text-main text-[0.95rem] outline-none transition-all duration-200 placeholder:text-text-light focus:border-success-green focus:bg-surface focus:shadow-[0_0_0_3px_rgba(55,178,126,0.1)]"
           />
@@ -291,25 +289,25 @@ async function submit() {
         <!-- Category -->
         <div class="flex flex-col gap-2">
           <label class="text-[0.85rem] font-bold text-text-main"
-            >Category <span class="text-red-400">*</span></label
+            >{{ t('addPlant.categoryLabel') }} <span class="text-red-400">*</span></label
           >
           <div class="flex flex-wrap gap-2">
             <button
               v-for="cat in categories"
-              :key="cat"
+              :key="cat.value"
               type="button"
               @click="
-                category = cat;
+                category = cat.value;
                 customCategory = '';
               "
               class="px-4 py-2 rounded-[20px] text-[0.8rem] font-semibold border-2 transition-all duration-150"
               :class="
-                category === cat
+                category === cat.value
                   ? 'border-success-green bg-light-green-bg text-primary'
                   : 'border-border bg-bg-app text-text-muted hover:border-success-green hover:text-text-main'
               "
             >
-              {{ cat }}
+              {{ cat.label }}
             </button>
             <button
               type="button"
@@ -321,14 +319,14 @@ async function submit() {
                   : 'border-border bg-bg-app text-text-muted hover:border-success-green hover:text-text-main'
               "
             >
-              + Other
+              {{ t('addPlant.other') }}
             </button>
           </div>
           <input
             v-if="category === '__custom__'"
             v-model="customCategory"
             type="text"
-            placeholder="Enter custom category…"
+            :placeholder="t('addPlant.customCategoryPlaceholder')"
             class="mt-2 px-4 py-3 rounded-xl border border-border bg-bg-app text-text-main text-[0.95rem] outline-none transition-all duration-200 placeholder:text-text-light focus:border-success-green focus:bg-surface focus:shadow-[0_0_0_3px_rgba(55,178,126,0.1)]"
           />
         </div>
@@ -339,7 +337,7 @@ async function submit() {
         <h2
           class="text-[0.65rem] font-extrabold text-text-muted tracking-[1px] mb-5"
         >
-          CARE PREFERENCES
+          {{ t('addPlant.carePreferences') }}
         </h2>
 
         <!-- Watering frequency -->
@@ -347,7 +345,7 @@ async function submit() {
           <div class="flex items-center gap-2 mb-3">
             <Droplet width="16" height="16" class="text-[#3b82f6]" />
             <label class="text-[0.9rem] font-bold text-text-main"
-              >Watering Frequency</label
+              >{{ t('addPlant.wateringFrequency') }}</label
             >
           </div>
           <div class="flex flex-wrap gap-2">
@@ -372,7 +370,7 @@ async function submit() {
         <div class="mb-6">
           <div class="flex items-center gap-2 mb-3">
             <Droplet width="16" height="16" class="text-[#37b27e]" />
-            <label class="text-[0.9rem] font-bold text-text-main">Current Water Level</label>
+            <label class="text-[0.9rem] font-bold text-text-main">{{ t('addPlant.currentWaterLevel') }}</label>
           </div>
           <div class="flex items-center gap-4 mb-2">
             <span class="text-[2rem] font-extrabold text-text-main leading-none">{{ wateringLevel }}%</span>
@@ -391,8 +389,8 @@ async function submit() {
             :style="`--fill: ${waterStatusColor}; background: linear-gradient(to right, ${waterStatusColor} ${wateringLevel}%, #e2e8e4 ${wateringLevel}%)`"
           />
           <div class="flex justify-between text-[0.72rem] text-text-muted mt-1.5">
-            <span>Needs water</span>
-            <span>Well watered</span>
+            <span>{{ t('addPlant.needsWater') }}</span>
+            <span>{{ t('addPlant.wellWatered') }}</span>
           </div>
         </div>
 
@@ -401,7 +399,7 @@ async function submit() {
           <div class="flex items-center gap-2 mb-3">
             <Sun width="16" height="16" class="text-[#f59e0b]" />
             <label class="text-[0.9rem] font-bold text-text-main"
-              >Sunlight Needs</label
+              >{{ t('addPlant.sunlightNeeds') }}</label
             >
           </div>
           <div class="grid grid-cols-2 max-sm:grid-cols-1 gap-3">
@@ -443,12 +441,12 @@ async function submit() {
         <h2
           class="text-[0.65rem] font-extrabold text-text-muted tracking-[1px] mb-5"
         >
-          NOTES (OPTIONAL)
+          {{ t('addPlant.notesOptional') }}
         </h2>
         <textarea
           v-model="notes"
           rows="3"
-          placeholder="Any special care instructions, where it's located, reminders…"
+          :placeholder="t('addPlant.notesPlaceholder')"
           class="w-full px-4 py-3 rounded-xl border border-border bg-bg-app text-text-main text-[0.95rem] outline-none transition-all duration-200 placeholder:text-text-light focus:border-success-green focus:bg-surface focus:shadow-[0_0_0_3px_rgba(55,178,126,0.1)] resize-none font-[inherit] leading-relaxed"
         ></textarea>
       </div>
@@ -469,7 +467,7 @@ async function submit() {
           @click="router.back()"
           class="flex-1 py-3.5 rounded-[24px] text-[0.95rem] font-bold border-2 border-border bg-transparent text-text-main hover:bg-bg-app transition-colors"
         >
-          Cancel
+          {{ t('common.cancel') }}
         </button>
         <button
           type="submit"
@@ -487,7 +485,7 @@ async function submit() {
           <svg v-else class="animate-spin" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 12a9 9 0 1 1-6.22-8.56" />
           </svg>
-          {{ saved && recs.loading ? "Getting AI recommendations…" : saved ? "Plant added!" : validating ? "Checking plant…" : saving ? "Saving…" : "Add Plant" }}
+          {{ saved && recs.loading ? t('addPlant.gettingRecs') : saved ? t('addPlant.plantAdded') : validating ? t('addPlant.checking') : saving ? t('addPlant.saving') : t('common.addPlant') }}
         </button>
       </div>
     </form>

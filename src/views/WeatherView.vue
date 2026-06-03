@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import CurrentConditions from '../components/Weather/CurrentConditions.vue'
 import Forecast from '../components/Weather/Forecast.vue'
 import PlantCareAlert from '../components/Weather/PlantCareAlert.vue'
@@ -10,6 +11,7 @@ import { useUserStore } from '../stores/user'
 import { useWeatherStore } from '../stores/weather'
 import { MapPin, Pencil } from 'lucide-vue-next'
 
+const { t } = useI18n()
 const user = useUserStore()
 const weather = useWeatherStore()
 const showLocationSearch = ref(false)
@@ -86,9 +88,9 @@ watch(
         <MapPin class="text-success-green" width="36" height="36" />
       </div>
       <div>
-        <h2 class="text-[1.6rem] font-bold text-text-main mb-2">Set your location</h2>
+        <h2 class="text-[1.6rem] font-bold text-text-main mb-2">{{ t('weather.setLocationTitle') }}</h2>
         <p class="text-text-muted text-[0.95rem] max-w-xs mx-auto">
-          Choose your location to see real-time weather data and a 7-day forecast for your garden.
+          {{ t('weather.setLocationDesc') }}
         </p>
       </div>
       <button
@@ -96,7 +98,7 @@ watch(
         class="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-[24px] font-semibold text-[0.95rem] hover:opacity-90 transition-opacity"
       >
         <MapPin width="18" height="18" />
-        Set Location
+        {{ t('common.setLocation') }}
       </button>
     </div>
 
@@ -105,11 +107,11 @@ watch(
       <!-- Title & actions -->
       <div class="flex justify-between items-end mb-2 max-lg:flex-col max-lg:items-start max-lg:gap-4">
         <div>
-          <span class="font-semibold text-success-green text-[0.9rem]">Home / Weather Analysis / {{ user.location }}</span>
-          <h1 class="text-[2.2rem] font-extrabold text-text-main mb-2 mt-2 tracking-[-0.5px]">Weather Analysis</h1>
+          <span class="font-semibold text-success-green text-[0.9rem]">{{ t('weather.breadcrumb', { location: user.location }) }}</span>
+          <h1 class="text-[2.2rem] font-extrabold text-text-main mb-2 mt-2 tracking-[-0.5px]">{{ t('weather.title') }}</h1>
           <p class="text-text-muted text-[0.95rem] flex items-center gap-1.5 font-medium">
             <MapPin class="text-success-green" width="16" height="16" />
-            {{ user.location }} • Updated just now
+            {{ t('weather.updatedNow', { location: user.location }) }}
           </p>
         </div>
         <button
@@ -117,7 +119,7 @@ watch(
           class="flex items-center gap-2 px-5 py-[10px] bg-surface text-text-main border border-border rounded-[24px] font-semibold text-[0.95rem] shadow-sm hover:bg-bg-app transition-colors"
         >
           <Pencil width="20" height="20" />
-          Change Location
+          {{ t('common.changeLocation') }}
         </button>
       </div>
 
@@ -131,17 +133,17 @@ watch(
           <!-- Temperature Trends placeholder -->
           <div class="bg-surface rounded-2xl p-8 shadow-sm">
             <div class="flex justify-between items-start mb-1 gap-4 max-lg:flex-col max-lg:gap-2">
-              <h3 class="text-[1.25rem] font-bold text-text-main m-0">Temperature Trends</h3>
+              <h3 class="text-[1.25rem] font-bold text-text-main m-0">{{ t('weather.temperatureTrends') }}</h3>
               <div class="flex gap-4 text-[0.75rem] font-semibold text-text-muted shrink-0">
                 <span class="flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-success-green inline-block"></span> Temperature
+                  <span class="w-2 h-2 rounded-full bg-success-green inline-block"></span> {{ t('weather.temperature') }}
                 </span>
                 <span class="flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-[#d1d5db] inline-block"></span> Avg. 10Y
+                  <span class="w-2 h-2 rounded-full bg-[#d1d5db] inline-block"></span> {{ t('weather.avg10y') }}
                 </span>
               </div>
             </div>
-            <p class="text-[0.85rem] text-text-muted font-medium mb-6">Next 24 hours expectation</p>
+            <p class="text-[0.85rem] text-text-muted font-medium mb-6">{{ t('weather.next24h') }}</p>
             <div class="w-full h-60 flex flex-col justify-between pt-4">
               <div class="flex-1 flex flex-col justify-between pb-4">
                 <div class="h-px w-full bg-border"></div>
@@ -167,7 +169,7 @@ watch(
           <div class="bg-surface rounded-2xl p-6 shadow-sm">
             <div class="flex justify-between items-start mb-4">
               <div>
-                <span class="text-[0.75rem] font-bold text-success-green tracking-[1px]">CURRENT LOCATION</span>
+                <span class="text-[0.75rem] font-bold text-success-green tracking-[1px]">{{ t('locationCard.label') }}</span>
                 <h3 class="text-[1.4rem] font-extrabold text-text-main mt-1 mb-0 leading-tight">{{ user.location }}</h3>
               </div>
               <button
@@ -188,7 +190,7 @@ watch(
                 title="Location map"
               />
               <div v-else class="w-full h-full flex items-center justify-center text-text-muted text-[0.85rem] font-medium">
-                Map unavailable
+                {{ t('locationCard.mapUnavailable') }}
               </div>
             </div>
           </div>

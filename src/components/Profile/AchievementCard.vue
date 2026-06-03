@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { Trophy } from 'lucide-vue-next'
+const { t } = useI18n()
 </script>
 
 <template>
@@ -8,8 +10,8 @@ import { Trophy } from 'lucide-vue-next'
       <Trophy width="32" height="32" />
     </div>
 
-    <h3 class="text-[1.35rem] font-extrabold text-text-main mb-2">Urban Jungler</h3>
-    <p class="text-[0.95rem] text-text-muted leading-relaxed mb-6 max-w-[80%]">You've reached level 8 of plant mastery. Keep going!</p>
+    <h3 class="text-[1.35rem] font-extrabold text-text-main mb-2">{{ t('profile.achievementTitle') }}</h3>
+    <p class="text-[0.95rem] text-text-muted leading-relaxed mb-6 max-w-[80%]">{{ t('profile.achievementDesc') }}</p>
 
     <div class="w-full">
       <div class="w-full h-2 bg-border rounded mb-2 overflow-hidden">

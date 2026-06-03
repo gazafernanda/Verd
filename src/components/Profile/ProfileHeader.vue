@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { useUserStore } from '../../stores/user'
 import { Check, MapPin } from 'lucide-vue-next'
+const { t } = useI18n()
 const user = useUserStore()
 </script>
 
@@ -24,16 +26,16 @@ const user = useUserStore()
             {{ user.location }}
           </span>
           <span class="text-text-muted">•</span>
-          <span class="text-success-green">{{ user.tier }} Tier</span>
+          <span class="text-success-green">{{ t('profile.tier', { tier: user.tier }) }}</span>
         </div>
-        <p class="text-[0.7rem] font-extrabold text-text-muted tracking-widest m-0">MEMBER SINCE {{ user.memberSince.toUpperCase() }}</p>
+        <p class="text-[0.7rem] font-extrabold text-text-muted tracking-widest m-0">{{ t('profile.memberSince', { date: user.memberSince.toUpperCase() }) }}</p>
       </div>
     </div>
 
     <!-- Action Buttons -->
     <div class="flex gap-3 max-md:w-full max-md:flex-col">
-      <button class="px-6 py-3 rounded-[24px] text-[0.9rem] font-bold cursor-pointer bg-transparent text-text-main border border-border hover:bg-bg-app transition-colors max-md:w-full">Edit Profile</button>
-      <button class="px-6 py-3 rounded-[24px] text-[0.9rem] font-bold cursor-pointer bg-primary text-white border border-primary shadow-[0_4px_12px_rgba(26,86,65,0.2)] hover:bg-primary-hover transition-colors max-md:w-full">Share Profile</button>
+      <button class="px-6 py-3 rounded-[24px] text-[0.9rem] font-bold cursor-pointer bg-transparent text-text-main border border-border hover:bg-bg-app transition-colors max-md:w-full">{{ t('profile.editProfile') }}</button>
+      <button class="px-6 py-3 rounded-[24px] text-[0.9rem] font-bold cursor-pointer bg-primary text-white border border-primary shadow-[0_4px_12px_rgba(26,86,65,0.2)] hover:bg-primary-hover transition-colors max-md:w-full">{{ t('profile.shareProfile') }}</button>
     </div>
   </div>
 </template>

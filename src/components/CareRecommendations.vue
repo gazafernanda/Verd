@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import CareCard from "./CareCard.vue";
+import { useI18n } from "vue-i18n";
 import { usePlantsStore } from "../stores/plants";
 
+const { t } = useI18n();
 const plants = usePlantsStore();
 </script>
 
@@ -13,13 +15,13 @@ const plants = usePlantsStore();
           <path d="M12 22V13M12 13C12 13 7 12.5 4 9c0 0 2.5 8 8 9M12 13C12 13 17 12.5 20 9c0 0-2.5 8-8 9M12 8a4 4 0 0 0-4-4c0 2.21 1.79 4 4 4zm0 0a4 4 0 0 1 4-4c0 2.21-1.79 4-4 4z"/>
         </svg>
         <h2 class="text-[1.4rem] max-lg:text-[1.1rem] font-bold text-text-main m-0 truncate">
-          Care Recommendations
+          {{ t('careRecommendations.title') }}
         </h2>
       </div>
       <a
         href="#"
         class="text-[0.95rem] font-bold text-primary transition-colors duration-200 hover:underline hover:text-primary-hover shrink-0"
-        >View Schedule</a
+        >{{ t('careRecommendations.viewSchedule') }}</a
       >
     </div>
 

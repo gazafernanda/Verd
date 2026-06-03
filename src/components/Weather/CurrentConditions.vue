@@ -1,28 +1,30 @@
 <script setup lang="ts">
 import { computed, markRaw } from "vue";
+import { useI18n } from "vue-i18n";
 import { useWeatherStore } from "../../stores/weather";
 import { Droplet, Sun, Droplets, Wind } from "lucide-vue-next";
 
+const { t } = useI18n();
 const weather = useWeatherStore();
 
 const metrics = computed(() => [
   {
-    label: "HUMIDITY",
+    label: t("weather.humidity"),
     value: `${weather.humidity}%`,
     icon: markRaw(Droplet),
   },
   {
-    label: "UV INDEX",
+    label: t("weather.uvIndex"),
     value: `${weather.uvIndex} (${weather.uvLabel})`,
     icon: markRaw(Sun),
   },
   {
-    label: "SOIL MOISTURE",
+    label: t("weather.soilMoisture"),
     value: `${weather.soilMoisture}%`,
     icon: markRaw(Droplets),
   },
   {
-    label: "WIND SPEED",
+    label: t("weather.windSpeed"),
     value: `${weather.windSpeed} km/h`,
     icon: markRaw(Wind),
   },
@@ -33,16 +35,16 @@ const metrics = computed(() => [
   <div class="bg-surface rounded-xl p-8 shadow-sm mb-8">
     <div class="flex justify-between items-start mb-6">
       <span class="text-[0.8rem] font-bold text-success-green tracking-[1px]"
-        >CURRENT CONDITIONS</span
+        >{{ t('weather.currentConditions') }}</span
       >
       <div
         class="flex flex-col items-end border border-success-green rounded-[20px] px-4 py-1.5 bg-surface"
       >
         <span class="text-[0.6rem] font-bold text-text-muted tracking-[0.5px]"
-          >AQI INDEX</span
+          >{{ t('weather.aqiIndex') }}</span
         >
         <span class="text-[0.85rem] font-bold text-success-green whitespace-nowrap"
-          >{{ weather.aqi }} - Excellent</span
+          >{{ t('weather.aqiExcellent', { value: weather.aqi }) }}</span
         >
       </div>
     </div>
@@ -67,7 +69,7 @@ const metrics = computed(() => [
     </div>
 
     <p class="text-xl text-text-muted font-medium mb-8">
-      {{ weather.condition }} • Feels like {{ weather.feelsLike }}°C
+      {{ t('weather.feelsLike', { condition: weather.condition, temp: weather.feelsLike }) }}
     </p>
 
     <div class="grid grid-cols-4 max-lg:grid-cols-2 gap-4">

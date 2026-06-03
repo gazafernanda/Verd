@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { marked } from 'marked'
+import { useI18n } from 'vue-i18n'
 import { Flower2, CircleUser } from 'lucide-vue-next'
+
+const { t } = useI18n()
 
 const props = defineProps({
   isAssistant: {
@@ -33,7 +36,7 @@ function renderMarkdown(text: string): string {
 
     <div :class="['flex flex-col max-w-[80%] max-sm:max-w-[90%]', { 'items-end': !isAssistant }]">
       <span class="text-[0.65rem] font-extrabold text-text-muted tracking-[0.5px] mb-2 uppercase">
-        {{ isAssistant ? 'VERD ASSISTANT' : 'YOU' }}
+        {{ isAssistant ? t('chat.assistantLabel') : t('chat.youLabel') }}
       </span>
 
       <div :class="[

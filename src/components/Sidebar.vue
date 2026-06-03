@@ -1,15 +1,22 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useUserStore } from '../stores/user'
-import { X, Home, Sun, Leaf, Sprout, MessageCircle, User, LogOut } from 'lucide-vue-next'
+import { setLocale, SUPPORTED_LOCALES, type LocaleCode } from '../i18n'
+import { X, Home, Sun, Leaf, Sprout, MessageCircle, User, LogOut, Languages } from 'lucide-vue-next'
 
 const router = useRouter()
+const { t, locale } = useI18n()
 const user = useUserStore()
 const emit = defineEmits(['close'])
 
 function logout() {
   user.logout()
   router.push({ name: 'login' })
+}
+
+function changeLanguage(code: LocaleCode) {
+  setLocale(code)
 }
 </script>
 
@@ -40,7 +47,7 @@ function logout() {
             @click="emit('close')"
           >
             <Home class="shrink-0" width="24" height="24" />
-            Dashboard
+            {{ t('nav.dashboard') }}
           </router-link>
         </li>
         <li>
@@ -51,7 +58,7 @@ function logout() {
             @click="emit('close')"
           >
             <Sun class="shrink-0" width="24" height="24" />
-            Weather
+            {{ t('nav.weather') }}
           </router-link>
         </li>
         <li>
@@ -62,7 +69,7 @@ function logout() {
             @click="emit('close')"
           >
             <Sprout class="shrink-0" width="24" height="24" />
-            My Plants
+            {{ t('nav.plants') }}
           </router-link>
         </li>
         <li>
@@ -73,7 +80,7 @@ function logout() {
             @click="emit('close')"
           >
             <Leaf class="shrink-0" width="24" height="24" />
-            Recommendation
+            {{ t('nav.recommendation') }}
           </router-link>
         </li>
         <li>
@@ -84,7 +91,7 @@ function logout() {
             @click="emit('close')"
           >
             <MessageCircle class="shrink-0" width="24" height="24" />
-            Chat AI
+            {{ t('nav.chat') }}
           </router-link>
         </li>
         <li>
@@ -95,7 +102,7 @@ function logout() {
             @click="emit('close')"
           >
             <User class="shrink-0" width="24" height="24" />
-            Profile
+            {{ t('nav.profile') }}
           </router-link>
         </li>
       </ul>
@@ -103,10 +110,31 @@ function logout() {
 
     <div class="flex-1"></div>
 
+    <!-- Language switcher -->
+    <div class="px-5 mb-2">
+      <div class="flex items-center gap-2 px-5 mb-2 text-text-light">
+        <Languages class="shrink-0" width="16" height="16" />
+        <span class="text-[0.7rem] font-bold tracking-[0.5px] uppercase">{{ t('language.label') }}</span>
+      </div>
+      <div class="flex gap-1 bg-bg-app rounded-lg p-1">
+        <button
+          v-for="loc in SUPPORTED_LOCALES"
+          :key="loc.code"
+          @click="changeLanguage(loc.code)"
+          class="flex-1 py-2 rounded-md text-[0.8rem] font-semibold transition-colors"
+          :class="locale === loc.code
+            ? 'bg-surface text-primary shadow-sm'
+            : 'text-text-muted hover:text-text-main'"
+        >
+          {{ loc.short }}
+        </button>
+      </div>
+    </div>
+
     <div class="px-5">
       <button @click="logout" class="w-full flex items-center gap-4 px-5 py-[14px] rounded-lg text-text-muted font-medium transition-colors hover:bg-bg-app hover:text-text-main">
         <LogOut class="shrink-0" width="24" height="24" />
-        Logout
+        {{ t('nav.logout') }}
       </button>
     </div>
   </aside>

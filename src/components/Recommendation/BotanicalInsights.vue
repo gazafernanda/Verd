@@ -1,20 +1,22 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { Leaf } from 'lucide-vue-next'
 import { useRecommendationsStore } from '../../stores/recommendations'
 
+const { t } = useI18n()
 const recs = useRecommendationsStore()
 </script>
 
 <template>
   <div class="flex flex-col">
     <div class="mb-6 h-6 flex items-center">
-      <h2 class="text-[1.35rem] font-extrabold text-text-main m-0">Botanical Insights</h2>
+      <h2 class="text-[1.35rem] font-extrabold text-text-main m-0">{{ t('recommendation.botanicalInsights') }}</h2>
     </div>
 
     <div v-if="recs.loading" class="bg-light-green-bg rounded-xl py-8 px-7 border border-[rgba(55,178,126,0.15)] animate-pulse h-48"></div>
 
     <div v-else-if="recs.insight" class="bg-light-green-bg rounded-xl py-8 px-7 border border-[rgba(55,178,126,0.15)]">
-      <span class="block text-[0.7rem] font-extrabold text-success-green tracking-[1px] mb-6">WHY THESE ACTIONS?</span>
+      <span class="block text-[0.7rem] font-extrabold text-success-green tracking-[1px] mb-6">{{ t('recommendation.whyActions') }}</span>
 
       <p class="text-[1.15rem] font-bold text-text-main leading-relaxed mb-8">
         {{ recs.insight.headline }}
@@ -33,7 +35,7 @@ const recs = useRecommendationsStore()
     </div>
 
     <div v-else class="bg-light-green-bg rounded-xl py-8 px-7 border border-[rgba(55,178,126,0.15)] text-text-muted text-[0.9rem]">
-      No insights available yet. Add some plants to get personalised recommendations.
+      {{ t('recommendation.noInsights') }}
     </div>
   </div>
 </template>

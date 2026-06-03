@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, nextTick } from "vue";
+import { useI18n } from "vue-i18n";
 import ChatMessage from "../components/Chat/ChatMessage.vue";
 import ChatInput from "../components/Chat/ChatInput.vue";
 import { useUserStore } from "../stores/user";
@@ -13,6 +14,7 @@ interface Message {
   time: string;
 }
 
+const { t } = useI18n();
 const user = useUserStore();
 const loading = ref(false);
 const scrollContainer = ref<HTMLElement | null>(null);
@@ -20,7 +22,9 @@ const scrollContainer = ref<HTMLElement | null>(null);
 const messages = ref<Message[]>([
   {
     role: "assistant",
-    content: `Hello${user.displayName ? " " + user.displayName : ""}! I'm your botanical specialist. Ask me anything about your plants — watering schedules, pests, soil, or care tips.`,
+    content: user.displayName
+      ? t("chat.greeting", { name: user.displayName })
+      : t("chat.greetingNoName"),
     time: formatTime(new Date()),
   },
 ]);
@@ -68,14 +72,14 @@ async function handleSend(text: string) {
     } else {
       messages.value.push({
         role: "assistant",
-        content: "Sorry, I had trouble responding. Please try again.",
+        content: t("chat.errorReply"),
         time: formatTime(new Date()),
       });
     }
   } catch {
     messages.value.push({
       role: "assistant",
-      content: "Cannot reach the server. Make sure the .NET API is running.",
+      content: t("chat.errorServer"),
       time: formatTime(new Date()),
     });
   } finally {
@@ -122,7 +126,7 @@ async function scrollToBottom() {
           <div class="flex flex-col max-w-[80%] max-sm:max-w-[90%]">
             <span
               class="text-[0.65rem] font-extrabold text-text-muted tracking-[0.5px] mb-2 uppercase"
-              >VERD ASSISTANT</span
+              >{{ t('chat.assistantLabel') }}</span
             >
             <div
               class="p-4 max-sm:p-3 rounded-lg bg-surface border border-border rounded-tl-[4px] flex gap-1.5 items-center"

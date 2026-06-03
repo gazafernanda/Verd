@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, computed } from "vue";
+import { useI18n } from "vue-i18n";
 import StatusBanner from "../components/StatusBanner.vue";
 import LocationCard from "../components/LocationCard.vue";
 import WeatherCard from "../components/WeatherCard.vue";
@@ -9,9 +10,18 @@ import { useWeatherStore } from "../stores/weather";
 import { useRouter } from "vue-router";
 import { Calendar, Plus } from "lucide-vue-next";
 
+const { t, locale } = useI18n();
 const user = useUserStore();
 const weather = useWeatherStore();
 const router = useRouter();
+
+const today = computed(() =>
+  new Date().toLocaleDateString(locale.value === "id" ? "id-ID" : "en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  }),
+);
 
 onMounted(() => {
   weather.fetchWeather();
@@ -42,10 +52,10 @@ onMounted(() => {
           <h1
             class="text-[2rem] max-lg:text-[1.6rem] max-sm:text-[1.3rem] font-bold text-text-main mb-1 tracking-[-0.5px]"
           >
-            Main Dashboard
+            {{ t('dashboard.title') }}
           </h1>
           <p class="text-text-muted text-[0.95rem]">
-            Monitoring your indoor sanctuary
+            {{ t('dashboard.subtitle') }}
           </p>
         </div>
         <div class="flex gap-3">
@@ -53,14 +63,14 @@ onMounted(() => {
             class="flex items-center gap-2 px-4 py-2.5 bg-surface border border-border rounded-md text-text-main font-semibold text-[0.9rem] transition-colors duration-200 hover:bg-bg-app max-lg:hidden"
           >
             <Calendar width="20" height="20" />
-            Oct 27, 2023
+            {{ today }}
           </button>
           <button
             @click="router.push({ name: 'add-plant' })"
             class="flex items-center gap-2 px-5 py-2.5 bg-accent-green text-white rounded-xl font-semibold text-[0.9rem] shadow-[0_4px_12px_rgba(41,156,119,0.3)] transition-all duration-200 hover:bg-accent-green-hover hover:-translate-y-px"
           >
             <Plus width="20" height="20" />
-            Add New Plant
+            {{ t('common.addNewPlant') }}
           </button>
         </div>
       </div>

@@ -1,14 +1,22 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { usePlantsStore } from '../stores/plants'
 import { Plus, Leaf, Flower2, Droplet, Sun, Trash2, Search } from 'lucide-vue-next'
 
 const router = useRouter()
+const { t } = useI18n()
 const plants = usePlantsStore()
 
 const query = ref('')
 const activeFilter = ref<'all' | 'healthy' | 'needs-care'>('all')
+
+const filters = computed(() => [
+  { key: 'all', label: t('plants.filterAll') },
+  { key: 'healthy', label: t('plants.filterHealthy') },
+  { key: 'needs-care', label: t('plants.filterNeedsCare') },
+])
 
 const filtered = computed(() => {
   let list = plants.plants
@@ -20,6 +28,26 @@ const filtered = computed(() => {
   }
   return list
 })
+
+const sunlightKeyMap: Record<string, string> = {
+  'full-sun': 'fullSunLabel',
+  partial: 'partialLabel',
+  indirect: 'indirectLabel',
+  low: 'lowLabel',
+}
+
+function statusLabel(status: string) {
+  return t(`status.${status}`)
+}
+
+function wateringLabel(freq?: string) {
+  return freq ? t(`addPlant.watering.${freq}`) : t('addPlant.watering.weekly')
+}
+
+function sunlightLabel(value?: string) {
+  const key = sunlightKeyMap[value ?? 'indirect'] ?? 'indirectLabel'
+  return t(`addPlant.sunlight.${key}`)
+}
 
 function statusStyle(status: string) {
   if (status === 'HEALTHY') return 'bg-light-green-bg text-success-green'
@@ -41,10 +69,10 @@ onMounted(() => plants.fetchPlants())
     <!-- Header -->
     <div class="flex justify-between items-end max-lg:flex-col max-lg:items-start max-lg:gap-4">
       <div>
-        <span class="font-semibold text-success-green text-[0.9rem]">Home / My Plants</span>
-        <h1 class="text-[2.2rem] max-sm:text-[1.6rem] font-extrabold text-text-main mb-2 mt-2 tracking-[-0.5px]">My Plants</h1>
+        <span class="font-semibold text-success-green text-[0.9rem]">{{ t('plants.breadcrumb') }}</span>
+        <h1 class="text-[2.2rem] max-sm:text-[1.6rem] font-extrabold text-text-main mb-2 mt-2 tracking-[-0.5px]">{{ t('plants.title') }}</h1>
         <p class="text-text-muted text-[0.95rem] font-medium">
-          {{ plants.totalPlants }} plant{{ plants.totalPlants !== 1 ? 's' : '' }} in your garden
+          {{ t('plants.inGarden', plants.totalPlants) }}
         </p>
       </div>
       <button
@@ -52,7 +80,7 @@ onMounted(() => plants.fetchPlants())
         class="flex items-center gap-2 px-5 py-[11px] bg-primary text-white rounded-[24px] font-semibold text-[0.95rem] shadow-sm hover:opacity-90 transition-opacity"
       >
         <Plus width="18" height="18" />
-        Add New Plant
+        {{ t('common.addNewPlant') }}
       </button>
     </div>
 
@@ -64,7 +92,7 @@ onMounted(() => plants.fetchPlants())
         <input
           v-model="query"
           type="text"
-          placeholder="Search by name or category…"
+          :placeholder="t('plants.searchPlaceholder')"
           class="flex-1 bg-transparent text-[0.9rem] text-text-main placeholder-text-light outline-none"
         />
       </div>
@@ -72,7 +100,7 @@ onMounted(() => plants.fetchPlants())
       <!-- Filter pills -->
       <div class="flex gap-2">
         <button
-          v-for="f in [{ key: 'all', label: 'All' }, { key: 'healthy', label: 'Healthy' }, { key: 'needs-care', label: 'Needs Care' }]"
+          v-for="f in filters"
           :key="f.key"
           @click="activeFilter = f.key as typeof activeFilter"
           class="px-4 py-2.5 rounded-xl text-[0.85rem] font-semibold border-2 transition-all"
@@ -91,22 +119,22 @@ onMounted(() => plants.fetchPlants())
         <Leaf class="text-success-green" width="36" height="36" />
       </div>
       <div>
-        <h2 class="text-[1.4rem] font-bold text-text-main mb-2">No plants yet</h2>
-        <p class="text-text-muted text-[0.95rem]">Add your first plant to start tracking your garden.</p>
+        <h2 class="text-[1.4rem] font-bold text-text-main mb-2">{{ t('plants.emptyTitle') }}</h2>
+        <p class="text-text-muted text-[0.95rem]">{{ t('plants.emptyDesc') }}</p>
       </div>
       <button
         @click="router.push({ name: 'add-plant' })"
         class="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-[24px] font-semibold hover:opacity-90 transition-opacity"
       >
         <Plus width="18" height="18" />
-        Add Plant
+        {{ t('common.addPlant') }}
       </button>
     </div>
 
     <!-- No search results -->
     <div v-else-if="filtered.length === 0" class="flex flex-col items-center justify-center py-16 gap-3 text-center">
       <Search class="text-text-muted" width="32" height="32" />
-      <p class="text-text-muted font-medium">No plants match your search.</p>
+      <p class="text-text-muted font-medium">{{ t('plants.noResults') }}</p>
     </div>
 
     <!-- Plant grid -->
@@ -138,14 +166,14 @@ onMounted(() => plants.fetchPlants())
             <span
               class="inline-block mt-1.5 text-[0.65rem] font-extrabold px-2 py-0.5 rounded tracking-[0.5px]"
               :class="statusStyle(plant.status)"
-            >{{ plant.status }}</span>
+            >{{ statusLabel(plant.status) }}</span>
           </div>
         </div>
 
         <!-- Watering level -->
         <div class="flex flex-col gap-1.5">
           <div class="flex justify-between items-center text-[0.75rem] font-semibold text-text-muted">
-            <span class="flex items-center gap-1"><Droplet width="12" height="12" /> Water level</span>
+            <span class="flex items-center gap-1"><Droplet width="12" height="12" /> {{ t('common.waterLevel') }}</span>
             <span>{{ plant.wateringLevel }}%</span>
           </div>
           <div class="h-1.5 bg-border rounded-full overflow-hidden">
@@ -161,15 +189,15 @@ onMounted(() => plants.fetchPlants())
         <div class="flex gap-3 text-[0.75rem] text-text-muted font-medium border-t border-border pt-3">
           <span class="flex items-center gap-1">
             <Droplet width="12" height="12" class="text-[#3b82f6]" />
-            {{ plant.wateringFrequency ?? 'Weekly' }}
+            {{ wateringLabel(plant.wateringFrequency) }}
           </span>
           <span class="flex items-center gap-1">
             <Sun width="12" height="12" class="text-[#f59e0b]" />
-            {{ plant.sunlight ?? 'Indirect' }}
+            {{ sunlightLabel(plant.sunlight) }}
           </span>
         </div>
 
-        <p class="text-[0.75rem] text-text-muted -mt-1">Last watered: {{ plant.lastWatered }}</p>
+        <p class="text-[0.75rem] text-text-muted -mt-1">{{ t('common.lastWatered', { time: plant.lastWatered }) }}</p>
       </div>
     </div>
   </div>

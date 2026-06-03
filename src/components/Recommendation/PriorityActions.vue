@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { Droplet, Sun, Scissors, Leaf, Sprout } from 'lucide-vue-next'
 import { useRecommendationsStore } from '../../stores/recommendations'
 
+const { t } = useI18n()
 const recs = useRecommendationsStore()
 
 const priorityColors: Record<string, string> = {
@@ -30,7 +32,7 @@ const borderColors: Record<string, string> = {
 <template>
   <div class="flex flex-col">
     <div class="flex items-center gap-4 mb-6">
-      <h2 class="text-[1.35rem] font-extrabold text-text-main m-0 whitespace-nowrap">Priority Actions</h2>
+      <h2 class="text-[1.35rem] font-extrabold text-text-main m-0 whitespace-nowrap">{{ t('recommendation.priorityActions') }}</h2>
       <div class="flex-1 h-0.5 bg-border"></div>
     </div>
 
@@ -39,7 +41,7 @@ const borderColors: Record<string, string> = {
     </div>
 
     <div v-else-if="recs.priorityActions.length === 0" class="py-8 text-center text-text-muted text-[0.9rem]">
-      No actions needed right now. Your garden looks great!
+      {{ t('recommendation.noActions') }}
     </div>
 
     <div v-else class="flex flex-col gap-5">

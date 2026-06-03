@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useUserStore } from '../stores/user'
 import { MapPin, Search, RefreshCw, Check, X, Crosshair } from 'lucide-vue-next'
 
 const emit = defineEmits<{ close: [] }>()
+const { t } = useI18n()
 const user = useUserStore()
 
 // tabs: 'detect' | 'search'
@@ -28,10 +30,10 @@ async function runDetect() {
       detectedLat = data.latitude
       detectedLon = data.longitude
     } else {
-      detectError.value = 'Could not detect location. Try searching instead.'
+      detectError.value = t('locationSearch.detectFailed')
     }
   } catch {
-    detectError.value = 'Network error. Try searching instead.'
+    detectError.value = t('locationSearch.networkError')
   } finally {
     detecting.value = false
   }
@@ -94,7 +96,7 @@ async function selectResult(r: { name: string; admin1: string; country: string; 
       <div class="flex items-center justify-between px-6 pt-6 pb-4">
         <div class="flex items-center gap-2">
           <MapPin class="text-success-green" width="20" height="20" />
-          <h2 class="text-[1.1rem] font-bold text-text-main">Change Location</h2>
+          <h2 class="text-[1.1rem] font-bold text-text-main">{{ t('locationSearch.title') }}</h2>
         </div>
         <button
           @click="emit('close')"
@@ -116,7 +118,7 @@ async function selectResult(r: { name: string; admin1: string; country: string; 
           ]"
         >
           <Crosshair width="16" height="16" />
-          Auto-detect
+          {{ t('locationSearch.autoDetect') }}
         </button>
         <button
           @click="activeTab = 'search'"
@@ -128,14 +130,14 @@ async function selectResult(r: { name: string; admin1: string; country: string; 
           ]"
         >
           <Search width="16" height="16" />
-          Search
+          {{ t('locationSearch.search') }}
         </button>
       </div>
 
       <!-- Detect tab -->
       <div v-if="activeTab === 'detect'" class="px-6 pb-6">
         <p class="text-[0.875rem] text-text-muted mb-5">
-          Detect your approximate location based on your IP address. No GPS required.
+          {{ t('locationSearch.detectDesc') }}
         </p>
 
         <!-- Not yet detected -->
@@ -147,7 +149,7 @@ async function selectResult(r: { name: string; admin1: string; country: string; 
           >
             <RefreshCw v-if="detecting" width="18" height="18" class="animate-spin" />
             <Crosshair v-else width="18" height="18" />
-            {{ detecting ? 'Detecting…' : 'Detect my location' }}
+            {{ detecting ? t('locationSearch.detecting') : t('locationSearch.detect') }}
           </button>
           <p v-if="detectError" class="mt-3 text-[0.8rem] text-red-500 text-center">{{ detectError }}</p>
         </div>
@@ -163,14 +165,14 @@ async function selectResult(r: { name: string; admin1: string; country: string; 
               @click="detected = ''"
               class="flex-1 py-2.5 border border-border rounded-xl text-[0.875rem] font-semibold text-text-muted hover:bg-bg-app transition-colors"
             >
-              Re-detect
+              {{ t('locationSearch.redetect') }}
             </button>
             <button
               @click="confirmDetected"
               class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-primary text-white rounded-xl text-[0.875rem] font-semibold hover:opacity-90 transition-opacity"
             >
               <Check width="16" height="16" />
-              Use this location
+              {{ t('locationSearch.useLocation') }}
             </button>
           </div>
         </div>
@@ -185,7 +187,7 @@ async function selectResult(r: { name: string; admin1: string; country: string; 
             v-model="query"
             @input="onQueryInput"
             type="text"
-            placeholder="Search city or region…"
+            :placeholder="t('locationSearch.searchPlaceholder')"
             class="flex-1 bg-transparent text-[0.9rem] text-text-main placeholder-text-light outline-none"
             autofocus
           />
@@ -210,10 +212,10 @@ async function selectResult(r: { name: string; admin1: string; country: string; 
 
         <!-- Empty hint -->
         <p v-else-if="!searching && query.trim().length >= 2" class="text-[0.85rem] text-text-muted text-center py-4">
-          No results found. Try a different spelling.
+          {{ t('locationSearch.noResults') }}
         </p>
         <p v-else-if="!query.trim()" class="text-[0.85rem] text-text-muted text-center py-4">
-          Start typing to search for a city.
+          {{ t('locationSearch.startTyping') }}
         </p>
       </div>
 

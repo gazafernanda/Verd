@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useUserStore } from '../stores/user'
 import { TriangleAlert, Eye, EyeOff, RefreshCw, CheckCircle } from 'lucide-vue-next'
 
 const router = useRouter()
+const { t } = useI18n()
 const user = useUserStore()
 
 const displayName = ref('')
@@ -16,6 +18,12 @@ const error = ref('')
 
 const isServerError = ref(false)
 
+const steps = computed(() => [
+  t('auth.register.steps.one'),
+  t('auth.register.steps.two'),
+  t('auth.register.steps.three'),
+])
+
 async function submit() {
   error.value = ''
   isServerError.value = false
@@ -25,7 +33,7 @@ async function submit() {
     user.logout()
     router.push({ name: 'login' })
   } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : 'Something went wrong.'
+    const msg = e instanceof Error ? e.message : t('auth.somethingWrong')
     error.value = msg
     isServerError.value = msg.includes('server') || msg.includes('reach')
   } finally {
@@ -58,16 +66,14 @@ async function submit() {
         <div class="w-16 h-16 bg-white bg-opacity-10 rounded-2xl flex items-center justify-center mb-8">
           <CheckCircle width="32" height="32" color="#ffffff" />
         </div>
-        <h1 class="text-4xl font-extrabold text-white leading-tight mb-4">
-          Start growing<br>with confidence.
-        </h1>
+        <h1 class="text-4xl font-extrabold text-white leading-tight mb-4 whitespace-pre-line">{{ t('auth.register.heroTitle') }}</h1>
         <p class="text-lg leading-relaxed max-w-sm" style="color: rgba(255,255,255,0.7)">
-          Join thousands of plant lovers who use Verd to keep their gardens thriving year-round.
+          {{ t('auth.register.heroSubtitle') }}
         </p>
 
         <!-- Steps -->
         <div class="mt-10 flex flex-col gap-5">
-          <div v-for="(step, i) in ['Create your account', 'Add your plants', 'Get personalized care']" :key="step"
+          <div v-for="(step, i) in steps" :key="step"
                class="flex items-center gap-4">
             <div class="w-7 h-7 rounded-full border-2 flex items-center justify-center shrink-0 text-xs font-bold"
                  style="border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.7)">
@@ -79,7 +85,7 @@ async function submit() {
       </div>
 
       <!-- Footer -->
-      <p class="text-xs relative z-10" style="color: rgba(255,255,255,0.4)">© 2025 Verd. All rights reserved.</p>
+      <p class="text-xs relative z-10" style="color: rgba(255,255,255,0.4)">{{ t('auth.copyright') }}</p>
     </div>
 
     <!-- Right panel -->
@@ -93,8 +99,8 @@ async function submit() {
           <span class="text-xl font-bold text-primary">Verd</span>
         </div>
 
-        <h2 class="text-[2rem] max-sm:text-[1.6rem] font-extrabold text-text-main mb-2 tracking-tight">Create your account</h2>
-        <p class="text-text-muted mb-8">Start your plant care journey today</p>
+        <h2 class="text-[2rem] max-sm:text-[1.6rem] font-extrabold text-text-main mb-2 tracking-tight">{{ t('auth.register.title') }}</h2>
+        <p class="text-text-muted mb-8">{{ t('auth.register.subtitle') }}</p>
 
         <!-- Error -->
         <div v-if="error" class="mb-6 rounded-xl overflow-hidden border text-sm font-medium"
@@ -109,11 +115,11 @@ async function submit() {
         <form @submit.prevent="submit" class="flex flex-col gap-5">
           <!-- Name -->
           <div class="flex flex-col gap-2">
-            <label class="text-sm font-bold text-text-main">Display name</label>
+            <label class="text-sm font-bold text-text-main">{{ t('auth.register.displayNameLabel') }}</label>
             <input
               v-model="displayName"
               type="text"
-              placeholder="Your name"
+              :placeholder="t('auth.register.displayNamePlaceholder')"
               required
               autocomplete="name"
               class="px-4 py-3.5 rounded-xl border border-border bg-surface text-text-main text-[0.95rem] outline-none transition-all duration-200 placeholder:text-text-light focus:border-accent-green focus:shadow-[0_0_0_3px_rgba(41,156,119,0.12)]"
@@ -122,11 +128,11 @@ async function submit() {
 
           <!-- Email -->
           <div class="flex flex-col gap-2">
-            <label class="text-sm font-bold text-text-main">Email address</label>
+            <label class="text-sm font-bold text-text-main">{{ t('auth.emailLabel') }}</label>
             <input
               v-model="email"
               type="email"
-              placeholder="you@example.com"
+              :placeholder="t('auth.emailPlaceholder')"
               required
               autocomplete="email"
               class="px-4 py-3.5 rounded-xl border border-border bg-surface text-text-main text-[0.95rem] outline-none transition-all duration-200 placeholder:text-text-light focus:border-accent-green focus:shadow-[0_0_0_3px_rgba(41,156,119,0.12)]"
@@ -135,7 +141,7 @@ async function submit() {
 
           <!-- Password -->
           <div class="flex flex-col gap-2">
-            <label class="text-sm font-bold text-text-main">Password <span class="text-text-light font-normal">(min. 8 characters)</span></label>
+            <label class="text-sm font-bold text-text-main">{{ t('auth.passwordLabel') }} <span class="text-text-light font-normal">{{ t('auth.register.passwordHint') }}</span></label>
             <div class="relative">
               <input
                 v-model="password"
@@ -170,14 +176,14 @@ async function submit() {
             class="mt-2 w-full py-3.5 bg-accent-green text-white rounded-xl font-bold text-[0.95rem] shadow-[0_4px_12px_rgba(41,156,119,0.3)] transition-all duration-200 hover:bg-accent-green-hover hover:-translate-y-px disabled:opacity-60 disabled:cursor-not-allowed disabled:translate-y-0 flex items-center justify-center gap-2"
           >
             <RefreshCw v-if="loading" class="animate-spin" width="18" height="18" />
-            {{ loading ? 'Creating account…' : 'Create account' }}
+            {{ loading ? t('auth.register.submitting') : t('auth.register.submit') }}
           </button>
         </form>
 
         <p class="mt-8 text-center text-sm text-text-muted">
-          Already have an account?
+          {{ t('auth.register.haveAccount') }}
           <router-link to="/login" class="font-bold text-accent-green hover:text-accent-green-hover transition-colors">
-            Sign in
+            {{ t('auth.register.signIn') }}
           </router-link>
         </p>
       </div>

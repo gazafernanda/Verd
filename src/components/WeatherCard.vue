@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { useWeatherStore } from '../stores/weather'
 import { Sun, Droplet, Wind } from 'lucide-vue-next'
+const { t } = useI18n()
 const weather = useWeatherStore()
 </script>
 
@@ -8,7 +10,7 @@ const weather = useWeatherStore()
   <div class="bg-surface rounded-lg p-6 shadow-sm flex-1 flex flex-col">
     <div class="flex justify-between items-start mb-6">
       <div>
-        <p class="text-[0.75rem] font-bold text-success-green tracking-[1px] mb-1">WEATHER FORECAST</p>
+        <p class="text-[0.75rem] font-bold text-success-green tracking-[1px] mb-1">{{ t('weatherCard.label') }}</p>
         <h3 class="text-2xl font-bold text-text-main">{{ weather.condition }}</h3>
       </div>
       <div class="w-12 h-12 bg-[#fff9eb] rounded-full flex items-center justify-center shrink-0">

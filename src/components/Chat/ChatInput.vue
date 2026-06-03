@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Send } from 'lucide-vue-next'
 
+const { t } = useI18n()
 const emit = defineEmits<{ send: [text: string] }>()
 
 defineProps<{ disabled?: boolean }>()
@@ -22,7 +24,7 @@ function submit() {
       <input
         v-model="inputText"
         type="text"
-        placeholder="Ask about your plants..."
+        :placeholder="t('chat.inputPlaceholder')"
         :disabled="disabled"
         class="flex-1 min-w-0 border-none outline-none px-3 py-3 text-[0.95rem] font-[inherit] text-text-main bg-transparent placeholder:text-text-light disabled:opacity-50"
         @keydown.enter="submit"

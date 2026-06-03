@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useUserStore } from '../stores/user'
 import { TriangleAlert, Eye, EyeOff, RefreshCw, Check, Leaf } from 'lucide-vue-next'
 
 const router = useRouter()
+const { t } = useI18n()
 const user = useUserStore()
 
 const email = ref('')
@@ -13,6 +15,12 @@ const showPassword = ref(false)
 const loading = ref(false)
 const error = ref('')
 
+const features = computed(() => [
+  t('auth.features.weather'),
+  t('auth.features.schedules'),
+  t('auth.features.ai'),
+])
+
 async function submit() {
   error.value = ''
   loading.value = true
@@ -20,7 +28,7 @@ async function submit() {
     await user.login(email.value, password.value)
     router.replace({ name: 'dashboard' })
   } catch (e: unknown) {
-    error.value = e instanceof Error ? e.message : 'Something went wrong.'
+    error.value = e instanceof Error ? e.message : t('auth.somethingWrong')
   } finally {
     loading.value = false
   }
@@ -51,16 +59,14 @@ async function submit() {
         <div class="w-16 h-16 bg-white bg-opacity-10 rounded-2xl flex items-center justify-center mb-8">
           <Leaf width="32" height="32" color="#ffffff" />
         </div>
-        <h1 class="text-4xl font-extrabold text-white leading-tight mb-4">
-          Your garden,<br>smarter.
-        </h1>
+        <h1 class="text-4xl font-extrabold text-white leading-tight mb-4 whitespace-pre-line">{{ t('auth.heroTitle') }}</h1>
         <p class="text-white text-opacity-70 text-lg leading-relaxed max-w-sm" style="color: rgba(255,255,255,0.7)">
-          AI-powered plant care with real-time weather insights. Know exactly when to water, prune, and feed every plant.
+          {{ t('auth.heroSubtitle') }}
         </p>
 
         <!-- Feature bullets -->
         <div class="mt-10 flex flex-col gap-4">
-          <div v-for="item in ['Hyper-local weather analysis', 'Personalized care schedules', 'AI plant diagnosis & chat']" :key="item"
+          <div v-for="item in features" :key="item"
                class="flex items-center gap-3">
             <div class="w-5 h-5 rounded-full bg-accent-green flex items-center justify-center shrink-0">
               <Check width="10" height="10" color="white" stroke-width="2.5" />
@@ -71,7 +77,7 @@ async function submit() {
       </div>
 
       <!-- Footer -->
-      <p class="text-xs relative z-10" style="color: rgba(255,255,255,0.4)">© 2025 Verd. All rights reserved.</p>
+      <p class="text-xs relative z-10" style="color: rgba(255,255,255,0.4)">{{ t('auth.copyright') }}</p>
     </div>
 
     <!-- Right panel -->
@@ -85,8 +91,8 @@ async function submit() {
           <span class="text-xl font-bold text-primary">Verd</span>
         </div>
 
-        <h2 class="text-[2rem] max-sm:text-[1.6rem] font-extrabold text-text-main mb-2 tracking-tight">Welcome back</h2>
-        <p class="text-text-muted mb-8">Sign in to your garden dashboard</p>
+        <h2 class="text-[2rem] max-sm:text-[1.6rem] font-extrabold text-text-main mb-2 tracking-tight">{{ t('auth.login.title') }}</h2>
+        <p class="text-text-muted mb-8">{{ t('auth.login.subtitle') }}</p>
 
         <!-- Error -->
         <div v-if="error" class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 flex items-start gap-2 text-sm font-medium text-red-600">
@@ -97,11 +103,11 @@ async function submit() {
         <form @submit.prevent="submit" class="flex flex-col gap-5">
           <!-- Email -->
           <div class="flex flex-col gap-2">
-            <label class="text-sm font-bold text-text-main">Email address</label>
+            <label class="text-sm font-bold text-text-main">{{ t('auth.emailLabel') }}</label>
             <input
               v-model="email"
               type="email"
-              placeholder="you@example.com"
+              :placeholder="t('auth.emailPlaceholder')"
               required
               autocomplete="email"
               class="px-4 py-3.5 rounded-xl border border-border bg-surface text-text-main text-[0.95rem] outline-none transition-all duration-200 placeholder:text-text-light focus:border-accent-green focus:shadow-[0_0_0_3px_rgba(41,156,119,0.12)]"
@@ -111,7 +117,7 @@ async function submit() {
           <!-- Password -->
           <div class="flex flex-col gap-2">
             <div class="flex justify-between items-center">
-              <label class="text-sm font-bold text-text-main">Password</label>
+              <label class="text-sm font-bold text-text-main">{{ t('auth.passwordLabel') }}</label>
             </div>
             <div class="relative">
               <input
@@ -140,14 +146,14 @@ async function submit() {
             class="mt-2 w-full py-3.5 bg-accent-green text-white rounded-xl font-bold text-[0.95rem] shadow-[0_4px_12px_rgba(41,156,119,0.3)] transition-all duration-200 hover:bg-accent-green-hover hover:-translate-y-px disabled:opacity-60 disabled:cursor-not-allowed disabled:translate-y-0 flex items-center justify-center gap-2"
           >
             <RefreshCw v-if="loading" class="animate-spin" width="18" height="18" />
-            {{ loading ? 'Signing in…' : 'Sign in' }}
+            {{ loading ? t('auth.login.submitting') : t('auth.login.submit') }}
           </button>
         </form>
 
         <p class="mt-8 text-center text-sm text-text-muted">
-          Don't have an account?
+          {{ t('auth.login.noAccount') }}
           <router-link to="/register" class="font-bold text-accent-green hover:text-accent-green-hover transition-colors">
-            Create one
+            {{ t('auth.login.createOne') }}
           </router-link>
         </p>
       </div>

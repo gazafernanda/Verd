@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from "vue";
+import { useI18n } from "vue-i18n";
 import { useUserStore } from "../stores/user";
 import { Pencil } from "lucide-vue-next";
 import LocationSearch from "./LocationSearch.vue";
 
+const { t } = useI18n();
 const user = useUserStore();
 const showLocationSearch = ref(false);
 
@@ -59,7 +61,7 @@ watch(
     <div class="flex justify-between items-start mb-5">
       <div>
         <p class="text-[0.75rem] font-bold text-success-green tracking-[1px] mb-1">
-          CURRENT LOCATION
+          {{ t('locationCard.label') }}
         </p>
         <h3 class="text-2xl font-bold text-text-main">{{ user.location }}</h3>
       </div>
@@ -80,7 +82,7 @@ watch(
         title="Location map"
       />
       <div v-else class="w-full h-full flex items-center justify-center text-text-muted text-sm">
-        Map loading…
+        {{ t('locationCard.mapLoading') }}
       </div>
     </div>
 

@@ -1,13 +1,15 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { useWeatherStore } from '../../stores/weather'
 import { ChevronLeft, ChevronRight, Sun, CloudSun, CloudRain, Cloud } from 'lucide-vue-next'
+const { t } = useI18n()
 const weather = useWeatherStore()
 </script>
 
 <template>
   <div class="mb-8">
     <div class="flex justify-between items-center mb-5">
-      <h2 class="text-[1.4rem] font-bold text-text-main m-0">7-Day Forecast</h2>
+      <h2 class="text-[1.4rem] font-bold text-text-main m-0">{{ t('weather.forecastTitle') }}</h2>
       <div class="flex gap-2">
         <button class="w-8 h-8 rounded-full border border-border bg-surface flex items-center justify-center text-text-muted shadow-sm transition-colors duration-200 hover:bg-bg-app hover:text-text-main">
           <ChevronLeft width="16" height="16" />

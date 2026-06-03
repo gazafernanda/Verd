@@ -1,9 +1,15 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { usePlantsStore } from '../../stores/plants'
 import { useRouter } from 'vue-router'
 import { Leaf, Flower2, Plus, Trash2 } from 'lucide-vue-next'
+const { t } = useI18n()
 const plants = usePlantsStore()
 const router = useRouter()
+
+function statusLabel(status: string) {
+  return t(`status.${status}`)
+}
 
 function statusClass(status: string) {
   if (status === 'HEALTHY') return 'bg-light-green-bg text-success-green'
@@ -23,14 +29,14 @@ function barClass(status: string) {
     <div class="flex justify-between items-center mb-6">
       <h2 class="flex items-center gap-3 text-xl font-extrabold text-text-main m-0">
         <Leaf class="text-success-green" width="20" height="20" />
-        My Plants
+        {{ t('profile.myPlants') }}
       </h2>
       <button
         @click="router.push({ name: 'add-plant' })"
         class="flex items-center gap-1.5 text-[0.85rem] font-bold text-success-green hover:text-primary transition-colors"
       >
         <Plus width="14" height="14" />
-        Add Plant
+        {{ t('common.addPlant') }}
       </button>
     </div>
 
@@ -39,13 +45,13 @@ function barClass(status: string) {
       <div class="w-14 h-14 rounded-full bg-light-green-bg flex items-center justify-center text-success-green">
         <Leaf width="24" height="24" />
       </div>
-      <p class="text-[0.9rem] text-text-muted font-medium">No plants yet. Add your first one!</p>
+      <p class="text-[0.9rem] text-text-muted font-medium">{{ t('profile.noPlants') }}</p>
       <button
         @click="router.push({ name: 'add-plant' })"
         class="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-[20px] text-[0.85rem] font-bold hover:bg-primary-hover transition-colors"
       >
         <Plus width="16" height="16" />
-        Add Plant
+        {{ t('common.addPlant') }}
       </button>
     </div>
 
@@ -63,9 +69,9 @@ function barClass(status: string) {
           <div class="flex justify-between items-start mb-2 gap-2">
             <h3 class="text-[0.95rem] font-extrabold text-text-main m-0 overflow-hidden text-ellipsis whitespace-nowrap">{{ plant.name }}</h3>
             <span class="text-[0.55rem] font-extrabold px-1.5 py-1 rounded tracking-[0.5px] whitespace-nowrap shrink-0"
-              :class="statusClass(plant.status)">{{ plant.status }}</span>
+              :class="statusClass(plant.status)">{{ statusLabel(plant.status) }}</span>
           </div>
-          <p class="text-[0.75rem] text-text-muted mb-3 leading-snug flex-1">Last watered: {{ plant.lastWatered }}</p>
+          <p class="text-[0.75rem] text-text-muted mb-3 leading-snug flex-1">{{ t('common.lastWatered', { time: plant.lastWatered }) }}</p>
           <div class="h-1.5 bg-border rounded w-full overflow-hidden">
             <div class="h-full rounded transition-all duration-500"
               :class="barClass(plant.status)"
@@ -77,7 +83,7 @@ function barClass(status: string) {
         <button
           @click.stop="plants.deletePlant(plant.id)"
           class="absolute top-2 right-2 w-6 h-6 rounded-full bg-red-50 text-red-400 flex items-center justify-center opacity-0 group-hover:opacity-100 max-sm:opacity-100 transition-opacity hover:bg-red-100"
-          title="Remove plant"
+          :title="t('profile.removePlant')"
         >
           <Trash2 width="12" height="12" />
         </button>
