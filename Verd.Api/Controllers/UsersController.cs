@@ -26,6 +26,7 @@ public class UsersController(AppDbContext db) : ControllerBase
             DisplayName: user.DisplayName,
             Email: user.Email,
             Location: user.Location,
+            AvatarUrl: user.AvatarUrl,
             Tier: user.Tier,
             MemberSince: user.MemberSince.ToString("MMM yyyy"),
             WeatherAlertsEnabled: user.WeatherAlertsEnabled
@@ -38,8 +39,12 @@ public class UsersController(AppDbContext db) : ControllerBase
         var user = await db.Users.FindAsync(UserId);
         if (user is null) return NotFound();
 
+        if (dto.AvatarUrl is { Length: > 2_000_000 })
+            return BadRequest(new { message = "Avatar image is too large." });
+
         if (dto.DisplayName is not null) user.DisplayName = dto.DisplayName;
         if (dto.Location is not null) user.Location = dto.Location;
+        if (dto.AvatarUrl is not null) user.AvatarUrl = dto.AvatarUrl;
         if (dto.WeatherAlertsEnabled is not null) user.WeatherAlertsEnabled = dto.WeatherAlertsEnabled.Value;
 
         await db.SaveChangesAsync();
@@ -49,6 +54,7 @@ public class UsersController(AppDbContext db) : ControllerBase
             DisplayName: user.DisplayName,
             Email: user.Email,
             Location: user.Location,
+            AvatarUrl: user.AvatarUrl,
             Tier: user.Tier,
             MemberSince: user.MemberSince.ToString("MMM yyyy"),
             WeatherAlertsEnabled: user.WeatherAlertsEnabled

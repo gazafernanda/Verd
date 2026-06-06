@@ -14,6 +14,7 @@ export const useUserStore = defineStore("user", () => {
     localStorage.getItem("verd_lon") ? Number(localStorage.getItem("verd_lon")) : null
   );
   const tier = ref(localStorage.getItem("verd_tier") ?? "Green Thumb");
+  const avatarUrl = ref(localStorage.getItem("verd_avatar") ?? "");
   const memberSince = ref("");
   const displayName = ref(name.value);
   const email = ref(localStorage.getItem("verd_email") ?? "");
@@ -95,17 +96,20 @@ export const useUserStore = defineStore("user", () => {
     displayName.value = "";
     email.value = "";
     location.value = "";
+    avatarUrl.value = "";
     tier.value = "Green Thumb";
     localStorage.removeItem("verd_token");
     localStorage.removeItem("verd_name");
     localStorage.removeItem("verd_email");
     localStorage.removeItem("verd_location");
+    localStorage.removeItem("verd_avatar");
     localStorage.removeItem("verd_tier");
   }
 
   async function saveSettings(updates: {
     displayName?: string;
     location?: string;
+    avatarUrl?: string;
     lat?: number;
     lon?: number;
     weatherAlertsEnabled?: boolean;
@@ -114,6 +118,10 @@ export const useUserStore = defineStore("user", () => {
       displayName.value = updates.displayName;
       name.value = updates.displayName;
       localStorage.setItem("verd_name", updates.displayName);
+    }
+    if (updates.avatarUrl !== undefined) {
+      avatarUrl.value = updates.avatarUrl;
+      localStorage.setItem("verd_avatar", updates.avatarUrl);
     }
     if (updates.location !== undefined) {
       location.value = updates.location;
@@ -156,12 +164,14 @@ export const useUserStore = defineStore("user", () => {
       name.value = data.displayName;
       email.value = data.email;
       location.value = data.location;
+      avatarUrl.value = data.avatarUrl ?? "";
       tier.value = data.tier;
       memberSince.value = data.memberSince;
       weatherAlertsEnabled.value = data.weatherAlertsEnabled;
       localStorage.setItem("verd_name", data.displayName);
       localStorage.setItem("verd_email", data.email);
       localStorage.setItem("verd_location", data.location);
+      localStorage.setItem("verd_avatar", data.avatarUrl ?? "");
       localStorage.setItem("verd_tier", data.tier);
     } catch {
       // silent fail — use cached localStorage values
@@ -195,6 +205,7 @@ export const useUserStore = defineStore("user", () => {
     lat,
     lon,
     tier,
+    avatarUrl,
     memberSince,
     displayName,
     email,

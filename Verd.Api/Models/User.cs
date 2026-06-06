@@ -7,6 +7,7 @@ public class User
     public string Email { get; set; } = string.Empty;
     public string PasswordHash { get; set; } = string.Empty;
     public string Location { get; set; } = string.Empty;
+    public string AvatarUrl { get; set; } = string.Empty;
     public string Tier { get; set; } = "Green Thumb";
     public DateTime MemberSince { get; set; } = DateTime.UtcNow;
     public bool WeatherAlertsEnabled { get; set; } = true;

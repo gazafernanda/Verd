@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '../../stores/user'
 import { Check, MapPin } from 'lucide-vue-next'
+import EditProfileModal from './EditProfileModal.vue'
+import defaultAvatar from '../../assets/alex_avatar.png'
 const { t } = useI18n()
 const user = useUserStore()
+const showEdit = ref(false)
 </script>
 
 <template>
@@ -12,7 +16,7 @@ const user = useUserStore()
     <!-- Avatar + Info -->
     <div class="flex items-center gap-6 max-md:flex-col max-md:items-center max-md:gap-4">
       <div class="relative w-24 h-24 rounded-full border-4 border-[#f6cfb0] bg-[#fcece0] flex items-center justify-center shrink-0">
-        <img src="/src/assets/alex_avatar.png" :alt="user.name" class="w-[88px] h-[88px] rounded-full object-cover" />
+        <img :src="user.avatarUrl || defaultAvatar" :alt="user.name" class="w-[88px] h-[88px] rounded-full object-cover" />
         <div class="absolute bottom-0 -right-1 bg-success-green text-white w-6 h-6 rounded-full flex items-center justify-center border-2 border-surface">
           <Check width="12" height="12" stroke-width="2" />
         </div>
@@ -34,7 +38,9 @@ const user = useUserStore()
 
     <!-- Action Buttons -->
     <div class="flex gap-3 max-md:w-full max-md:flex-col">
-      <button class="px-6 py-3 rounded-[24px] text-[0.9rem] font-bold cursor-pointer bg-transparent text-text-main border border-border hover:bg-bg-app transition-colors max-md:w-full">{{ t('profile.editProfile') }}</button>
+      <button @click="showEdit = true" class="px-6 py-3 rounded-[24px] text-[0.9rem] font-bold cursor-pointer bg-transparent text-text-main border border-border hover:bg-bg-app transition-colors max-md:w-full">{{ t('profile.editProfile') }}</button>
     </div>
   </div>
+
+  <EditProfileModal v-if="showEdit" @close="showEdit = false" />
 </template>

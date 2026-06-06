@@ -5,6 +5,7 @@ public record UserProfileDto(
     string DisplayName,
     string Email,
     string Location,
+    string AvatarUrl,
     string Tier,
     string MemberSince,
     bool WeatherAlertsEnabled
