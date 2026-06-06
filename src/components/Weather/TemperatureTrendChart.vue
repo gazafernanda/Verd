@@ -8,7 +8,7 @@ const weather = useWeatherStore()
 const W = 800
 const H = 220
 const PAD_X = 16
-const PAD_TOP = 24
+const PAD_TOP = 36
 const PAD_BOTTOM = 36
 
 const chart = computed(() => {
@@ -79,13 +79,21 @@ function formatHour(h: number) {
         stroke-linecap="round" stroke-linejoin="round"
         vector-effect="non-scaling-stroke" />
 
-      <!-- "now" dot -->
+      <!-- per-hour data dots + temperature labels -->
+      <g v-for="(p, i) in chart.points" :key="`p${i}`">
+        <circle :cx="p.x" :cy="p.y" r="2.5" fill="#37b27e" />
+        <text
+          :x="p.x" :y="p.y - 10"
+          text-anchor="middle"
+          font-size="11"
+          font-weight="700"
+          fill="#1a5641"
+        >{{ p.temp }}°</text>
+      </g>
+
+      <!-- "now" emphasis -->
       <circle :cx="chart.points[0]!.x" :cy="chart.points[0]!.y" r="5" fill="#37b27e" />
       <circle :cx="chart.points[0]!.x" :cy="chart.points[0]!.y" r="9" fill="#37b27e" fill-opacity="0.18" />
-
-      <!-- y-axis range labels -->
-      <text :x="PAD_X" :y="PAD_TOP - 6" font-size="11" fill="#94a3a0" font-weight="600">{{ chart.max }}°</text>
-      <text :x="PAD_X" :y="H - PAD_BOTTOM + 14" font-size="11" fill="#94a3a0" font-weight="600">{{ chart.min }}°</text>
 
       <!-- x-axis tick labels -->
       <text v-for="(tick, i) in chart.ticks" :key="i"
