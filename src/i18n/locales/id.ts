@@ -43,7 +43,7 @@ export default {
     somethingWrong: "Terjadi kesalahan.",
     login: {
       title: "Selamat datang kembali",
-      subtitle: "Masuk ke dasbor taman Anda",
+      subtitle: "Masuk ke halaman utama",
       submit: "Masuk",
       submitting: "Sedang masuk…",
       noAccount: "Belum punya akun?",
