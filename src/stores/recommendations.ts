@@ -1,7 +1,13 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
+import i18n from "../i18n";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+// The app language the AI should answer in (e.g. "id" or "en").
+function currentLang() {
+  return i18n.global.locale.value;
+}
 
 export interface PriorityAction {
   id: string;
@@ -37,7 +43,7 @@ export const useRecommendationsStore = defineStore("recommendations", () => {
 
     loading.value = true;
     try {
-      const res = await fetch(`${API}/api/recommendations`, {
+      const res = await fetch(`${API}/api/recommendations?lang=${currentLang()}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -61,7 +67,7 @@ export const useRecommendationsStore = defineStore("recommendations", () => {
       const res = await fetch(`${API}/api/recommendations/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ plantId }),
+        body: JSON.stringify({ plantId, language: currentLang() }),
       });
       if (!res.ok) return false;
       const data = await res.json();
