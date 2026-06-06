@@ -46,9 +46,18 @@ public class RecommendationAiService(IHttpClientFactory factory, WeatherService 
         var languageInstruction = isIndonesian
             ? """
 
-            LANGUAGE: Write ALL human-readable text in Indonesian (Bahasa Indonesia) — that means the "title", "description", "headline", "detail", "action", and "weather" fields. Use natural, idiomatic Indonesian. Do NOT translate the "day", "date", "type", or "priority" fields: keep "day" as the English codes (TODAY, SUN, MON, TUE, WED, THU, FRI, SAT), keep "type" and "priority" as the exact English enum values, and keep "date" as given.
+            LANGUAGE (MANDATORY): Write ALL human-readable text in Indonesian (Bahasa Indonesia) — the "title", "description", "headline", "detail", "action", and "weather" fields. Use natural, idiomatic Indonesian; do NOT use any English words or sentences in those fields. Do NOT translate the "day", "date", "type", or "priority" fields: keep "day" as the English codes (TODAY, SUN, MON, TUE, WED, THU, FRI, SAT), keep "type" and "priority" as the exact English enum values, and keep "date" as given.
             """
             : "";
+
+        // A strong, early directive — models weight the first line and the system
+        // message far more than a requirement buried at the end of the prompt.
+        var languagePrefix = isIndonesian
+            ? "RESPOND IN INDONESIAN (Bahasa Indonesia). All title/description/headline/detail/action/weather text MUST be written in Indonesian.\n\n"
+            : "";
+        var systemMessage = isIndonesian
+            ? "You are a plant care specialist who writes exclusively in Indonesian (Bahasa Indonesia). Every human-readable text field you output must be in natural Indonesian, never English."
+            : "You are a plant care specialist.";
 
         var plantSummary = string.Join("\n", plantList.Select(p =>
             $"- {p.Name} ({p.Category}): watering {p.WateringFrequency}, sunlight {p.Sunlight}, status {p.Status}" +
@@ -70,7 +79,7 @@ public class RecommendationAiService(IHttpClientFactory factory, WeatherService 
             """;
 
         var prompt = $"""
-            You are a plant care specialist. Generate care recommendations for this garden given the current weather and the 7-day forecast.
+            {languagePrefix}You are a plant care specialist. Generate care recommendations for this garden given the current weather and the 7-day forecast.
 
             Garden ({plantList.Count} plant{(plantList.Count == 1 ? "" : "s")}):
             {plantSummary}
@@ -94,7 +103,11 @@ public class RecommendationAiService(IHttpClientFactory factory, WeatherService 
         var body = new
         {
             model = "llama-3.3-70b-versatile",
-            messages = new[] { new { role = "user", content = prompt } },
+            messages = new[]
+            {
+                new { role = "system", content = systemMessage },
+                new { role = "user", content = prompt },
+            },
             temperature = 0.4,
             response_format = new { type = "json_object" }
         };
