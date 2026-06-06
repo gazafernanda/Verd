@@ -8,7 +8,7 @@ import CareRecommendations from "../components/CareRecommendations.vue";
 import { useUserStore } from "../stores/user";
 import { useWeatherStore } from "../stores/weather";
 import { useRouter } from "vue-router";
-import { Calendar, Plus } from "lucide-vue-next";
+import { Calendar, Plus, UserRound } from "lucide-vue-next";
 
 const { t, locale } = useI18n();
 const user = useUserStore();
@@ -39,8 +39,11 @@ onMounted(() => {
             user.name
           }}</span>
           <div
-            class="w-10 h-10 rounded-full bg-gradient-to-br from-[#f08b5e] to-[#e85d46] shadow-sm"
-          ></div>
+            class="w-10 h-10 rounded-full bg-bg-app border border-border shadow-sm overflow-hidden flex items-center justify-center shrink-0"
+          >
+            <img v-if="user.avatarUrl" :src="user.avatarUrl" :alt="user.name" class="w-full h-full object-cover" />
+            <UserRound v-else class="text-text-light" width="22" height="22" stroke-width="1.5" />
+          </div>
         </div>
       </div>
 
