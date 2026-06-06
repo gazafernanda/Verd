@@ -5,7 +5,6 @@ import CurrentConditions from '../components/Weather/CurrentConditions.vue'
 import Forecast from '../components/Weather/Forecast.vue'
 import PlantCareAlert from '../components/Weather/PlantCareAlert.vue'
 import RainfallOutlook from '../components/Weather/RainfallOutlook.vue'
-import GardenContext from '../components/Weather/GardenContext.vue'
 import LocationSearch from '../components/LocationSearch.vue'
 import { useUserStore } from '../stores/user'
 import { useWeatherStore } from '../stores/weather'
@@ -197,7 +196,6 @@ watch(
 
           <PlantCareAlert />
           <RainfallOutlook />
-          <GardenContext />
 
         </div>
       </div>

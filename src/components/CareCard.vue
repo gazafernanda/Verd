@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Sprout } from 'lucide-vue-next'
 
 const props = defineProps<{
@@ -10,7 +11,16 @@ const props = defineProps<{
   bgType?: 'blue' | 'yellow' | 'green'
 }>()
 
+const { t } = useI18n()
 const errored = ref(false)
+
+// The badge defaults to the constant "MAINTENANCE" — localize that, but show
+// any real plant category (e.g. "Herbs") as given.
+const displayCategory = computed(() =>
+  props.category?.toUpperCase() === 'MAINTENANCE'
+    ? t('careRecommendations.maintenanceBadge')
+    : props.category,
+)
 
 // Only treat http(s)/data URLs as real images. Empty strings and old
 // "/src/assets/..." dev paths don't resolve in the production build, so
@@ -51,7 +61,7 @@ const hasImage = computed(
           'bg-[var(--success-green)]': bgType === 'green'
         }"
       >
-        {{ category }}
+        {{ displayCategory }}
       </span>
     </div>
     <div class="p-5 flex-1 flex flex-col">

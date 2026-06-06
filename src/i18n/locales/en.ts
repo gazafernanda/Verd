@@ -94,6 +94,7 @@ export default {
   careRecommendations: {
     title: "Care Recommendations",
     viewSchedule: "View Schedule",
+    maintenanceBadge: "MAINTENANCE",
   },
   plants: {
     breadcrumb: "Home / My Plants",

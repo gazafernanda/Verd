@@ -94,6 +94,7 @@ export default {
   careRecommendations: {
     title: "Rekomendasi Perawatan",
     viewSchedule: "Lihat Jadwal",
+    maintenanceBadge: "PERAWATAN",
   },
   plants: {
     breadcrumb: "Beranda / Tanaman Saya",
