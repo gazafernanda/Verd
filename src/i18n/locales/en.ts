@@ -163,7 +163,9 @@ export default {
       "AI-generated care plan for your {name} based on current weather conditions.",
     genericSubtitle:
       "Hyper-local agricultural insights based on your plants and real-time weather.",
-    switchCategory: "Switch Category",
+    switchPlant: "Switch Plant",
+    allPlants: "All Plants",
+    noPlants: "No plants yet",
     updateData: "Update Data",
     soilMoisture: "Soil Moisture",
     hydration: "HYDRATION",

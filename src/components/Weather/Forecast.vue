@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { useWeatherStore } from '../../stores/weather'
-import { ChevronLeft, ChevronRight, Sun, CloudSun, CloudRain, Cloud } from 'lucide-vue-next'
+import { ChevronLeft, ChevronRight, Sun, CloudSun, CloudRain, Cloud, ArrowUp, ArrowDown } from 'lucide-vue-next'
 const { t } = useI18n()
 const weather = useWeatherStore()
 </script>
@@ -42,8 +42,12 @@ const weather = useWeatherStore()
         </div>
 
         <div class="flex flex-col items-center gap-1">
-          <span class="text-xl font-bold text-text-main">{{ item.tempHi }}°</span>
-          <span class="text-[0.9rem] font-medium text-text-muted">{{ item.tempLo }}°</span>
+          <span class="inline-flex items-center gap-1 text-xl font-bold text-text-main">
+            <ArrowUp width="14" height="14" class="text-text-muted" />{{ item.tempHi }}°
+          </span>
+          <span class="inline-flex items-center gap-1 text-[0.9rem] font-medium text-text-muted">
+            <ArrowDown width="13" height="13" />{{ item.tempLo }}°
+          </span>
         </div>
       </div>
     </div>

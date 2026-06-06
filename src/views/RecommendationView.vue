@@ -1,14 +1,40 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, ref, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
 import MetricsRow from '../components/Recommendation/MetricsRow.vue'
 import PriorityActions from '../components/Recommendation/PriorityActions.vue'
 import BotanicalInsights from '../components/Recommendation/BotanicalInsights.vue'
-import { Calendar, RefreshCw, Droplet, Sun, Scissors, Sprout, Leaf, CalendarDays } from 'lucide-vue-next'
+import { Leaf as LeafIcon, RefreshCw, Droplet, Sun, Scissors, Sprout, Leaf, CalendarDays, ChevronDown, Check } from 'lucide-vue-next'
 import { useRecommendationsStore } from '../stores/recommendations'
+import { usePlantsStore } from '../stores/plants'
 
 const { t, te } = useI18n()
 const recs = useRecommendationsStore()
+const plantsStore = usePlantsStore()
+
+const menuOpen = ref(false)
+const menuRef = ref<HTMLElement | null>(null)
+
+function toggleMenu() {
+  menuOpen.value = !menuOpen.value
+}
+
+function selectPlant(id: number, name: string) {
+  menuOpen.value = false
+  recs.generateForPlant(id, name)
+}
+
+function selectAllPlants() {
+  menuOpen.value = false
+  recs.generatingFor = null
+  recs.fetchRecommendations()
+}
+
+function onClickOutside(e: MouseEvent) {
+  if (menuRef.value && !menuRef.value.contains(e.target as Node)) {
+    menuOpen.value = false
+  }
+}
 
 function dayLabel(day: string) {
   const key = `recommendation.days.${day}`
@@ -26,6 +52,12 @@ const typeStyle: Record<string, string> = {
 
 onMounted(() => {
   if (!recs.generatingFor) recs.fetchRecommendations()
+  if (plantsStore.plants.length === 0) plantsStore.fetchPlants()
+  document.addEventListener('click', onClickOutside)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', onClickOutside)
 })
 </script>
 
@@ -47,10 +79,39 @@ onMounted(() => {
       </p>
 
       <div class="flex gap-3 max-sm:flex-col max-sm:w-full">
-        <button class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[0.9rem] font-semibold cursor-pointer transition-colors duration-200 bg-transparent text-text-main border border-border hover:bg-surface">
-          <Calendar width="16" height="16" />
-          {{ t('recommendation.switchCategory') }}
-        </button>
+        <div ref="menuRef" class="relative max-sm:w-full">
+          <button
+            @click.stop="toggleMenu"
+            class="w-full inline-flex items-center justify-between gap-2 px-5 py-2.5 rounded-xl text-[0.9rem] font-semibold cursor-pointer transition-colors duration-200 bg-transparent text-text-main border border-border hover:bg-surface">
+            <span class="inline-flex items-center gap-2">
+              <LeafIcon width="16" height="16" />
+              {{ recs.generatingFor ?? t('recommendation.switchPlant') }}
+            </span>
+            <ChevronDown width="16" height="16" :class="{ 'rotate-180': menuOpen }" class="transition-transform duration-200" />
+          </button>
+
+          <div
+            v-if="menuOpen"
+            class="absolute left-0 top-[calc(100%+0.5rem)] z-20 min-w-full sm:min-w-[240px] bg-surface border border-border rounded-xl shadow-lg p-1.5 max-h-[320px] overflow-y-auto">
+            <button
+              @click="selectAllPlants"
+              class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-[0.85rem] font-semibold text-text-main hover:bg-bg-app transition-colors duration-150">
+              {{ t('recommendation.allPlants') }}
+              <Check v-if="!recs.generatingFor" width="15" height="15" class="text-success-green" />
+            </button>
+            <button
+              v-for="p in plantsStore.plants"
+              :key="p.id"
+              @click="selectPlant(p.id, p.name)"
+              class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-[0.85rem] font-medium text-text-main hover:bg-bg-app transition-colors duration-150">
+              <span class="truncate">{{ p.name }}</span>
+              <Check v-if="recs.generatingFor === p.name" width="15" height="15" class="text-success-green shrink-0" />
+            </button>
+            <p v-if="plantsStore.plants.length === 0" class="px-3 py-2 text-[0.85rem] text-text-muted">
+              {{ t('recommendation.noPlants') }}
+            </p>
+          </div>
+        </div>
         <button
           @click="recs.fetchRecommendations()"
           class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[0.9rem] font-semibold cursor-pointer transition-colors duration-200 bg-primary text-white border border-primary shadow-[0_4px_12px_rgba(26,86,65,0.2)] hover:bg-primary-hover">

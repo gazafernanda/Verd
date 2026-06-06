@@ -162,7 +162,9 @@ export default {
       "Rencana perawatan yang dihasilkan AI untuk {name} Anda berdasarkan kondisi cuaca saat ini.",
     genericSubtitle:
       "Wawasan agrikultur hiper-lokal berdasarkan tanaman Anda dan cuaca real-time.",
-    switchCategory: "Ganti Kategori",
+    switchPlant: "Ganti Tanaman",
+    allPlants: "Semua Tanaman",
+    noPlants: "Belum ada tanaman",
     updateData: "Perbarui Data",
     soilMoisture: "Kelembapan Tanah",
     hydration: "HIDRASI",
