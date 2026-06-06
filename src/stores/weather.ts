@@ -34,6 +34,9 @@ export const useWeatherStore = defineStore("weather", () => {
   const aqi = ref(24);
   const feelsLike = ref(24);
 
+  // 24 hourly samples starting at the current hour, used by the temp trend chart.
+  const hourlyTemps = ref<{ hour: number; temp: number }[]>([]);
+
   const forecast = ref([
     { day: "TODAY", date: "May 12", icon: "sun",       tempHi: 22, tempLo: 12, active: true  },
     { day: "MON",   date: "May 13", icon: "cloud-sun", tempHi: 20, tempLo: 11, active: false },
@@ -87,6 +90,16 @@ export const useWeatherStore = defineStore("weather", () => {
         windSpeed.value = Math.round(hourly.windspeed_10m[hourIndex]);
         uvIndex.value = Math.round(hourly.uv_index[hourIndex] ?? 0);
         soilMoisture.value = Math.min(100, Math.round((hourly.soil_moisture_0_to_1cm?.[hourIndex] ?? 0) * 100));
+
+        // Collect the next 24 hourly temperatures for the trend chart.
+        const series: { hour: number; temp: number }[] = [];
+        for (let offset = 0; offset <= 24; offset++) {
+          const i = hourIndex + offset;
+          if (hourly.temperature_2m[i] == null) break;
+          const ts = new Date(hourly.time[i]);
+          series.push({ hour: ts.getHours(), temp: round(hourly.temperature_2m[i]) });
+        }
+        hourlyTemps.value = series;
       }
 
       lastFetched.value = Date.now();
@@ -142,6 +155,7 @@ export const useWeatherStore = defineStore("weather", () => {
     aqi,
     feelsLike,
     forecast,
+    hourlyTemps,
     uvLabel,
     fetchWeather,
     fetchWeatherByCoords,

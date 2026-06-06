@@ -5,6 +5,7 @@ import CurrentConditions from '../components/Weather/CurrentConditions.vue'
 import Forecast from '../components/Weather/Forecast.vue'
 import PlantCareAlert from '../components/Weather/PlantCareAlert.vue'
 import RainfallOutlook from '../components/Weather/RainfallOutlook.vue'
+import TemperatureTrendChart from '../components/Weather/TemperatureTrendChart.vue'
 import LocationSearch from '../components/LocationSearch.vue'
 import { useUserStore } from '../stores/user'
 import { useWeatherStore } from '../stores/weather'
@@ -143,22 +144,7 @@ watch(
               </div>
             </div>
             <p class="text-[0.85rem] text-text-muted font-medium mb-6">{{ t('weather.next24h') }}</p>
-            <div class="w-full h-60 flex flex-col justify-between pt-4">
-              <div class="flex-1 flex flex-col justify-between pb-4">
-                <div class="h-px w-full bg-border"></div>
-                <div class="h-px w-full bg-border"></div>
-                <div class="h-px w-full bg-border"></div>
-              </div>
-              <div class="flex justify-between px-4 text-[0.65rem] font-semibold text-text-light">
-                <span>12 AM</span>
-                <span>4 AM</span>
-                <span>8 AM</span>
-                <span>12 PM</span>
-                <span>4 PM</span>
-                <span>8 PM</span>
-                <span>12 AM</span>
-              </div>
-            </div>
+            <TemperatureTrendChart />
           </div>
         </div>
 
