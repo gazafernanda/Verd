@@ -3,17 +3,16 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '../../stores/user'
 import { UserRound, Camera, Trash2, X } from 'lucide-vue-next'
-import defaultAvatar from '../../assets/alex_avatar.png'
 
 const emit = defineEmits<{ close: [] }>()
 const { t } = useI18n()
 const user = useUserStore()
 
 const displayNameInput = ref(user.displayName)
-const locationInput = ref(user.location)
 const avatarInput = ref(user.avatarUrl)
 const error = ref('')
 const saving = ref(false)
+const saved = ref(false)
 const fileInput = ref<HTMLInputElement | null>(null)
 
 // Resize/compress the chosen image to a small square JPEG data URL so it
@@ -64,10 +63,10 @@ async function save() {
   try {
     await user.saveSettings({
       displayName: displayNameInput.value.trim() || user.displayName,
-      location: locationInput.value.trim(),
       avatarUrl: avatarInput.value,
     })
-    emit('close')
+    saved.value = true
+    setTimeout(() => emit('close'), 900)
   } finally {
     saving.value = false
   }
@@ -100,8 +99,9 @@ async function save() {
       <div class="px-6 pb-6 flex flex-col gap-6">
         <!-- Avatar -->
         <div class="flex items-center gap-5">
-          <div class="relative w-24 h-24 rounded-full border-4 border-[#f6cfb0] bg-[#fcece0] flex items-center justify-center shrink-0">
-            <img :src="avatarInput || defaultAvatar" :alt="displayNameInput" class="w-[88px] h-[88px] rounded-full object-cover" />
+          <div class="relative w-24 h-24 rounded-full border-4 border-border bg-bg-app flex items-center justify-center shrink-0 overflow-hidden">
+            <img v-if="avatarInput" :src="avatarInput" :alt="displayNameInput" class="w-[88px] h-[88px] rounded-full object-cover" />
+            <UserRound v-else class="text-text-light" width="48" height="48" stroke-width="1.5" />
           </div>
           <div class="flex flex-col gap-2">
             <div class="flex gap-2">
@@ -138,17 +138,6 @@ async function save() {
           />
         </div>
 
-        <!-- Location -->
-        <div class="flex flex-col gap-2">
-          <label class="text-[0.85rem] font-extrabold text-text-main">{{ t('profile.locationLabel') }}</label>
-          <input
-            v-model="locationInput"
-            type="text"
-            :placeholder="t('profile.locationPlaceholder')"
-            class="px-4 py-3 rounded-md border border-border bg-bg-app font-[inherit] text-[0.95rem] text-text-main outline-none focus:border-success-green focus:bg-surface transition-colors"
-          />
-        </div>
-
         <!-- Actions -->
         <div class="flex justify-end gap-3 pt-1">
           <button
@@ -159,10 +148,11 @@ async function save() {
           </button>
           <button
             @click="save"
-            :disabled="saving"
-            class="px-6 py-2.5 rounded-[24px] text-[0.9rem] font-bold bg-success-green text-white hover:bg-[#2ea06e] transition-colors disabled:opacity-60"
+            :disabled="saving || saved"
+            class="px-6 py-2.5 rounded-[24px] text-[0.9rem] font-bold text-white transition-colors disabled:opacity-90"
+            :class="saved ? 'bg-primary' : 'bg-success-green hover:bg-[#2ea06e]'"
           >
-            {{ t('common.saveChanges') }}
+            {{ saved ? t('common.saved') : t('common.saveChanges') }}
           </button>
         </div>
       </div>

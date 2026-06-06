@@ -3,6 +3,20 @@ import { defineStore } from "pinia";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
+// The API is hosted on Render's free tier, which spins down after inactivity
+// and takes a while to wake. A plain fetch throws immediately on the first hit
+// to a cold instance, so retry a few times with backoff before giving up.
+async function fetchWithWake(input: string, init?: RequestInit, retries = 3) {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await fetch(input, init);
+    } catch (e) {
+      if (attempt >= retries) throw e;
+      await new Promise((r) => setTimeout(r, 2000 * (attempt + 1)));
+    }
+  }
+}
+
 export const useUserStore = defineStore("user", () => {
   const token = ref<string | null>(localStorage.getItem("verd_token"));
   const name = ref(localStorage.getItem("verd_name") ?? "");
@@ -45,14 +59,14 @@ export const useUserStore = defineStore("user", () => {
   async function login(emailInput: string, password: string) {
     let res: Response;
     try {
-      res = await fetch(`${API}/api/auth/login`, {
+      res = await fetchWithWake(`${API}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: emailInput, password }),
       });
     } catch {
       throw new Error(
-        "Cannot reach the server. Make sure the .NET API is running.",
+        "The server is waking up. Please wait a moment and try again.",
       );
     }
     if (!res.ok) {
@@ -69,7 +83,7 @@ export const useUserStore = defineStore("user", () => {
   ) {
     let res: Response;
     try {
-      res = await fetch(`${API}/api/auth/register`, {
+      res = await fetchWithWake(`${API}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -80,7 +94,7 @@ export const useUserStore = defineStore("user", () => {
       });
     } catch {
       throw new Error(
-        "Cannot reach the server. Make sure the .NET API is running.",
+        "The server is waking up. Please wait a moment and try again.",
       );
     }
     if (!res.ok) {

@@ -128,9 +128,18 @@ using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     if (databaseUrl != null)
+    {
         dbContext.Database.EnsureCreated();
+        // EnsureCreated() does NOT evolve the schema of a database that already
+        // exists, so additive columns introduced after the first deploy must be
+        // reconciled by hand. These statements are idempotent and safe to repeat.
+        dbContext.Database.ExecuteSqlRaw(
+            """ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "AvatarUrl" text NOT NULL DEFAULT '';""");
+    }
     else
+    {
         dbContext.Database.Migrate();
+    }
 }
 
 if (app.Environment.IsDevelopment())

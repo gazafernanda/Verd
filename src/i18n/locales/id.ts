@@ -258,8 +258,6 @@ export default {
     removePhoto: "Hapus Foto",
     photoHint: "JPG atau PNG. Gambar persegi tampil paling baik.",
     photoTooLarge: "Gambar terlalu besar. Pilih file yang lebih kecil.",
-    locationLabel: "Lokasi",
-    locationPlaceholder: "mis. Jakarta, Indonesia",
     shareProfile: "Bagikan Profil",
     myPlants: "Tanaman Saya",
     noPlants: "Belum ada tanaman. Tambahkan yang pertama!",

@@ -259,8 +259,6 @@ export default {
     removePhoto: "Remove Photo",
     photoHint: "JPG or PNG. Square images look best.",
     photoTooLarge: "Image is too large. Please choose a smaller file.",
-    locationLabel: "Location",
-    locationPlaceholder: "e.g. Jakarta, Indonesia",
     shareProfile: "Share Profile",
     myPlants: "My Plants",
     noPlants: "No plants yet. Add your first one!",
