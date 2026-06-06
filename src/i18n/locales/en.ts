@@ -109,6 +109,11 @@ export default {
     noResults: "No plants match your search.",
     markWatered: "I watered this today",
     watering: "Saving…",
+    editTitle: "Edit Plant",
+    editSubtitle: "Update the details for {name}.",
+    deleteTitle: "Delete this plant?",
+    deleteDesc: "Are you sure you want to delete {name}? This action can't be undone.",
+    deleteConfirm: "Delete",
   },
   chat: {
     greeting:

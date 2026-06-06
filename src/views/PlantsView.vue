@@ -3,18 +3,33 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { usePlantsStore, type Plant } from '../stores/plants'
-import { useRecommendationsStore } from '../stores/recommendations'
-import { Plus, Leaf, Flower2, Droplet, Sun, Trash2, Search } from 'lucide-vue-next'
+import { Plus, Leaf, Flower2, Droplet, Sun, Trash2, Search, TriangleAlert } from 'lucide-vue-next'
+import EditPlantModal from '../components/EditPlantModal.vue'
 
 const router = useRouter()
 const { t } = useI18n()
 const plants = usePlantsStore()
-const recs = useRecommendationsStore()
+
+// Clicking a card opens the edit modal.
+const editing = ref<Plant | null>(null)
 
 function openPlant(plant: Plant) {
-  // Kick off the AI 7-day plan for this plant, then show the recommendation page.
-  recs.generateForPlant(plant.id, plant.name)
-  router.push({ name: 'recommendation' })
+  editing.value = plant
+}
+
+// Delete confirmation.
+const deleteTarget = ref<Plant | null>(null)
+const deleting = ref(false)
+
+async function confirmDelete() {
+  if (!deleteTarget.value || deleting.value) return
+  deleting.value = true
+  try {
+    await plants.deletePlant(deleteTarget.value.id)
+    deleteTarget.value = null
+  } finally {
+    deleting.value = false
+  }
 }
 
 const wateringId = ref<number | null>(null)
@@ -167,7 +182,7 @@ onMounted(() => plants.fetchPlants())
       >
         <!-- Delete -->
         <button
-          @click.stop="plants.deletePlant(plant.id)"
+          @click.stop="deleteTarget = plant"
           class="absolute top-3 right-3 w-7 h-7 rounded-full bg-red-50 text-red-400 flex items-center justify-center opacity-0 group-hover:opacity-100 max-sm:opacity-100 transition-opacity hover:bg-red-100"
         >
           <Trash2 width="13" height="13" />
@@ -229,6 +244,41 @@ onMounted(() => plants.fetchPlants())
           <Droplet width="14" height="14" />
           {{ wateringId === plant.id ? t('plants.watering') : t('plants.markWatered') }}
         </button>
+      </div>
+    </div>
+
+    <!-- Edit plant modal -->
+    <EditPlantModal v-if="editing" :plant="editing" @close="editing = null" />
+
+    <!-- Delete confirmation -->
+    <div
+      v-if="deleteTarget"
+      class="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4"
+      @click.self="deleteTarget = null"
+    >
+      <div class="bg-surface rounded-2xl shadow-xl w-full max-w-[400px] p-6 flex flex-col items-center text-center gap-4">
+        <div class="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center">
+          <TriangleAlert class="text-red-500" width="26" height="26" />
+        </div>
+        <div>
+          <h2 class="text-[1.15rem] font-bold text-text-main mb-1.5">{{ t('plants.deleteTitle') }}</h2>
+          <p class="text-[0.9rem] text-text-muted leading-relaxed">{{ t('plants.deleteDesc', { name: deleteTarget.name }) }}</p>
+        </div>
+        <div class="flex gap-3 w-full mt-1">
+          <button
+            @click="deleteTarget = null"
+            class="flex-1 py-2.5 rounded-[24px] text-[0.9rem] font-bold border border-border text-text-main hover:bg-bg-app transition-colors"
+          >
+            {{ t('common.cancel') }}
+          </button>
+          <button
+            @click="confirmDelete"
+            :disabled="deleting"
+            class="flex-1 py-2.5 rounded-[24px] text-[0.9rem] font-bold bg-red-500 text-white hover:bg-red-600 transition-colors disabled:opacity-60"
+          >
+            {{ t('plants.deleteConfirm') }}
+          </button>
+        </div>
       </div>
     </div>
   </div>

@@ -108,6 +108,11 @@ export default {
     noResults: "Tidak ada tanaman yang cocok dengan pencarian Anda.",
     markWatered: "Sudah saya siram hari ini",
     watering: "Menyimpan…",
+    editTitle: "Edit Tanaman",
+    editSubtitle: "Perbarui detail untuk {name}.",
+    deleteTitle: "Hapus tanaman ini?",
+    deleteDesc: "Apakah Anda yakin ingin menghapus {name}? Tindakan ini tidak dapat dibatalkan.",
+    deleteConfirm: "Hapus",
   },
   chat: {
     greeting:
