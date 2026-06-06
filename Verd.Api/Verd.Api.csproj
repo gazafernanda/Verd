@@ -5,6 +5,9 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Verd.Api</RootNamespace>
+    <!-- Allow running on a newer major runtime (e.g. .NET 10) when the
+         .NET 9 runtime isn't installed locally. -->
+    <RollForward>Major</RollForward>
   </PropertyGroup>
 
   <ItemGroup>

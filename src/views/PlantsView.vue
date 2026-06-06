@@ -183,7 +183,7 @@ onMounted(() => plants.fetchPlants())
         <!-- Delete -->
         <button
           @click.stop="deleteTarget = plant"
-          class="absolute top-3 right-3 w-7 h-7 rounded-full bg-red-50 text-red-400 flex items-center justify-center opacity-0 group-hover:opacity-100 max-sm:opacity-100 transition-opacity hover:bg-red-100"
+          class="absolute top-4 right-4 w-7 h-7 rounded-full bg-red-50 text-red-400 flex items-center justify-center transition-colors hover:bg-red-100"
         >
           <Trash2 width="13" height="13" />
         </button>

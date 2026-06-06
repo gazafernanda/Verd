@@ -95,6 +95,7 @@ export default {
     title: "Care Recommendations",
     viewSchedule: "View Schedule",
     maintenanceBadge: "MAINTENANCE",
+    cardFallback: "Water {freq}. Prefers {sun}.",
   },
   plants: {
     breadcrumb: "Home / My Plants",

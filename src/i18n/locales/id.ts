@@ -95,6 +95,7 @@ export default {
     title: "Rekomendasi Perawatan",
     viewSchedule: "Lihat Jadwal",
     maintenanceBadge: "PERAWATAN",
+    cardFallback: "Siram {freq}. Menyukai {sun}.",
   },
   plants: {
     breadcrumb: "Beranda / Tanaman Saya",

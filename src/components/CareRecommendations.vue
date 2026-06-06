@@ -2,11 +2,32 @@
 import CareCard from "./CareCard.vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
-import { usePlantsStore } from "../stores/plants";
+import { usePlantsStore, type Plant } from "../stores/plants";
 
 const { t } = useI18n();
 const router = useRouter();
 const plants = usePlantsStore();
+
+const sunlightKeyMap: Record<string, string> = {
+  "full-sun": "fullSunLabel",
+  partial: "partialLabel",
+  indirect: "indirectLabel",
+  low: "lowLabel",
+};
+
+// The persisted care card title/description are often empty, so fall back to
+// the plant's own name and a care summary built from its watering + sunlight.
+function cardTitle(plant: Plant) {
+  return plant.careCard.title?.trim() || plant.name;
+}
+
+function cardDescription(plant: Plant) {
+  if (plant.careCard.description?.trim()) return plant.careCard.description;
+  if (plant.notes?.trim()) return plant.notes;
+  const freq = t(`addPlant.watering.${plant.wateringFrequency || "weekly"}`).toLowerCase();
+  const sun = t(`addPlant.sunlight.${sunlightKeyMap[plant.sunlight] ?? "indirectLabel"}`);
+  return t("careRecommendations.cardFallback", { freq, sun });
+}
 </script>
 
 <template>
@@ -37,8 +58,8 @@ const plants = usePlantsStore();
         >
           <CareCard
             :category="plant.careCard.category"
-            :title="plant.careCard.title"
-            :description="plant.careCard.description"
+            :title="cardTitle(plant)"
+            :description="cardDescription(plant)"
             :image="plant.careCard.image"
             :bgType="plant.careCard.bgType"
           />
