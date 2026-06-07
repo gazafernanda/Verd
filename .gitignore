@@ -44,6 +44,9 @@ Verd.Api/appsettings.Production.json
 Verd.Api/appsettings.Development.json
 
 # SQLite database and WAL files
-Verd.Api/verd.db
-Verd.Api/verd.db-shm
-Verd.Api/verd.db-wal
+Verd.Api/*.db
+Verd.Api/*.db-shm
+Verd.Api/*.db-wal
+
+# Local Claude Code agent settings
+.claude/settings.local.json
