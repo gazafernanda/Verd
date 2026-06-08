@@ -40,7 +40,7 @@ onMounted(async () => {
 
     <template v-else>
       <!-- App pages: sidebar layout -->
-      <main class="w-full h-screen flex bg-bg-app overflow-hidden">
+      <main class="w-full h-[100dvh] flex bg-bg-app overflow-hidden">
         <!-- Mobile overlay -->
         <Transition name="fade">
           <div
@@ -61,7 +61,7 @@ onMounted(async () => {
         </div>
 
         <div
-          class="flex-1 py-10 px-12 max-lg:px-5 max-lg:py-5 overflow-y-auto min-w-0"
+          class="flex-1 flex flex-col py-10 px-12 max-lg:px-5 max-lg:py-5 overflow-y-auto min-w-0"
         >
           <!-- Mobile top bar -->
           <div class="lg:hidden flex items-center gap-3 mb-6">

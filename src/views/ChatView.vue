@@ -97,7 +97,7 @@ async function scrollToBottom() {
 </script>
 
 <template>
-  <div class="h-[calc(100vh-80px)] max-lg:h-[calc(100dvh-140px)] flex flex-col">
+  <div class="flex-1 min-h-0 flex flex-col">
     <div
       class="flex-1 flex flex-col bg-transparent max-w-[900px] mx-auto w-full min-h-0"
     >
