@@ -2,12 +2,14 @@
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '../stores/user'
+import { useNotificationsStore } from '../stores/notifications'
 import { setLocale, SUPPORTED_LOCALES, type LocaleCode } from '../i18n'
-import { X, Home, Sun, Leaf, Sprout, MessageCircle, User, LogOut, Languages } from 'lucide-vue-next'
+import { X, Home, Sun, Leaf, Sprout, MessageCircle, Bell, User, LogOut, Languages } from 'lucide-vue-next'
 
 const router = useRouter()
 const { t, locale } = useI18n()
 const user = useUserStore()
+const notifications = useNotificationsStore()
 const emit = defineEmits(['close'])
 
 async function logout() {
@@ -98,6 +100,21 @@ function changeLanguage(code: LocaleCode) {
           >
             <MessageCircle class="shrink-0" width="24" height="24" />
             {{ t('nav.chat') }}
+          </router-link>
+        </li>
+        <li>
+          <router-link
+            to="/notifications"
+            class="flex items-center gap-4 px-5 py-[14px] rounded-lg text-text-muted font-medium transition-colors hover:bg-bg-app hover:text-text-main"
+            active-class="bg-light-green-bg !text-primary"
+            @click="emit('close')"
+          >
+            <Bell class="shrink-0" width="24" height="24" />
+            {{ t('nav.notifications') }}
+            <span
+              v-if="notifications.unreadCount > 0"
+              class="ml-auto min-w-[20px] h-5 px-1.5 rounded-full bg-success-green text-white text-[0.7rem] font-bold flex items-center justify-center"
+            >{{ notifications.unreadCount }}</span>
           </router-link>
         </li>
         <li>

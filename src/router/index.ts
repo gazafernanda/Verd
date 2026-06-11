@@ -43,6 +43,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/notifications',
+      name: 'notifications',
+      component: () => import('../views/NotificationsView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/profile',
       name: 'profile',
       component: () => import('../views/ProfileView.vue'),

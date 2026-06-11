@@ -5,6 +5,7 @@ export default {
     plants: "Tanaman Saya",
     recommendation: "Rekomendasi",
     chat: "Chat AI",
+    notifications: "Notifikasi",
     profile: "Profil",
     logout: "Keluar",
   },
@@ -26,6 +27,42 @@ export default {
     HEALTHY: "SEHAT",
     "NEEDS WATER": "PERLU AIR",
     "NEEDS MISTING": "PERLU PENYEMPROTAN",
+  },
+  notifications: {
+    breadcrumb: "Beranda / Notifikasi",
+    title: "Notifikasi",
+    subtitleUnread: "Anda memiliki {count} notifikasi belum dibaca",
+    allCaughtUp: "Semua sudah terbaca.",
+    markAllRead: "Tandai semua dibaca",
+    filterAll: "Semua",
+    filterUnread: "Belum Dibaca",
+    emptyTitle: "Tidak ada notifikasi",
+    emptyDesc: "Kami akan memberi tahu Anda saat tanaman membutuhkan perhatian.",
+    noUnread: "Tidak ada notifikasi yang belum dibaca.",
+    waterTitle: "{name} perlu disiram",
+    waterMsg:
+      "Tingkat air berada di {level}%. Siram agar tetap sehat.",
+    mistTitle: "{name} perlu penyemprotan",
+    mistMsg:
+      "Kelembapan rendah untuk {name}. Penyemprotan ringan akan membantu.",
+    uvTitle: "UV tinggi hari ini",
+    uvMsg:
+      "Indeks UV {uv} ({label}). Pindahkan tanaman yang sensitif sinar ke cahaya tidak langsung.",
+    hotTitle: "Peringatan cuaca panas",
+    hotMsg:
+      "Suhu di luar {temp}°C. Periksa kelembapan tanah — tanaman mungkin perlu air tambahan.",
+    dryTitle: "Kelembapan rendah",
+    dryMsg:
+      "Kelembapan {humidity}%. Pertimbangkan menyemprot tanaman tropis Anda.",
+    healthyTitle: "Taman Anda tumbuh subur",
+    healthyMsg: "Semua {count} tanaman dalam kondisi sehat. Kerja bagus!",
+    streakTitle: "Rangkaian perawatan {days} hari!",
+    streakMsg:
+      "Anda konsisten merawat tanaman. Pertahankan!",
+    action: {
+      plants: "Lihat taman",
+      weather: "Lihat cuaca",
+    },
   },
   auth: {
     heroTitle: "Taman Anda,\nlebih cerdas.",

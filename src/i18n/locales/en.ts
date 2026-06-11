@@ -5,6 +5,7 @@ export default {
     plants: "My Plants",
     recommendation: "Recommendation",
     chat: "Chat AI",
+    notifications: "Notifications",
     profile: "Profile",
     logout: "Logout",
   },
@@ -26,6 +27,40 @@ export default {
     HEALTHY: "HEALTHY",
     "NEEDS WATER": "NEEDS WATER",
     "NEEDS MISTING": "NEEDS MISTING",
+  },
+  notifications: {
+    breadcrumb: "Home / Notifications",
+    title: "Notifications",
+    subtitleUnread:
+      "You have {count} unread notification | You have {count} unread notifications",
+    allCaughtUp: "You're all caught up.",
+    markAllRead: "Mark all as read",
+    filterAll: "All",
+    filterUnread: "Unread",
+    emptyTitle: "No notifications",
+    emptyDesc: "We'll let you know when your plants need attention.",
+    noUnread: "No unread notifications.",
+    waterTitle: "{name} needs water",
+    waterMsg:
+      "Water level is at {level}%. Give it a drink to keep it healthy.",
+    mistTitle: "{name} needs misting",
+    mistMsg: "Humidity is low for {name}. A light misting will help.",
+    uvTitle: "High UV today",
+    uvMsg:
+      "UV index is {uv} ({label}). Move sun-sensitive plants to indirect light.",
+    hotTitle: "Warm weather alert",
+    hotMsg:
+      "It's {temp}°C outside. Check soil moisture — plants may need extra water.",
+    dryTitle: "Low humidity",
+    dryMsg: "Humidity is {humidity}%. Consider misting your tropical plants.",
+    healthyTitle: "Your garden is thriving",
+    healthyMsg: "All {count} plants are healthy. Great work!",
+    streakTitle: "{days}-day care streak!",
+    streakMsg: "You've kept up with your plant care. Keep it going!",
+    action: {
+      plants: "View garden",
+      weather: "View weather",
+    },
   },
   auth: {
     heroTitle: "Your garden,\nsmarter.",
