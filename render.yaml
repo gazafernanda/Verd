@@ -19,3 +19,7 @@ services:
         generateValue: true
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
+      # Disables the appsettings.json FileSystemWatcher — the container's
+      # inotify instance limit was being hit on startup, crash-looping the service.
+      - key: DOTNET_hostBuilder__reloadConfigOnChange
+        value: "false"
