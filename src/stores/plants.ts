@@ -42,7 +42,7 @@ function authHeaders() {
 export const usePlantsStore = defineStore("plants", () => {
   const plants = ref<Plant[]>([]);
 
-  const careStreak = ref(45);
+  const careStreak = ref(0);
 
   const totalPlants = computed(() => plants.value.length);
 
@@ -72,10 +72,36 @@ export const usePlantsStore = defineStore("plants", () => {
       const res = await fetch(`${API}/api/plants`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (res.ok) { plants.value = await res.json(); return true; }
+      if (res.ok) {
+        plants.value = await res.json();
+        await refreshCareStreak();
+        return true;
+      }
       if (res.status === 401) return false;
     } catch { /* silent fail */ }
     return false;
+  }
+
+  /** Consecutive days (ending today) with at least one care log across any plant. */
+  async function refreshCareStreak() {
+    if (plants.value.length === 0) {
+      careStreak.value = 0;
+      return;
+    }
+    const logsByPlant = await Promise.all(
+      plants.value.map((p) => fetchLogs(p.id)),
+    );
+    const loggedDays = new Set(
+      logsByPlant.flat().map((log) => log.loggedAt.slice(0, 10)),
+    );
+
+    let streak = 0;
+    const cursor = new Date();
+    while (loggedDays.has(cursor.toISOString().slice(0, 10))) {
+      streak++;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+    careStreak.value = streak;
   }
 
   async function deletePlant(id: number) {
@@ -144,6 +170,7 @@ export const usePlantsStore = defineStore("plants", () => {
         const idx = plants.value.findIndex((p) => p.id === plantId);
         if (idx !== -1) plants.value[idx] = updated;
       }
+      await refreshCareStreak();
     }
   }
 
