@@ -106,19 +106,22 @@ onMounted(async () => {
 </template>
 
 <style>
-.page-enter-active,
-.page-leave-active {
+/* out-in mode plays leave fully before enter starts, so the leave half is pure
+   dead time on every navigation — keep it minimal and let the enter carry the motion. */
+.page-enter-active {
   transition:
-    opacity 0.18s ease,
-    transform 0.18s ease;
+    opacity 0.14s ease-out,
+    transform 0.14s ease-out;
+}
+.page-leave-active {
+  transition: opacity 0.06s linear;
 }
 .page-enter-from {
   opacity: 0;
-  transform: translateY(6px);
+  transform: translateY(4px);
 }
 .page-leave-to {
   opacity: 0;
-  transform: translateY(-6px);
 }
 .fade-enter-active,
 .fade-leave-active {
