@@ -74,7 +74,9 @@ export const usePlantsStore = defineStore("plants", () => {
       });
       if (res.ok) {
         plants.value = await res.json();
-        await refreshCareStreak();
+        // Fire-and-forget: the streak costs one request per plant and only feeds a
+        // notification, so it must not hold up rendering the plant list.
+        void refreshCareStreak();
         return true;
       }
       if (res.status === 401) return false;
@@ -170,7 +172,7 @@ export const usePlantsStore = defineStore("plants", () => {
         const idx = plants.value.findIndex((p) => p.id === plantId);
         if (idx !== -1) plants.value[idx] = updated;
       }
-      await refreshCareStreak();
+      void refreshCareStreak();
     }
   }
 
