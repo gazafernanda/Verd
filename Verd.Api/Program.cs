@@ -135,6 +135,8 @@ using (var scope = app.Services.CreateScope())
         // reconciled by hand. These statements are idempotent and safe to repeat.
         dbContext.Database.ExecuteSqlRaw(
             """ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "AvatarUrl" text NOT NULL DEFAULT '';""");
+        dbContext.Database.ExecuteSqlRaw(
+            """ALTER TABLE "Plants" ADD COLUMN IF NOT EXISTS "LastWateredAt" timestamp with time zone NULL;""");
     }
     else
     {

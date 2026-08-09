@@ -8,6 +8,12 @@ public class Plant
     public string Status { get; set; } = "HEALTHY"; // HEALTHY | NEEDS WATER | NEEDS MISTING
     public int WateringLevel { get; set; }
     public string LastWatered { get; set; } = string.Empty;
+
+    /// <summary>
+    /// When the plant was last watered, used to decay <see cref="WateringLevel"/>
+    /// over time. Null for plants created before time tracking existed.
+    /// </summary>
+    public DateTime? LastWateredAt { get; set; }
     public string Category { get; set; } = string.Empty;
     public string IconBg { get; set; } = "#f0f9f4";
 

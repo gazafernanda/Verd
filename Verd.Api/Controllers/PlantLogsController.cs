@@ -5,6 +5,7 @@ using System.Security.Claims;
 using Verd.Api.Data;
 using Verd.Api.DTOs.Plants;
 using Verd.Api.Models;
+using Verd.Api.Services;
 
 namespace Verd.Api.Controllers;
 
@@ -50,11 +51,22 @@ public class PlantLogsController(AppDbContext db) : ControllerBase
         {
             plant.WateringLevel = 100;
             plant.LastWatered = "Just now";
-            if (plant.Status == "NEEDS WATER") plant.Status = "HEALTHY";
+            plant.LastWateredAt = log.LoggedAt;
+            plant.Status = "HEALTHY";
         }
         else if (dto.Action == "misted")
         {
-            if (plant.Status == "NEEDS MISTING") plant.Status = "HEALTHY";
+            // Misting is a partial top-up: it clears NEEDS MISTING but does not
+            // reset the watering cycle the way a full watering does.
+            var level = PlantCareService.CurrentLevel(plant, log.LoggedAt);
+            if (level <= PlantCareService.NeedsMistingAtOrBelow)
+            {
+                var topUp = Math.Max(level, PlantCareService.NeedsMistingAtOrBelow + 1);
+                plant.WateringLevel = topUp;
+                plant.LastWateredAt = PlantCareService.BaselineFor(
+                    topUp, plant.WateringFrequency, log.LoggedAt);
+                plant.Status = PlantCareService.StatusFor(topUp);
+            }
         }
 
         db.PlantLogs.Add(log);

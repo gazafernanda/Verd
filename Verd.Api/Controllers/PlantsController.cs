@@ -6,6 +6,7 @@ using System.Text.Json.Serialization;
 using Verd.Api.Data;
 using Verd.Api.DTOs.Plants;
 using Verd.Api.Models;
+using Verd.Api.Services;
 
 namespace Verd.Api.Controllers;
 
@@ -78,9 +79,12 @@ public class PlantsController(AppDbContext db, IHttpClientFactory httpFactory) :
         {
             UserId = UserId,
             Name = dto.Name,
-            Status = dto.Status,
+            Status = PlantCareService.StatusFor(dto.WateringLevel),
             WateringLevel = dto.WateringLevel,
             LastWatered = dto.LastWatered,
+            // Anchor the chosen level in time so it starts decaying from here.
+            LastWateredAt = PlantCareService.BaselineFor(
+                dto.WateringLevel, dto.WateringFrequency, DateTime.UtcNow),
             Category = dto.Category,
             IconBg = dto.IconBg,
             WateringFrequency = dto.WateringFrequency,
@@ -105,9 +109,18 @@ public class PlantsController(AppDbContext db, IHttpClientFactory httpFactory) :
         var plant = await db.Plants.FirstOrDefaultAsync(p => p.Id == id && p.UserId == UserId);
         if (plant is null) return NotFound();
 
+        // Re-anchor only when the user actually moved the slider (or the cycle
+        // changed) — otherwise an unrelated edit would silently top the plant up.
+        var currentLevel = PlantCareService.CurrentLevel(plant, DateTime.UtcNow);
+        if (dto.WateringLevel != currentLevel || dto.WateringFrequency != plant.WateringFrequency)
+        {
+            plant.LastWateredAt = PlantCareService.BaselineFor(
+                dto.WateringLevel, dto.WateringFrequency, DateTime.UtcNow);
+        }
+
         plant.Name = dto.Name;
-        plant.Status = dto.Status;
         plant.WateringLevel = dto.WateringLevel;
+        plant.Status = PlantCareService.StatusFor(dto.WateringLevel);
         plant.LastWatered = dto.LastWatered;
         plant.Category = dto.Category;
         plant.IconBg = dto.IconBg;
@@ -135,12 +148,21 @@ public class PlantsController(AppDbContext db, IHttpClientFactory httpFactory) :
         return NoContent();
     }
 
-    private static PlantDto ToDto(Plant p) => new(
+    // Water level is derived at read time rather than stored, so a plant dries out
+    // on its own between requests without needing a background job.
+    private static PlantDto ToDto(Plant p)
+    {
+        var now = DateTime.UtcNow;
+        var level = PlantCareService.CurrentLevel(p, now);
+        return ToDto(p, level, PlantCareService.StatusFor(level), PlantCareService.LastWateredLabel(p, now));
+    }
+
+    private static PlantDto ToDto(Plant p, int wateringLevel, string status, string lastWatered) => new(
         Id: p.Id,
         Name: p.Name,
-        Status: p.Status,
-        WateringLevel: p.WateringLevel,
-        LastWatered: p.LastWatered,
+        Status: status,
+        WateringLevel: wateringLevel,
+        LastWatered: lastWatered,
         Category: p.Category,
         IconBg: p.IconBg,
         WateringFrequency: p.WateringFrequency,
