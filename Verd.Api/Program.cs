@@ -123,24 +123,53 @@ builder.Services.AddSwaggerGen(c =>
 // ── Build ─────────────────────────────────────────────────────────────────────
 var app = builder.Build();
 
-// Apply migrations on startup (EnsureCreated for PostgreSQL, Migrate for SQLite)
+// Apply migrations on startup (EnsureCreated for PostgreSQL, Migrate for SQLite).
+// The container can boot before outbound DNS is ready, so the first connection
+// may fail with a transient socket error. Retry a few times, and never let this
+// take the whole service down — the app can still start and connect later.
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    if (databaseUrl != null)
+    var startupLog = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("Startup");
+
+    const int maxAttempts = 5;
+    for (var attempt = 1; attempt <= maxAttempts; attempt++)
     {
-        dbContext.Database.EnsureCreated();
-        // EnsureCreated() does NOT evolve the schema of a database that already
-        // exists, so additive columns introduced after the first deploy must be
-        // reconciled by hand. These statements are idempotent and safe to repeat.
-        dbContext.Database.ExecuteSqlRaw(
-            """ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "AvatarUrl" text NOT NULL DEFAULT '';""");
-        dbContext.Database.ExecuteSqlRaw(
-            """ALTER TABLE "Plants" ADD COLUMN IF NOT EXISTS "LastWateredAt" timestamp with time zone NULL;""");
-    }
-    else
-    {
-        dbContext.Database.Migrate();
+        try
+        {
+            if (databaseUrl != null)
+            {
+                dbContext.Database.EnsureCreated();
+                // EnsureCreated() does NOT evolve the schema of a database that already
+                // exists, so additive columns introduced after the first deploy must be
+                // reconciled by hand. These statements are idempotent and safe to repeat.
+                dbContext.Database.ExecuteSqlRaw(
+                    """ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "AvatarUrl" text NOT NULL DEFAULT '';""");
+                dbContext.Database.ExecuteSqlRaw(
+                    """ALTER TABLE "Plants" ADD COLUMN IF NOT EXISTS "LastWateredAt" timestamp with time zone NULL;""");
+            }
+            else
+            {
+                dbContext.Database.Migrate();
+            }
+
+            startupLog.LogInformation("Database bootstrap succeeded on attempt {Attempt}.", attempt);
+            break;
+        }
+        catch (Exception ex) when (attempt < maxAttempts)
+        {
+            var delay = TimeSpan.FromSeconds(2 * attempt);
+            startupLog.LogWarning(ex,
+                "Database bootstrap attempt {Attempt}/{Max} failed; retrying in {Seconds}s.",
+                attempt, maxAttempts, delay.TotalSeconds);
+            Thread.Sleep(delay);
+        }
+        catch (Exception ex)
+        {
+            startupLog.LogError(ex,
+                "Database bootstrap failed after {Max} attempts. Starting anyway — requests that " +
+                "need the database will fail until it becomes reachable.", maxAttempts);
+        }
     }
 }
 
