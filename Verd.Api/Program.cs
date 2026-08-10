@@ -173,22 +173,40 @@ using (var scope = app.Services.CreateScope())
 
             // Bootstrapping an admin: there is no UI for granting the first one,
             // so promote the account named by ADMIN_EMAIL on every start.
-            var adminEmail = Environment.GetEnvironmentVariable("ADMIN_EMAIL");
+            var adminEmail = Environment.GetEnvironmentVariable("ADMIN_EMAIL")?.Trim();
             if (!string.IsNullOrWhiteSpace(adminEmail))
             {
-                var admin = dbContext.Users.FirstOrDefault(u => u.Email == adminEmail);
+                // Match loosely: a stray space or different casing in the dashboard
+                // value should still find the account rather than silently do nothing.
+                var admin = dbContext.Users
+                    .FirstOrDefault(u => u.Email.ToLower() == adminEmail.ToLower());
+
                 if (admin is null)
                 {
                     startupLog.LogWarning(
-                        "ADMIN_EMAIL is set to {Email} but no such user exists yet — register it first.",
-                        adminEmail);
+                        "ADMIN_EMAIL is set to '{Email}' but no such user exists — register that " +
+                        "account first, then restart. Known emails: {Emails}",
+                        adminEmail,
+                        string.Join(", ", dbContext.Users.Select(u => u.Email).Take(20)));
                 }
                 else if (admin.Role != "Admin")
                 {
                     admin.Role = "Admin";
                     dbContext.SaveChanges();
-                    startupLog.LogInformation("Promoted {Email} to Admin.", adminEmail);
+                    startupLog.LogInformation("Promoted {Email} to Admin.", admin.Email);
                 }
+                else
+                {
+                    startupLog.LogInformation("{Email} is already an Admin.", admin.Email);
+                }
+            }
+            else
+            {
+                var adminCount = dbContext.Users.Count(u => u.Role == "Admin");
+                if (adminCount == 0)
+                    startupLog.LogWarning(
+                        "No admin account exists and ADMIN_EMAIL is not set — the admin console " +
+                        "is unreachable. Set ADMIN_EMAIL to a registered address and restart.");
             }
 
             startupLog.LogInformation("Database bootstrap succeeded on attempt {Attempt}.", attempt);
