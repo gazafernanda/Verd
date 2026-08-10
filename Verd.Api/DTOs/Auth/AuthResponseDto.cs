@@ -5,5 +5,6 @@ public record AuthResponseDto(
     string DisplayName,
     string Email,
     string Location,
-    string Tier
+    string Tier,
+    string Role
 );

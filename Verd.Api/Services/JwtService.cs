@@ -20,6 +20,8 @@ public class JwtService(IConfiguration configuration)
             new Claim(JwtRegisteredClaimNames.Email, user.Email),
             new Claim(JwtRegisteredClaimNames.Name, user.DisplayName),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            // Drives [Authorize(Roles = "Admin")] on the admin console.
+            new Claim(ClaimTypes.Role, user.Role),
         };
 
         var token = new JwtSecurityToken(

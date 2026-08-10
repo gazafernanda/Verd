@@ -28,6 +28,7 @@ public class UsersController(AppDbContext db) : ControllerBase
             Location: user.Location,
             AvatarUrl: user.AvatarUrl,
             Tier: user.Tier,
+            Role: user.Role,
             MemberSince: user.MemberSince.ToString("MMM yyyy"),
             WeatherAlertsEnabled: user.WeatherAlertsEnabled
         ));
@@ -56,6 +57,7 @@ public class UsersController(AppDbContext db) : ControllerBase
             Location: user.Location,
             AvatarUrl: user.AvatarUrl,
             Tier: user.Tier,
+            Role: user.Role,
             MemberSince: user.MemberSince.ToString("MMM yyyy"),
             WeatherAlertsEnabled: user.WeatherAlertsEnabled
         ));

@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { useUserStore } from '../stores/user'
 import { useNotificationsStore } from '../stores/notifications'
 import { setLocale, SUPPORTED_LOCALES, type LocaleCode } from '../i18n'
-import { X, Home, Sun, Leaf, Sprout, MessageCircle, Bell, User, LogOut, Languages } from 'lucide-vue-next'
+import { X, Home, Sun, Leaf, Sprout, MessageCircle, Bell, User, LogOut, Languages, ShieldCheck } from 'lucide-vue-next'
 
 const router = useRouter()
 const { t, locale } = useI18n()
@@ -126,6 +126,17 @@ function changeLanguage(code: LocaleCode) {
           >
             <User class="shrink-0" width="24" height="24" />
             {{ t('nav.profile') }}
+          </router-link>
+        </li>
+        <li v-if="user.isAdmin">
+          <router-link
+            to="/admin"
+            class="flex items-center gap-4 px-5 py-[14px] rounded-lg text-text-muted font-medium transition-colors hover:bg-bg-app hover:text-text-main"
+            active-class="bg-light-green-bg !text-primary"
+            @click="emit('close')"
+          >
+            <ShieldCheck class="shrink-0" width="24" height="24" />
+            {{ t('nav.admin') }}
           </router-link>
         </li>
       </ul>

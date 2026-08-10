@@ -48,6 +48,7 @@ public class AuthController(AppDbContext db, JwtService jwt) : ControllerBase
         DisplayName: user.DisplayName,
         Email: user.Email,
         Location: user.Location,
-        Tier: user.Tier
+        Tier: user.Tier,
+        Role: user.Role
     );
 }

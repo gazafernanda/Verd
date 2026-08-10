@@ -147,10 +147,48 @@ using (var scope = app.Services.CreateScope())
                     """ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "AvatarUrl" text NOT NULL DEFAULT '';""");
                 dbContext.Database.ExecuteSqlRaw(
                     """ALTER TABLE "Plants" ADD COLUMN IF NOT EXISTS "LastWateredAt" timestamp with time zone NULL;""");
+                dbContext.Database.ExecuteSqlRaw(
+                    """ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "Role" text NOT NULL DEFAULT 'Gardener';""");
+                dbContext.Database.ExecuteSqlRaw(
+                    """
+                    CREATE TABLE IF NOT EXISTS "SystemSettings" (
+                        "Id" serial PRIMARY KEY,
+                        "Key" text NOT NULL,
+                        "Value" text NOT NULL,
+                        "UpdatedAt" timestamp with time zone NOT NULL
+                    );
+                    """);
+                dbContext.Database.ExecuteSqlRaw(
+                    """CREATE UNIQUE INDEX IF NOT EXISTS "IX_SystemSettings_Key" ON "SystemSettings" ("Key");""");
             }
             else
             {
                 dbContext.Database.Migrate();
+            }
+
+            // Accounts that predate the Role column land with an empty string,
+            // which matches neither role — normalise them to the default.
+            dbContext.Database.ExecuteSqlRaw(
+                """UPDATE "Users" SET "Role" = 'Gardener' WHERE "Role" IS NULL OR "Role" = '';""");
+
+            // Bootstrapping an admin: there is no UI for granting the first one,
+            // so promote the account named by ADMIN_EMAIL on every start.
+            var adminEmail = Environment.GetEnvironmentVariable("ADMIN_EMAIL");
+            if (!string.IsNullOrWhiteSpace(adminEmail))
+            {
+                var admin = dbContext.Users.FirstOrDefault(u => u.Email == adminEmail);
+                if (admin is null)
+                {
+                    startupLog.LogWarning(
+                        "ADMIN_EMAIL is set to {Email} but no such user exists yet — register it first.",
+                        adminEmail);
+                }
+                else if (admin.Role != "Admin")
+                {
+                    admin.Role = "Admin";
+                    dbContext.SaveChanges();
+                    startupLog.LogInformation("Promoted {Email} to Admin.", adminEmail);
+                }
             }
 
             startupLog.LogInformation("Database bootstrap succeeded on attempt {Attempt}.", attempt);

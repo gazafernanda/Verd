@@ -66,6 +66,12 @@ const router = createRouter({
       component: () => import('../views/AddPlantView.vue'),
       meta: { requiresAuth: true },
     },
+    {
+      path: '/admin',
+      name: 'admin',
+      component: () => import('../views/AdminView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true },
+    },
   ],
 })
 
@@ -76,6 +82,10 @@ router.beforeEach((to) => {
     return { name: 'login' }
   }
   if (to.meta.guestOnly && isAuthenticated) {
+    return { name: 'dashboard' }
+  }
+  // Convenience only — the API enforces the role on every admin request.
+  if (to.meta.requiresAdmin && localStorage.getItem('verd_role') !== 'Admin') {
     return { name: 'dashboard' }
   }
 })

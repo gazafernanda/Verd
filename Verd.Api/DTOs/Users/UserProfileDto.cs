@@ -7,6 +7,7 @@ public record UserProfileDto(
     string Location,
     string AvatarUrl,
     string Tier,
+    string Role,
     string MemberSince,
     bool WeatherAlertsEnabled
 );

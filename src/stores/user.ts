@@ -28,6 +28,7 @@ export const useUserStore = defineStore("user", () => {
     localStorage.getItem("verd_lon") ? Number(localStorage.getItem("verd_lon")) : null
   );
   const tier = ref(localStorage.getItem("verd_tier") ?? "Green Thumb");
+  const role = ref(localStorage.getItem("verd_role") ?? "Gardener");
   const avatarUrl = ref(localStorage.getItem("verd_avatar") ?? "");
   const memberSince = ref("");
   const displayName = ref(name.value);
@@ -35,6 +36,7 @@ export const useUserStore = defineStore("user", () => {
   const weatherAlertsEnabled = ref(true);
 
   const isAuthenticated = computed(() => !!token.value);
+  const isAdmin = computed(() => role.value === "Admin");
 
   function persist(data: {
     token: string;
@@ -42,6 +44,7 @@ export const useUserStore = defineStore("user", () => {
     email: string;
     location: string;
     tier: string;
+    role?: string;
   }) {
     token.value = data.token;
     name.value = data.displayName;
@@ -49,6 +52,8 @@ export const useUserStore = defineStore("user", () => {
     email.value = data.email;
     location.value = data.location;
     tier.value = data.tier;
+    role.value = data.role ?? "Gardener";
+    localStorage.setItem("verd_role", role.value);
     localStorage.setItem("verd_token", data.token);
     localStorage.setItem("verd_name", data.displayName);
     localStorage.setItem("verd_email", data.email);
@@ -112,6 +117,8 @@ export const useUserStore = defineStore("user", () => {
     location.value = "";
     avatarUrl.value = "";
     tier.value = "Green Thumb";
+    role.value = "Gardener";
+    localStorage.removeItem("verd_role");
     localStorage.removeItem("verd_token");
     localStorage.removeItem("verd_name");
     localStorage.removeItem("verd_email");
@@ -180,6 +187,8 @@ export const useUserStore = defineStore("user", () => {
       location.value = data.location;
       avatarUrl.value = data.avatarUrl ?? "";
       tier.value = data.tier;
+      role.value = data.role ?? role.value;
+      localStorage.setItem("verd_role", role.value);
       memberSince.value = data.memberSince;
       weatherAlertsEnabled.value = data.weatherAlertsEnabled;
       localStorage.setItem("verd_name", data.displayName);
@@ -224,7 +233,9 @@ export const useUserStore = defineStore("user", () => {
     displayName,
     email,
     weatherAlertsEnabled,
+    role,
     isAuthenticated,
+    isAdmin,
     login,
     register,
     logout,
