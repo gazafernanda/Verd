@@ -74,7 +74,7 @@ export default {
       schedules: "Jadwal perawatan yang dipersonalisasi",
       ai: "Diagnosis & chat tanaman dengan AI",
     },
-    copyright: "© 2025 Verd. Hak cipta dilindungi.",
+    copyright: "© 2026 Verd. Hak cipta dilindungi.",
     emailLabel: "Alamat email",
     emailPlaceholder: "anda{'@'}contoh.com",
     passwordLabel: "Kata sandi",

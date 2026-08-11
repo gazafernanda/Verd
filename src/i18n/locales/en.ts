@@ -72,7 +72,7 @@ export default {
       schedules: "Personalized care schedules",
       ai: "AI plant diagnosis & chat",
     },
-    copyright: "© 2025 Verd. All rights reserved.",
+    copyright: "© 2026 Verd. All rights reserved.",
     emailLabel: "Email address",
     emailPlaceholder: "you{'@'}example.com",
     passwordLabel: "Password",
