@@ -19,10 +19,10 @@ public record GoogleIdentity(
 public class GoogleAuthService(IConfiguration config, ILogger<GoogleAuthService> log)
 {
     public string? ClientId =>
-        Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID") is { Length: > 0 } fromEnv
-            ? fromEnv
-            : config["Google:ClientId"] is { Length: > 0 } fromConfig
-                ? fromConfig
+        config["Google:ClientId"] is { Length: > 0 } fromConfig
+            ? fromConfig
+            : Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID") is { Length: > 0 } fromEnv
+                ? fromEnv
                 : null;
 
     /// <summary>False when no client id is set, in which case sign-in must be refused.</summary>
