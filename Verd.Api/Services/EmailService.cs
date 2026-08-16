@@ -1,5 +1,7 @@
 using System.Net;
 using System.Net.Mail;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 
 namespace Verd.Api.Services;
 
@@ -10,13 +12,19 @@ namespace Verd.Api.Services;
 /// the message is written to the log instead of being dropped silently, so the
 /// verification and reset links are still reachable while working offline.
 /// </summary>
-public class EmailService(IConfiguration config, ILogger<EmailService> log)
+public class EmailService(
+    IConfiguration config,
+    IHttpClientFactory httpClientFactory,
+    ILogger<EmailService> log)
 {
     private string? Host => Env("SMTP_HOST", "Smtp:Host");
     private string? Username => Env("SMTP_USERNAME", "Smtp:Username");
     private string? Password => Env("SMTP_PASSWORD", "Smtp:Password");
     private string FromAddress => Env("SMTP_FROM", "Smtp:From") ?? "no-reply@verd.app";
     private string FromName => Env("SMTP_FROM_NAME", "Smtp:FromName") ?? "Verd";
+    private string? SendGridApiKey => Env("SENDGRID_API_KEY", "SendGrid:ApiKey");
+    private string SendGridFromAddress =>
+        Env("SENDGRID_FROM", "SendGrid:From") ?? FromAddress;
 
     private int Port =>
         int.TryParse(Env("SMTP_PORT", "Smtp:Port"), out var p) ? p : 587;
@@ -25,7 +33,8 @@ public class EmailService(IConfiguration config, ILogger<EmailService> log)
         !bool.TryParse(Env("SMTP_USE_SSL", "Smtp:UseSsl"), out var s) || s;
 
     /// <summary>True when real mail can actually be delivered.</summary>
-    public bool IsConfigured => !string.IsNullOrWhiteSpace(Host);
+    public bool IsConfigured =>
+        !string.IsNullOrWhiteSpace(SendGridApiKey) || !string.IsNullOrWhiteSpace(Host);
 
     private string? Env(string variable, string configKey) =>
         Environment.GetEnvironmentVariable(variable) is { Length: > 0 } value
@@ -36,6 +45,14 @@ public class EmailService(IConfiguration config, ILogger<EmailService> log)
 
     public async Task SendAsync(string toEmail, string subject, string htmlBody, string textBody)
     {
+        // Render's free instances block SMTP ports. SendGrid's HTTPS API is the
+        // production transport; SMTP remains available for local development.
+        if (!string.IsNullOrWhiteSpace(SendGridApiKey))
+        {
+            await SendWithSendGridAsync(toEmail, subject, htmlBody, textBody);
+            return;
+        }
+
         if (!IsConfigured)
         {
             // Deliberately logged in full: without a mail server there is no other
@@ -69,6 +86,43 @@ public class EmailService(IConfiguration config, ILogger<EmailService> log)
             // A mail outage must not turn into a failed registration or a reset
             // response that reveals whether the address exists.
             log.LogError(ex, "Failed to send '{Subject}' to {To}.", subject, toEmail);
+        }
+    }
+
+    private async Task SendWithSendGridAsync(string toEmail, string subject, string htmlBody, string textBody)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Post, "https://api.sendgrid.com/v3/mail/send")
+        {
+            Content = JsonContent.Create(new
+            {
+                personalizations = new[] { new { to = new[] { new { email = toEmail } } } },
+                from = new { email = SendGridFromAddress, name = FromName },
+                subject,
+                content = new[]
+                {
+                    new { type = "text/plain", value = textBody },
+                    new { type = "text/html", value = htmlBody },
+                },
+            }),
+        };
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", SendGridApiKey);
+
+        try
+        {
+            using var response = await httpClientFactory.CreateClient().SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                log.LogInformation("Sent '{Subject}' to {To} with SendGrid.", subject, toEmail);
+                return;
+            }
+
+            var details = await response.Content.ReadAsStringAsync();
+            log.LogError("SendGrid rejected '{Subject}' to {To}: {Status} {Details}",
+                subject, toEmail, (int)response.StatusCode, details);
+        }
+        catch (Exception ex)
+        {
+            log.LogError(ex, "Failed to send '{Subject}' to {To} with SendGrid.", subject, toEmail);
         }
     }
 

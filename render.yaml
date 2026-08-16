@@ -26,22 +26,12 @@ services:
       # Public application address used in verification and password-reset links.
       - key: APP_BASE_URL
         value: https://gazafernanda.github.io/Verd
-      # Gmail SMTP. Generate a Gmail App Password and add it in the Render
-      # dashboard; never commit the credential to source control.
-      - key: SMTP_HOST
-        value: smtp.gmail.com
-      - key: SMTP_PORT
-        value: "587"
-      - key: SMTP_USE_SSL
-        value: "true"
-      - key: SMTP_USERNAME
+      # SendGrid's HTTPS API works on Render's free plan, unlike SMTP ports.
+      # Verify a single Gmail sender in SendGrid, then set these values.
+      - key: SENDGRID_API_KEY
         sync: false
-      - key: SMTP_PASSWORD
+      - key: SENDGRID_FROM
         sync: false
-      - key: SMTP_FROM
-        sync: false
-      - key: SMTP_FROM_NAME
-        value: Verd
       # Disables the appsettings.json FileSystemWatcher — the container's
       # inotify instance limit was being hit on startup, crash-looping the service.
       - key: DOTNET_hostBuilder__reloadConfigOnChange
