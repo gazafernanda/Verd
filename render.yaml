@@ -23,6 +23,25 @@ services:
         generateValue: true
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
+      # Public application address used in verification and password-reset links.
+      - key: APP_BASE_URL
+        value: https://gazafernanda.github.io/Verd
+      # Resend SMTP. Create a Resend API key and a verified sender address, then
+      # enter them in the Render dashboard for the two sync:false variables.
+      - key: SMTP_HOST
+        value: smtp.resend.com
+      - key: SMTP_PORT
+        value: "465"
+      - key: SMTP_USE_SSL
+        value: "true"
+      - key: SMTP_USERNAME
+        value: resend
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: SMTP_FROM
+        sync: false
+      - key: SMTP_FROM_NAME
+        value: Verd
       # Disables the appsettings.json FileSystemWatcher — the container's
       # inotify instance limit was being hit on startup, crash-looping the service.
       - key: DOTNET_hostBuilder__reloadConfigOnChange
