@@ -71,6 +71,21 @@ The frontend reads `VITE_API_URL` from `.env.development` (set to `http://localh
 
 To override the database connection or JWT secret, edit `Verd.Api/appsettings.json`. Never commit production secrets — use `Verd.Api/appsettings.Production.json` (gitignored).
 
+### Production Google sign-in
+
+Google sign-in is enabled only when the API receives `GOOGLE_CLIENT_ID`. In the
+Render service's environment settings, add `GOOGLE_CLIENT_ID` with the OAuth
+2.0 **Web application** client ID from Google Cloud Console, then redeploy the
+service. In that OAuth client's **Authorized JavaScript origins**, add:
+
+```
+https://gazafernanda.github.io
+```
+
+The API exposes whether this is configured at
+`https://verd-api.onrender.com/api/auth/google/config`; it should report
+`"enabled": true` once the environment variable is present.
+
 ---
 
 ## Common Commands

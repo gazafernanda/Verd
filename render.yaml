@@ -14,6 +14,10 @@ services:
       # Groq API key for the AI chat/recommendations — set manually.
       - key: GROQ_API_KEY
         sync: false
+      # OAuth web-client ID. Set this in Render; without it the API deliberately
+      # reports Google sign-in as disabled and the frontend hides the button.
+      - key: GOOGLE_CLIENT_ID
+        sync: false
       # JWT signing secret — Render generates a strong random value on first deploy.
       - key: Jwt__Secret
         generateValue: true
