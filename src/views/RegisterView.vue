@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '../stores/user'
+import GoogleSignInButton from '../components/Auth/GoogleSignInButton.vue'
 import { TriangleAlert, Eye, EyeOff, RefreshCw, CheckCircle } from 'lucide-vue-next'
 
 const router = useRouter()
@@ -30,8 +31,9 @@ async function submit() {
   loading.value = true
   try {
     await user.register(displayName.value, email.value, password.value)
-    user.logout()
-    router.push({ name: 'login' })
+    // The session stays — the account just can't reach core features until the
+    // emailed link is clicked, and this page explains that and offers a resend.
+    router.replace({ name: 'verify-email' })
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : t('auth.somethingWrong')
     error.value = msg
@@ -39,6 +41,12 @@ async function submit() {
   } finally {
     loading.value = false
   }
+}
+
+// Google has already verified the address, so these users skip verification.
+function onGoogleSuccess() {
+  error.value = ''
+  router.replace({ name: 'dashboard' })
 }
 </script>
 
@@ -110,6 +118,11 @@ async function submit() {
             <TriangleAlert width="16" height="16" class="shrink-0 mt-px" />
             {{ error }}
           </div>
+        </div>
+
+        <!-- Google sign-up (hidden when the server has no client id configured) -->
+        <div class="mb-6">
+          <GoogleSignInButton :disabled="loading" @success="onGoogleSuccess" @error="error = $event" />
         </div>
 
         <form @submit.prevent="submit" class="flex flex-col gap-5">

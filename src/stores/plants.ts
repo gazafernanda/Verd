@@ -31,6 +31,41 @@ export interface PlantLog {
   loggedAt: string;
 }
 
+/** AI-proposed care defaults for a plant name the user just typed. */
+export interface PlantSuggestion {
+  isValid: boolean;
+  commonName: string;
+  scientificName: string;
+  category: string;
+  wateringFrequency: string;
+  sunlight: string;
+  notes: string;
+  /** False when the model was unreachable and this is a do-nothing fallback. */
+  fromAi: boolean;
+}
+
+/** One planting period — active or ended — as shown in the history page. */
+export interface PlantHistoryEntry {
+  id: number;
+  name: string;
+  category: string;
+  iconBg: string;
+  registeredAt: string;
+  endedAt: string | null;
+  status: "ACTIVE" | "ENDED";
+  careStatus: string;
+  durationDays: number;
+  logCount: number;
+}
+
+export interface PlantHistoryDetail {
+  summary: PlantHistoryEntry;
+  wateringFrequency: string;
+  sunlight: string;
+  notes: string;
+  logs: PlantLog[];
+}
+
 function authHeaders() {
   const token = localStorage.getItem("verd_token");
   return {
@@ -176,6 +211,60 @@ export const usePlantsStore = defineStore("plants", () => {
     }
   }
 
+  /**
+   * Asks the API what a plant of this name typically needs.
+   * `signal` lets a newer keystroke abandon an in-flight request.
+   */
+  async function suggestPlantDetails(
+    name: string,
+    language: string,
+    signal?: AbortSignal,
+  ): Promise<PlantSuggestion | null> {
+    const token = localStorage.getItem("verd_token");
+    if (!token || !name.trim()) return null;
+
+    const res = await fetch(`${API}/api/plants/suggest`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({ name: name.trim(), language }),
+      signal,
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  }
+
+  /** Every plant the user ever registered, including ones since removed. */
+  async function fetchHistory(): Promise<PlantHistoryEntry[]> {
+    const token = localStorage.getItem("verd_token");
+    if (!token) return [];
+    try {
+      const res = await fetch(`${API}/api/plants/history`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) return await res.json();
+    } catch {
+      /* silent fail — the view renders its empty state */
+    }
+    return [];
+  }
+
+  /** A single planting period plus the monitoring data recorded during it. */
+  async function fetchHistoryDetail(
+    plantId: number,
+  ): Promise<PlantHistoryDetail | null> {
+    const token = localStorage.getItem("verd_token");
+    if (!token) return null;
+    try {
+      const res = await fetch(`${API}/api/plants/history/${plantId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) return await res.json();
+    } catch {
+      /* silent fail — the view renders its not-found state */
+    }
+    return null;
+  }
+
   async function fetchLogs(plantId: number): Promise<PlantLog[]> {
     const token = localStorage.getItem("verd_token");
     if (!token) return [];
@@ -199,5 +288,8 @@ export const usePlantsStore = defineStore("plants", () => {
     updatePlant,
     logCare,
     fetchLogs,
+    fetchHistory,
+    fetchHistoryDetail,
+    suggestPlantDetails,
   };
 });

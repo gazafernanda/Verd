@@ -2,31 +2,39 @@
 import { computed, markRaw } from "vue";
 import { useI18n } from "vue-i18n";
 import { useWeatherStore } from "../../stores/weather";
+import { formatTempValue } from "../../utils/temperature";
+import HelpTip from "../HelpTip.vue";
 import { Droplet, Sun, Droplets, Wind } from "lucide-vue-next";
 
 const { t } = useI18n();
 const weather = useWeatherStore();
 
+// Every sensor parameter carries its own short explanation — these are the
+// readings a gardener is most likely to be unsure how to act on.
 const metrics = computed(() => [
   {
     label: t("weather.humidity"),
     value: `${weather.humidity}%`,
     icon: markRaw(Droplet),
+    help: t("help.humidity"),
   },
   {
     label: t("weather.uvIndex"),
     value: `${weather.uvIndex} (${weather.uvLabel})`,
     icon: markRaw(Sun),
+    help: t("help.uvIndex"),
   },
   {
     label: t("weather.soilMoisture"),
     value: `${weather.soilMoisture}%`,
     icon: markRaw(Droplets),
+    help: t("help.soilMoisture"),
   },
   {
     label: t("weather.windSpeed"),
     value: `${weather.windSpeed} km/h`,
     icon: markRaw(Wind),
+    help: t("help.windSpeed"),
   },
 ]);
 </script>
@@ -53,7 +61,7 @@ const metrics = computed(() => [
       <div class="flex items-start">
         <span
           class="text-[6.5rem] max-lg:text-[4.5rem] font-extrabold leading-[0.9] tracking-[-3px] text-text-main"
-          >{{ weather.temp }}°</span
+          >{{ formatTempValue(weather.temp) }}°</span
         >
         <span
           class="text-[2.5rem] max-lg:text-[1.8rem] font-semibold text-text-main mt-2"
@@ -68,8 +76,9 @@ const metrics = computed(() => [
       />
     </div>
 
-    <p class="text-xl text-text-muted font-medium mb-8">
-      {{ t('weather.feelsLike', { condition: weather.condition, temp: weather.feelsLike }) }}
+    <p class="flex items-center gap-2 text-xl text-text-muted font-medium mb-8">
+      {{ t('weather.feelsLike', { condition: weather.condition, temp: formatTempValue(weather.feelsLike) }) }}
+      <HelpTip :label="t('help.feelsLike')" :size="15" />
     </p>
 
     <div class="grid grid-cols-4 max-lg:grid-cols-2 gap-4">
@@ -85,9 +94,11 @@ const metrics = computed(() => [
         </div>
         <div class="flex flex-col gap-1">
           <span
-            class="text-[0.65rem] font-bold text-text-muted tracking-[0.5px]"
-            >{{ metric.label }}</span
+            class="flex items-center gap-1.5 text-[0.65rem] font-bold text-text-muted tracking-[0.5px]"
           >
+            {{ metric.label }}
+            <HelpTip :label="metric.help" :size="12" />
+          </span>
           <span class="text-lg font-bold text-text-main">{{
             metric.value
           }}</span>

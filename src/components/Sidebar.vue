@@ -3,17 +3,22 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '../stores/user'
 import { useNotificationsStore } from '../stores/notifications'
+import { useChatStore } from '../stores/chat'
 import { setLocale, SUPPORTED_LOCALES, type LocaleCode } from '../i18n'
-import { X, Home, Sun, Leaf, Sprout, MessageCircle, Bell, User, LogOut, Languages, ShieldCheck } from 'lucide-vue-next'
+import { X, Home, Sun, Leaf, Sprout, Bell, User, LogOut, Languages, ShieldCheck } from 'lucide-vue-next'
 
 const router = useRouter()
 const { t, locale } = useI18n()
 const user = useUserStore()
 const notifications = useNotificationsStore()
+const chat = useChatStore()
 const emit = defineEmits(['close'])
 
 async function logout() {
   user.logout()
+  // Drops this device's cached copy only. The conversation itself is stored
+  // server-side and comes back on the next sign-in.
+  chat.reset()
   emit('close')
   try {
     await router.replace({ name: 'login' })
@@ -91,17 +96,8 @@ function changeLanguage(code: LocaleCode) {
             {{ t('nav.recommendation') }}
           </router-link>
         </li>
-        <li>
-          <router-link
-            to="/chat"
-            class="flex items-center gap-4 px-5 py-[14px] rounded-lg text-text-muted font-medium transition-colors hover:bg-bg-app hover:text-text-main"
-            active-class="bg-light-green-bg !text-primary"
-            @click="emit('close')"
-          >
-            <MessageCircle class="shrink-0" width="24" height="24" />
-            {{ t('nav.chat') }}
-          </router-link>
-        </li>
+        <!-- The assistant is no longer a destination: it lives in the floating
+             chat button, reachable from every page. -->
         <li>
           <router-link
             to="/notifications"

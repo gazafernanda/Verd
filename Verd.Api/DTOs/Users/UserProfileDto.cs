@@ -9,5 +9,7 @@ public record UserProfileDto(
     string Tier,
     string Role,
     string MemberSince,
-    bool WeatherAlertsEnabled
+    bool WeatherAlertsEnabled,
+    bool IsEmailVerified,
+    string AuthProvider
 );

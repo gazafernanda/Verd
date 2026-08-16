@@ -12,6 +12,7 @@ namespace Verd.Api.Controllers;
 [ApiController]
 [Route("api/plants/{plantId}/logs")]
 [Authorize]
+[RequireVerifiedEmail]
 public class PlantLogsController(AppDbContext db) : ControllerBase
 {
     private int UserId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)
@@ -35,7 +36,10 @@ public class PlantLogsController(AppDbContext db) : ControllerBase
     [HttpPost]
     public async Task<ActionResult<PlantLogDto>> CreateLog(int plantId, CreatePlantLogDto dto)
     {
-        var plant = await db.Plants.FirstOrDefaultAsync(p => p.Id == plantId && p.UserId == UserId);
+        // Care can only be logged against a plant still in the garden — an ended
+        // planting period is a historical record and must stay immutable.
+        var plant = await db.Plants
+            .FirstOrDefaultAsync(p => p.Id == plantId && p.UserId == UserId && p.DeletedAt == null);
         if (plant is null) return NotFound();
 
         var log = new PlantLog

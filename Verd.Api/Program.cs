@@ -60,9 +60,12 @@ builder.Services.AddAuthorization();
 
 // ── Services ──────────────────────────────────────────────────────────────────
 builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<GoogleAuthService>();
 builder.Services.AddScoped<ChatService>();
 builder.Services.AddScoped<WeatherService>();
 builder.Services.AddScoped<RecommendationAiService>();
+builder.Services.AddScoped<PlantSuggestionService>();
 builder.Services.AddHttpClient();
 
 var groqApiKey = Environment.GetEnvironmentVariable("GROQ_API_KEY")
@@ -160,6 +163,53 @@ using (var scope = app.Services.CreateScope())
                     """);
                 dbContext.Database.ExecuteSqlRaw(
                     """CREATE UNIQUE INDEX IF NOT EXISTS "IX_SystemSettings_Key" ON "SystemSettings" ("Key");""");
+
+                // Email verification, password reset and federated identity.
+                // Existing accounts were never asked to verify, so they default to
+                // verified — flipping them to false would lock out every current user.
+                dbContext.Database.ExecuteSqlRaw(
+                    """ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "IsEmailVerified" boolean NOT NULL DEFAULT TRUE;""");
+                dbContext.Database.ExecuteSqlRaw(
+                    """ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "EmailVerificationTokenHash" text NULL;""");
+                dbContext.Database.ExecuteSqlRaw(
+                    """ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "EmailVerificationExpiresAt" timestamp with time zone NULL;""");
+                dbContext.Database.ExecuteSqlRaw(
+                    """ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "VerificationEmailSentAt" timestamp with time zone NULL;""");
+                dbContext.Database.ExecuteSqlRaw(
+                    """ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "PasswordResetTokenHash" text NULL;""");
+                dbContext.Database.ExecuteSqlRaw(
+                    """ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "PasswordResetExpiresAt" timestamp with time zone NULL;""");
+                dbContext.Database.ExecuteSqlRaw(
+                    """ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "GoogleId" text NULL;""");
+                dbContext.Database.ExecuteSqlRaw(
+                    """ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "AuthProvider" text NOT NULL DEFAULT 'local';""");
+                dbContext.Database.ExecuteSqlRaw(
+                    """CREATE UNIQUE INDEX IF NOT EXISTS "IX_Users_GoogleId" ON "Users" ("GoogleId");""");
+
+                // Plant history: soft delete plus the bounds of the planting period.
+                dbContext.Database.ExecuteSqlRaw(
+                    """ALTER TABLE "Plants" ADD COLUMN IF NOT EXISTS "DeletedAt" timestamp with time zone NULL;""");
+                dbContext.Database.ExecuteSqlRaw(
+                    """
+                    ALTER TABLE "Plants" ADD COLUMN IF NOT EXISTS "RegisteredAt"
+                        timestamp with time zone NOT NULL DEFAULT (now() AT TIME ZONE 'utc');
+                    """);
+
+                dbContext.Database.ExecuteSqlRaw(
+                    """
+                    CREATE TABLE IF NOT EXISTS "ChatMessages" (
+                        "Id" serial PRIMARY KEY,
+                        "UserId" integer NOT NULL REFERENCES "Users" ("Id") ON DELETE CASCADE,
+                        "Role" text NOT NULL,
+                        "Content" text NOT NULL,
+                        "SentAt" timestamp with time zone NOT NULL
+                    );
+                    """);
+                dbContext.Database.ExecuteSqlRaw(
+                    """
+                    CREATE INDEX IF NOT EXISTS "IX_ChatMessages_UserId_SentAt"
+                        ON "ChatMessages" ("UserId", "SentAt");
+                    """);
             }
             else
             {

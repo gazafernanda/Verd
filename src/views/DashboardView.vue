@@ -5,8 +5,10 @@ import StatusBanner from "../components/StatusBanner.vue";
 import LocationCard from "../components/LocationCard.vue";
 import WeatherCard from "../components/WeatherCard.vue";
 import CareRecommendations from "../components/CareRecommendations.vue";
+import MonitoringStatus from "../components/MonitoringStatus.vue";
 import { useUserStore } from "../stores/user";
 import { useWeatherStore } from "../stores/weather";
+import { useMonitoring } from "../composables/useMonitoring";
 import { useRouter } from "vue-router";
 import { Calendar, Plus, UserRound } from "lucide-vue-next";
 
@@ -14,6 +16,9 @@ const { t, locale } = useI18n();
 const user = useUserStore();
 const weather = useWeatherStore();
 const router = useRouter();
+
+// Keeps sensor readings and the garden list current while this page is open.
+const { refresh, refreshing, secondsSinceUpdate, disconnected } = useMonitoring();
 
 const today = computed(() =>
   new Date().toLocaleDateString(locale.value === "id" ? "id-ID" : "en-US", {
@@ -60,6 +65,13 @@ onMounted(() => {
           <p class="text-text-muted text-[0.95rem]">
             {{ t('dashboard.subtitle') }}
           </p>
+          <MonitoringStatus
+            class="mt-3"
+            :seconds-since-update="secondsSinceUpdate"
+            :disconnected="disconnected"
+            :refreshing="refreshing"
+            @refresh="refresh(true)"
+          />
         </div>
         <div class="flex gap-3">
           <button

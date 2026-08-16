@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { useWeatherStore } from '../../stores/weather'
+import { formatTemp } from '../../utils/temperature'
 import { Sun } from 'lucide-vue-next'
 const { t } = useI18n()
 const weather = useWeatherStore()
@@ -14,7 +15,7 @@ const weather = useWeatherStore()
     </div>
 
     <div class="flex items-center gap-4 relative z-10">
-      <div class="text-5xl font-extrabold leading-none">{{ weather.temp }}°F</div>
+      <div class="text-5xl font-extrabold leading-none">{{ formatTemp(weather.temp) }}</div>
       <div class="flex flex-col">
         <span class="text-lg font-bold">{{ weather.condition }}</span>
         <span class="text-[0.8rem] opacity-90">{{ t('profile.humidityLabel', { value: weather.humidity }) }}</span>

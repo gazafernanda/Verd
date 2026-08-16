@@ -29,6 +29,17 @@ public class Plant
     public string CareImage { get; set; } = string.Empty;
     public string CareBgType { get; set; } = "green"; // blue | yellow | green
 
+    // ── History ───────────────────────────────────────────────────────────────
+    /// <summary>When the plant was first registered — the start of its planting period.</summary>
+    public DateTime RegisteredAt { get; set; } = DateTime.UtcNow;
+
+    /// <summary>
+    /// Set instead of deleting the row, so the planting period survives in the
+    /// history page along with the monitoring data recorded during it.
+    /// Null means the plant is still active.
+    /// </summary>
+    public DateTime? DeletedAt { get; set; }
+
     public User User { get; set; } = null!;
     public ICollection<PlantLog> Logs { get; set; } = [];
 }

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { useWeatherStore } from '../stores/weather'
+import { formatTempValue } from '../utils/temperature'
 import { Sun, Droplet, Wind } from 'lucide-vue-next'
 const { t } = useI18n()
 const weather = useWeatherStore()
@@ -20,7 +21,7 @@ const weather = useWeatherStore()
 
     <div class="flex justify-between items-center mb-8">
       <div class="flex items-start">
-        <span class="text-[4.5rem] font-extrabold leading-none tracking-[-2px] text-text-main">{{ weather.temp }}°</span>
+        <span class="text-[4.5rem] font-extrabold leading-none tracking-[-2px] text-text-main">{{ formatTempValue(weather.temp) }}°</span>
         <span class="text-[2rem] font-medium text-text-light mt-2">F</span>
       </div>
       <div class="w-[72px] h-[72px] rounded-[20px] bg-gradient-to-br from-[#a3c4cb] to-[#4b8994] flex items-center justify-center shadow-[0_8px_16px_rgba(75,137,148,0.3)]">

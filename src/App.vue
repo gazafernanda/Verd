@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import Sidebar from "./components/Sidebar.vue";
+import ChatWidget from "./components/Chat/ChatWidget.vue";
+import VerificationBanner from "./components/Auth/VerificationBanner.vue";
 import { RouterView, useRoute, useRouter } from "vue-router";
 import { useUserStore } from "./stores/user";
 import { usePlantsStore } from "./stores/plants";
@@ -15,17 +17,26 @@ const plants = usePlantsStore();
 const weather = useWeatherStore();
 
 onMounted(async () => {
-  if (user.isAuthenticated) {
-    const ok = await plants.fetchPlants();
-    if (!ok) {
-      user.logout();
-      router.replace({ name: "login" });
-      return;
-    }
-    user.fetchProfile();
-    weather.fetchWeather();
-    if (!user.location) user.detectLocationFromIP();
+  if (!user.isAuthenticated) return;
+
+  // The profile is the authority on verification state, and an unverified
+  // account is refused the plant list — so establish who we are first, then
+  // only load garden data once we know it's allowed.
+  await user.fetchProfile();
+
+  if (!user.isEmailVerified) {
+    router.replace({ name: "verify-email" });
+    return;
   }
+
+  const ok = await plants.fetchPlants();
+  if (!ok) {
+    user.logout();
+    router.replace({ name: "login" });
+    return;
+  }
+  weather.fetchWeather();
+  if (!user.location) user.detectLocationFromIP();
 });
 </script>
 
@@ -96,10 +107,15 @@ onMounted(async () => {
             </div>
           </div>
 
+          <VerificationBanner v-if="user.needsEmailVerification" class="mb-6" />
+
           <Transition name="page" mode="out-in">
             <component :is="Component" />
           </Transition>
         </div>
+
+        <!-- Available from every page in the app layout -->
+        <ChatWidget />
       </main>
     </template>
   </RouterView>

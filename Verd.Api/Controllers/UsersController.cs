@@ -30,7 +30,9 @@ public class UsersController(AppDbContext db) : ControllerBase
             Tier: user.Tier,
             Role: user.Role,
             MemberSince: user.MemberSince.ToString("MMM yyyy"),
-            WeatherAlertsEnabled: user.WeatherAlertsEnabled
+            WeatherAlertsEnabled: user.WeatherAlertsEnabled,
+            IsEmailVerified: user.IsEmailVerified,
+            AuthProvider: user.AuthProvider
         ));
     }
 
@@ -59,7 +61,9 @@ public class UsersController(AppDbContext db) : ControllerBase
             Tier: user.Tier,
             Role: user.Role,
             MemberSince: user.MemberSince.ToString("MMM yyyy"),
-            WeatherAlertsEnabled: user.WeatherAlertsEnabled
+            WeatherAlertsEnabled: user.WeatherAlertsEnabled,
+            IsEmailVerified: user.IsEmailVerified,
+            AuthProvider: user.AuthProvider
         ));
     }
 }

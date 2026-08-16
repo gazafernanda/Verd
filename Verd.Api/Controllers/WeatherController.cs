@@ -11,6 +11,7 @@ namespace Verd.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
+[RequireVerifiedEmail]
 public class WeatherController(AppDbContext db, WeatherService weatherService) : ControllerBase
 {
     private int UserId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)

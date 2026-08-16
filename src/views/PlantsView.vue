@@ -3,12 +3,26 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { usePlantsStore, type Plant } from '../stores/plants'
-import { Plus, Leaf, Flower2, Droplet, Sun, Trash2, Search, TriangleAlert } from 'lucide-vue-next'
+import { Plus, Leaf, Flower2, Droplet, Sun, Trash2, Search, TriangleAlert, History, CircleAlert } from 'lucide-vue-next'
+import { useRecommendationsStore } from '../stores/recommendations'
 import EditPlantModal from '../components/EditPlantModal.vue'
+import HelpTip from '../components/HelpTip.vue'
 
 const router = useRouter()
 const { t } = useI18n()
 const plants = usePlantsStore()
+const recs = useRecommendationsStore()
+
+/**
+ * Jumps straight to a care plan for one plant. The alert badge is the fastest
+ * route from "this plant has a problem" to "here's what to do about it", so it
+ * kicks off generation before navigating rather than landing the user on the
+ * recommendation page with nothing selected.
+ */
+function openRecommendation(plant: Plant) {
+  void recs.generateForPlant(plant.id, plant.name)
+  router.push({ name: 'recommendation' })
+}
 
 // Clicking a card opens the edit modal.
 const editing = ref<Plant | null>(null)
@@ -90,6 +104,11 @@ function statusStyle(status: string) {
   return 'bg-[#ebf5ff] text-[#3b82f6]'
 }
 
+/** Matches the badge to the status colour already used by the pill and bar. */
+function alertStyle(status: string) {
+  return status === 'NEEDS WATER' ? 'bg-[#f59e0b]' : 'bg-[#3b82f6]'
+}
+
 function barColor(status: string) {
   if (status === 'HEALTHY') return 'bg-success-green'
   if (status === 'NEEDS WATER') return 'bg-[#f59e0b]'
@@ -106,17 +125,29 @@ onMounted(() => plants.fetchPlants())
       <div>
         <span class="font-semibold text-success-green text-[0.9rem]">{{ t('plants.breadcrumb') }}</span>
         <h1 class="text-[2.2rem] max-sm:text-[1.6rem] font-extrabold text-text-main mb-2 mt-2 tracking-[-0.5px]">{{ t('plants.title') }}</h1>
-        <p class="text-text-muted text-[0.95rem] font-medium">
+        <p class="flex items-center gap-2 text-text-muted text-[0.95rem] font-medium">
           {{ t('plants.inGarden', plants.totalPlants) }}
+          <HelpTip :label="t('help.plantStatus')" />
         </p>
       </div>
-      <button
-        @click="router.push({ name: 'add-plant' })"
-        class="flex items-center gap-2 px-5 py-[11px] bg-primary text-white rounded-[24px] font-semibold text-[0.95rem] shadow-sm hover:opacity-90 transition-opacity"
-      >
-        <Plus width="18" height="18" />
-        {{ t('common.addNewPlant') }}
-      </button>
+      <!-- The one and only Add Plant button. It sits here in every state —
+           empty, filtered, or populated — so it never moves under the cursor. -->
+      <div class="flex items-center gap-3">
+        <button
+          @click="router.push({ name: 'plant-history' })"
+          class="flex items-center gap-2 px-4 py-[11px] bg-surface border border-border text-text-main rounded-[24px] font-semibold text-[0.9rem] hover:bg-bg-app transition-colors"
+        >
+          <History width="17" height="17" />
+          {{ t('plants.historyLink') }}
+        </button>
+        <button
+          @click="router.push({ name: 'add-plant' })"
+          class="flex items-center gap-2 px-5 py-[11px] bg-primary text-white rounded-[24px] font-semibold text-[0.95rem] shadow-sm hover:opacity-90 transition-opacity"
+        >
+          <Plus width="18" height="18" />
+          {{ t('common.addNewPlant') }}
+        </button>
+      </div>
     </div>
 
     <!-- Filters & Search -->
@@ -155,15 +186,10 @@ onMounted(() => plants.fetchPlants())
       </div>
       <div>
         <h2 class="text-[1.4rem] font-bold text-text-main mb-2">{{ t('plants.emptyTitle') }}</h2>
+        <!-- Points at the header button rather than adding a second one, so the
+             add flow has exactly one entry point on this page. -->
         <p class="text-text-muted text-[0.95rem]">{{ t('plants.emptyDesc') }}</p>
       </div>
-      <button
-        @click="router.push({ name: 'add-plant' })"
-        class="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-[24px] font-semibold hover:opacity-90 transition-opacity"
-      >
-        <Plus width="18" height="18" />
-        {{ t('common.addPlant') }}
-      </button>
     </div>
 
     <!-- No search results -->
@@ -180,6 +206,20 @@ onMounted(() => plants.fetchPlants())
         @click="openPlant(plant)"
         class="bg-surface rounded-2xl p-5 shadow-sm border border-border flex flex-col gap-4 relative group hover:shadow-md transition-shadow cursor-pointer"
       >
+        <!-- Attention badge: sits on the card's corner so it reads as an alert on
+             the card itself, not another control inside it. Only appears when the
+             plant actually needs something. -->
+        <button
+          v-if="plant.status !== 'HEALTHY'"
+          @click.stop="openRecommendation(plant)"
+          class="absolute -top-2 -left-2 z-10 w-8 h-8 rounded-full text-white flex items-center justify-center shadow-md ring-4 ring-bg-app transition-transform hover:scale-110 active:scale-95"
+          :class="alertStyle(plant.status)"
+          :title="t('plants.needsAttention', { name: plant.name })"
+          :aria-label="t('plants.needsAttention', { name: plant.name })"
+        >
+          <CircleAlert width="18" height="18" stroke-width="2.5" />
+        </button>
+
         <!-- Delete -->
         <button
           @click.stop="deleteTarget = plant"
@@ -209,7 +249,10 @@ onMounted(() => plants.fetchPlants())
         <!-- Watering level -->
         <div class="flex flex-col gap-1.5">
           <div class="flex justify-between items-center text-[0.75rem] font-semibold text-text-muted">
-            <span class="flex items-center gap-1"><Droplet width="12" height="12" /> {{ t('common.waterLevel') }}</span>
+            <span class="flex items-center gap-1" @click.stop>
+              <Droplet width="12" height="12" /> {{ t('common.waterLevel') }}
+              <HelpTip :label="t('help.waterLevel')" :size="12" />
+            </span>
             <span>{{ plant.wateringLevel }}%</span>
           </div>
           <div class="h-1.5 bg-border rounded-full overflow-hidden">

@@ -6,5 +6,8 @@ public record AuthResponseDto(
     string Email,
     string Location,
     string Tier,
-    string Role
+    string Role,
+    bool IsEmailVerified,
+    string AvatarUrl,
+    string AuthProvider
 );

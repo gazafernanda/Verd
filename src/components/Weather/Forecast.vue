@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { useWeatherStore } from '../../stores/weather'
+import { formatTempValue } from '../../utils/temperature'
+import HelpTip from '../HelpTip.vue'
 import { ChevronLeft, ChevronRight, Sun, CloudSun, CloudRain, Cloud, ArrowUp, ArrowDown } from 'lucide-vue-next'
 const { t } = useI18n()
 const weather = useWeatherStore()
@@ -9,7 +11,10 @@ const weather = useWeatherStore()
 <template>
   <div class="mb-8">
     <div class="flex justify-between items-center mb-5">
-      <h2 class="text-[1.4rem] font-bold text-text-main m-0">{{ t('weather.forecastTitle') }}</h2>
+      <h2 class="flex items-center gap-2 text-[1.4rem] font-bold text-text-main m-0">
+        {{ t('weather.forecastTitle') }}
+        <HelpTip :label="t('help.forecast')" />
+      </h2>
       <div class="flex gap-2">
         <button class="w-8 h-8 rounded-full border border-border bg-surface flex items-center justify-center text-text-muted shadow-sm transition-colors duration-200 hover:bg-bg-app hover:text-text-main">
           <ChevronLeft width="16" height="16" />
@@ -43,10 +48,10 @@ const weather = useWeatherStore()
 
         <div class="flex flex-col items-center gap-1">
           <span class="inline-flex items-center gap-1 text-xl font-bold text-text-main">
-            <ArrowUp width="14" height="14" class="text-text-muted" />{{ item.tempHi }}°
+            <ArrowUp width="14" height="14" class="text-text-muted" />{{ formatTempValue(item.tempHi) }}°
           </span>
           <span class="inline-flex items-center gap-1 text-[0.9rem] font-medium text-text-muted">
-            <ArrowDown width="13" height="13" />{{ item.tempLo }}°
+            <ArrowDown width="13" height="13" />{{ formatTempValue(item.tempLo) }}°
           </span>
         </div>
       </div>

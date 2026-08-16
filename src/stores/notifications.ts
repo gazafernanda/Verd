@@ -2,6 +2,7 @@ import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 import { usePlantsStore } from "./plants";
 import { useWeatherStore } from "./weather";
+import { formatTempValue } from "../utils/temperature";
 
 export type NotificationType =
   | "water"
@@ -98,7 +99,7 @@ export const useNotificationsStore = defineStore("notifications", () => {
         type: "weather",
         titleKey: "notifications.hotTitle",
         messageKey: "notifications.hotMsg",
-        params: { temp: weather.temp },
+        params: { temp: formatTempValue(weather.temp) },
         actionKey: "notifications.action.weather",
         route: "weather",
       });

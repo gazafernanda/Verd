@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useWeatherStore } from '../../stores/weather'
+import { formatTempValue } from '../../utils/temperature'
 
 const weather = useWeatherStore()
 
@@ -88,7 +89,7 @@ function formatHour(h: number) {
           font-size="11"
           font-weight="700"
           fill="#1a5641"
-        >{{ p.temp }}°</text>
+        >{{ formatTempValue(p.temp) }}°</text>
       </g>
 
       <!-- "now" emphasis -->

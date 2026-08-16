@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '../stores/user'
+import GoogleSignInButton from '../components/Auth/GoogleSignInButton.vue'
 import { TriangleAlert, Eye, EyeOff, RefreshCw, Check, Leaf } from 'lucide-vue-next'
 
 const router = useRouter()
@@ -32,6 +33,11 @@ async function submit() {
   } finally {
     loading.value = false
   }
+}
+
+function onGoogleSuccess() {
+  error.value = ''
+  router.replace({ name: 'dashboard' })
 }
 </script>
 
@@ -100,6 +106,11 @@ async function submit() {
           {{ error }}
         </div>
 
+        <!-- Google sign-in (hidden when the server has no client id configured) -->
+        <div class="mb-6">
+          <GoogleSignInButton :disabled="loading" @success="onGoogleSuccess" @error="error = $event" />
+        </div>
+
         <form @submit.prevent="submit" class="flex flex-col gap-5">
           <!-- Email -->
           <div class="flex flex-col gap-2">
@@ -116,8 +127,14 @@ async function submit() {
 
           <!-- Password -->
           <div class="flex flex-col gap-2">
-            <div class="flex justify-between items-center">
+            <div class="flex justify-between items-center gap-3">
               <label class="text-sm font-bold text-text-main">{{ t('auth.passwordLabel') }}</label>
+              <router-link
+                to="/forgot-password"
+                class="text-[0.8rem] font-semibold text-accent-green hover:text-accent-green-hover transition-colors"
+              >
+                {{ t('auth.forgot.link') }}
+              </router-link>
             </div>
             <div class="relative">
               <input

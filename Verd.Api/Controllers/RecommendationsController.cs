@@ -11,6 +11,7 @@ namespace Verd.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
+[RequireVerifiedEmail]
 public class RecommendationsController(AppDbContext db, RecommendationAiService aiService) : ControllerBase
 {
     private int UserId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)
@@ -20,7 +21,7 @@ public class RecommendationsController(AppDbContext db, RecommendationAiService 
     public async Task<ActionResult<RecommendationDto>> Generate([FromBody] GeneratePlantRecommendationDto dto)
     {
         var plant = await db.Plants.FindAsync(dto.PlantId);
-        if (plant is null || plant.UserId != UserId) return NotFound();
+        if (plant is null || plant.UserId != UserId || plant.DeletedAt is not null) return NotFound();
 
         var user = await db.Users.FindAsync(UserId);
         if (user is null) return NotFound();

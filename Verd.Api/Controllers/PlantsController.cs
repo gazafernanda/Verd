@@ -13,26 +13,100 @@ namespace Verd.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class PlantsController(AppDbContext db, IHttpClientFactory httpFactory) : ControllerBase
+[RequireVerifiedEmail]
+public class PlantsController(
+    AppDbContext db,
+    IHttpClientFactory httpFactory,
+    PlantSuggestionService suggestions) : ControllerBase
 {
     private int UserId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)
         ?? User.FindFirstValue("sub")!);
 
+    /// <summary>Plants currently in the garden. Soft-deleted rows live on in /history.</summary>
     [HttpGet]
     public async Task<ActionResult<IEnumerable<PlantDto>>> GetAll()
     {
         var plants = await db.Plants
-            .Where(p => p.UserId == UserId)
+            .Where(p => p.UserId == UserId && p.DeletedAt == null)
             .ToListAsync();
 
         return Ok(plants.Select(ToDto));
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     public async Task<ActionResult<PlantDto>> GetById(int id)
     {
-        var plant = await db.Plants.FirstOrDefaultAsync(p => p.Id == id && p.UserId == UserId);
+        var plant = await db.Plants
+            .FirstOrDefaultAsync(p => p.Id == id && p.UserId == UserId && p.DeletedAt == null);
         return plant is null ? NotFound() : Ok(ToDto(plant));
+    }
+
+    // ── History ───────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Every plant the user has ever registered, active and ended alike, newest
+    /// registration first.
+    /// </summary>
+    [HttpGet("history")]
+    public async Task<ActionResult<IEnumerable<PlantHistoryDto>>> GetHistory()
+    {
+        var plants = await db.Plants
+            .Where(p => p.UserId == UserId)
+            .OrderByDescending(p => p.RegisteredAt)
+            .ThenByDescending(p => p.Id)
+            .ToListAsync();
+
+        var logCounts = await db.PlantLogs
+            .Where(l => plants.Select(p => p.Id).Contains(l.PlantId))
+            .GroupBy(l => l.PlantId)
+            .Select(g => new { PlantId = g.Key, Count = g.Count() })
+            .ToDictionaryAsync(x => x.PlantId, x => x.Count);
+
+        return Ok(plants.Select(p => ToHistoryDto(p, logCounts.GetValueOrDefault(p.Id))));
+    }
+
+    /// <summary>
+    /// A single planting period together with the monitoring data recorded during it.
+    /// Works for ended plants too — that is the whole point of the soft delete.
+    /// </summary>
+    [HttpGet("history/{id:int}")]
+    public async Task<ActionResult<PlantHistoryDetailDto>> GetHistoryDetail(int id)
+    {
+        var plant = await db.Plants.FirstOrDefaultAsync(p => p.Id == id && p.UserId == UserId);
+        if (plant is null) return NotFound();
+
+        var logs = await db.PlantLogs
+            .Where(l => l.PlantId == id)
+            .OrderByDescending(l => l.LoggedAt)
+            .Select(l => new PlantLogDto(l.Id, l.PlantId, l.Action, l.Notes, l.LoggedAt))
+            .ToListAsync();
+
+        return Ok(new PlantHistoryDetailDto(
+            Summary: ToHistoryDto(plant, logs.Count),
+            WateringFrequency: plant.WateringFrequency,
+            Sunlight: plant.Sunlight,
+            Notes: plant.Notes,
+            Logs: logs
+        ));
+    }
+
+    /// <summary>
+    /// Works out the category and care defaults for a typed plant name, so the
+    /// user doesn't have to fill the form in from scratch. Also reports whether
+    /// the name is a real plant, which makes a separate /validate call redundant
+    /// when the client has already asked for a suggestion.
+    /// </summary>
+    [HttpPost("suggest")]
+    public async Task<ActionResult<PlantSuggestionDto>> Suggest([FromBody] SuggestPlantDto dto)
+    {
+        if (string.IsNullOrWhiteSpace(dto.Name))
+            return BadRequest(new { message = "A plant name is required." });
+
+        // Guards against a stray paste turning into a huge prompt.
+        if (dto.Name.Trim().Length > 100)
+            return BadRequest(new { message = "That plant name is too long." });
+
+        return Ok(await suggestions.SuggestAsync(dto.Name, dto.Language));
     }
 
     [HttpPost("validate")]
@@ -95,6 +169,7 @@ public class PlantsController(AppDbContext db, IHttpClientFactory httpFactory) :
             CareDescription = dto.CareDescription,
             CareImage = dto.CareImage,
             CareBgType = dto.CareBgType,
+            RegisteredAt = DateTime.UtcNow,
         };
 
         db.Plants.Add(plant);
@@ -103,10 +178,11 @@ public class PlantsController(AppDbContext db, IHttpClientFactory httpFactory) :
         return CreatedAtAction(nameof(GetById), new { id = plant.Id }, ToDto(plant));
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:int}")]
     public async Task<ActionResult<PlantDto>> Update(int id, UpsertPlantDto dto)
     {
-        var plant = await db.Plants.FirstOrDefaultAsync(p => p.Id == id && p.UserId == UserId);
+        var plant = await db.Plants
+            .FirstOrDefaultAsync(p => p.Id == id && p.UserId == UserId && p.DeletedAt == null);
         if (plant is null) return NotFound();
 
         // Re-anchor only when the user actually moved the slider (or the cycle
@@ -137,15 +213,48 @@ public class PlantsController(AppDbContext db, IHttpClientFactory httpFactory) :
         return Ok(ToDto(plant));
     }
 
-    [HttpDelete("{id}")]
+    /// <summary>
+    /// Ends the planting period instead of destroying the row, so the plant and
+    /// the monitoring data collected for it stay available in the history page.
+    /// </summary>
+    [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var plant = await db.Plants.FirstOrDefaultAsync(p => p.Id == id && p.UserId == UserId);
+        var plant = await db.Plants
+            .FirstOrDefaultAsync(p => p.Id == id && p.UserId == UserId && p.DeletedAt == null);
         if (plant is null) return NotFound();
 
-        db.Plants.Remove(plant);
+        plant.DeletedAt = DateTime.UtcNow;
         await db.SaveChangesAsync();
         return NoContent();
+    }
+
+    private static PlantHistoryDto ToHistoryDto(Plant p, int logCount)
+    {
+        var now = DateTime.UtcNow;
+        var isActive = p.DeletedAt is null;
+
+        // An ended plant's care status is frozen at deletion; recomputing decay
+        // for it would keep "drying out" a plant that is no longer in the garden.
+        var careStatus = isActive
+            ? PlantCareService.StatusFor(PlantCareService.CurrentLevel(p, now))
+            : p.Status;
+
+        var periodEnd = p.DeletedAt ?? now;
+        var duration = (int)Math.Max(0, Math.Floor((periodEnd - p.RegisteredAt).TotalDays));
+
+        return new PlantHistoryDto(
+            Id: p.Id,
+            Name: p.Name,
+            Category: p.Category,
+            IconBg: p.IconBg,
+            RegisteredAt: p.RegisteredAt,
+            EndedAt: p.DeletedAt,
+            Status: isActive ? "ACTIVE" : "ENDED",
+            CareStatus: careStatus,
+            DurationDays: duration,
+            LogCount: logCount
+        );
     }
 
     // Water level is derived at read time rather than stored, so a plant dries out

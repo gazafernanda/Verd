@@ -1,5 +1,6 @@
 import { ref, computed } from "vue";
 import { defineStore } from "pinia";
+import { roundTemp } from "../utils/temperature";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -16,14 +17,27 @@ const WMO_ICONS: Record<number, string> = {
 const DAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
+// Every temperature entering the store is normalised here, so nothing downstream
+// has to know where the reading came from or what unit it arrived in.
 function round(n: number) {
-  return Math.round(n);
+  return roundTemp(n);
 }
 
 export const useWeatherStore = defineStore("weather", () => {
   const loading = ref(false);
   const lastFetched = ref<number | null>(null);
   const CACHE_MS = 5 * 60 * 1000; // 5 minutes
+
+  /** When the displayed readings were last successfully refreshed. */
+  const lastUpdatedAt = ref<number | null>(null);
+
+  /**
+   * Consecutive failed refreshes. One blip is normal on a flaky connection, so
+   * the UI only warns once a refresh has failed twice in a row — otherwise the
+   * indicator would flicker on every dropped request.
+   */
+  const failureCount = ref(0);
+  const isStale = computed(() => failureCount.value >= 2);
 
   const temp = ref(22);
   const condition = ref("Partly Cloudy");
@@ -60,9 +74,15 @@ export const useWeatherStore = defineStore("weather", () => {
         `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}` +
         `&daily=weathercode,temperature_2m_max,temperature_2m_min` +
         `&hourly=temperature_2m,relativehumidity_2m,windspeed_10m,uv_index,apparent_temperature,soil_moisture_0_to_1cm` +
+        // Pinned rather than relying on the API default, so the unit can never
+        // drift out from under the UI.
+        `&temperature_unit=celsius` +
         `&timezone=auto&forecast_days=7`;
       const res = await fetch(url);
-      if (!res.ok) return;
+      if (!res.ok) {
+        failureCount.value += 1;
+        return;
+      }
       const data = await res.json();
 
       const daily = data.daily;
@@ -103,29 +123,35 @@ export const useWeatherStore = defineStore("weather", () => {
       }
 
       lastFetched.value = Date.now();
+      lastUpdatedAt.value = lastFetched.value;
+      failureCount.value = 0;
     } catch {
-      // silent fail
+      failureCount.value += 1;
     } finally {
       loading.value = false;
     }
   }
 
-  async function fetchWeather(force = false) {
+  /** Resolves true when fresh readings were applied, false when the refresh failed. */
+  async function fetchWeather(force = false): Promise<boolean> {
     const token = localStorage.getItem("verd_token");
-    if (!token) return;
+    if (!token) return false;
     if (
       !force &&
       lastFetched.value &&
       Date.now() - lastFetched.value < CACHE_MS
     )
-      return;
-    if (loading.value) return;
+      return true;
+    if (loading.value) return true;
     loading.value = true;
     try {
       const res = await fetch(`${API}/api/weather`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) return;
+      if (!res.ok) {
+        failureCount.value += 1;
+        return false;
+      }
       const data = await res.json();
       temp.value = data.temp;
       condition.value = data.condition;
@@ -137,8 +163,14 @@ export const useWeatherStore = defineStore("weather", () => {
       feelsLike.value = data.feelsLike;
       forecast.value = data.forecast;
       lastFetched.value = Date.now();
+      lastUpdatedAt.value = lastFetched.value;
+      failureCount.value = 0;
+      return true;
     } catch {
-      // silent fail — keep showing defaults/cached values
+      // Keep showing the last good readings rather than blanking the dashboard —
+      // the staleness indicator is what tells the user they're looking at old data.
+      failureCount.value += 1;
+      return false;
     } finally {
       loading.value = false;
     }
@@ -146,6 +178,9 @@ export const useWeatherStore = defineStore("weather", () => {
 
   return {
     loading,
+    lastUpdatedAt,
+    failureCount,
+    isStale,
     temp,
     condition,
     humidity,

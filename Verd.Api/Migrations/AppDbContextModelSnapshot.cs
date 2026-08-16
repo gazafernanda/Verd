@@ -17,6 +17,33 @@ namespace Verd.Api.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.4");
 
+            modelBuilder.Entity("Verd.Api.Models.ChatMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "SentAt");
+
+                    b.ToTable("ChatMessages");
+                });
+
             modelBuilder.Entity("Verd.Api.Models.Plant", b =>
                 {
                     b.Property<int>("Id")
@@ -47,6 +74,9 @@ namespace Verd.Api.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("IconBg")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -64,6 +94,9 @@ namespace Verd.Api.Migrations
 
                     b.Property<string>("Notes")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("RegisteredAt")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Status")
@@ -149,6 +182,10 @@ namespace Verd.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("AuthProvider")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("AvatarUrl")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -161,6 +198,18 @@ namespace Verd.Api.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime?>("EmailVerificationExpiresAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EmailVerificationTokenHash")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("GoogleId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsEmailVerified")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Location")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -172,12 +221,21 @@ namespace Verd.Api.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime?>("PasswordResetExpiresAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PasswordResetTokenHash")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Tier")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("VerificationEmailSentAt")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("WeatherAlertsEnabled")
@@ -188,7 +246,21 @@ namespace Verd.Api.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
+                    b.HasIndex("GoogleId")
+                        .IsUnique();
+
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Verd.Api.Models.ChatMessage", b =>
+                {
+                    b.HasOne("Verd.Api.Models.User", "User")
+                        .WithMany("ChatMessages")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Verd.Api.Models.Plant", b =>
@@ -220,6 +292,8 @@ namespace Verd.Api.Migrations
 
             modelBuilder.Entity("Verd.Api.Models.User", b =>
                 {
+                    b.Navigation("ChatMessages");
+
                     b.Navigation("Plants");
                 });
 #pragma warning restore 612, 618
