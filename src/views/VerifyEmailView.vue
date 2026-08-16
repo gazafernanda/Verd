@@ -72,6 +72,14 @@ function goToApp() {
   router.replace({ name: 'dashboard' })
 }
 
+function backToLogin() {
+  // Login is guest-only. An unverified user still has a valid local session,
+  // so a router-link to /login is immediately redirected back here by the
+  // route guard. Signing out first makes this escape hatch actually work.
+  user.logout()
+  router.replace({ name: 'login' })
+}
+
 onMounted(() => {
   if (token.value) verify()
 })
@@ -126,9 +134,9 @@ onUnmounted(() => clearInterval(cooldownTimer))
         {{ cooldown > 0 ? t('auth.verify.resendIn', { seconds: cooldown }) : t('auth.verify.resend') }}
       </button>
 
-      <router-link v-else to="/login" class="text-[0.9rem] font-bold text-accent-green hover:text-accent-green-hover">
+      <button v-else @click="backToLogin" class="text-[0.9rem] font-bold text-accent-green hover:text-accent-green-hover">
         {{ t('auth.verify.backToLogin') }}
-      </router-link>
+      </button>
     </div>
 
     <!-- Just registered: waiting for the user to open their inbox -->
@@ -162,13 +170,13 @@ onUnmounted(() => clearInterval(cooldownTimer))
     </div>
 
     <template #footer>
-      <router-link
+      <button
         v-if="state !== 'verified'"
-        to="/login"
+        @click="backToLogin"
         class="text-[0.85rem] font-semibold text-text-muted hover:text-text-main transition-colors"
       >
         {{ t('auth.verify.backToLogin') }}
-      </router-link>
+      </button>
     </template>
   </AuthCard>
 </template>
