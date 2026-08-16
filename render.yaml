@@ -26,11 +26,10 @@ services:
       # Public application address used in verification and password-reset links.
       - key: APP_BASE_URL
         value: https://gazafernanda.github.io/Verd
-      # SendGrid's HTTPS API works on Render's free plan, unlike SMTP ports.
-      # Verify a single Gmail sender in SendGrid, then set these values.
-      - key: SENDGRID_API_KEY
+      # HTTPS email APIs work on Render's free plan, unlike SMTP ports.
+      - key: BREVO_API_KEY
         sync: false
-      - key: SENDGRID_FROM
+      - key: BREVO_FROM
         sync: false
       # Disables the appsettings.json FileSystemWatcher — the container's
       # inotify instance limit was being hit on startup, crash-looping the service.

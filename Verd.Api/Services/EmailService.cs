@@ -25,6 +25,9 @@ public class EmailService(
     private string? SendGridApiKey => Env("SENDGRID_API_KEY", "SendGrid:ApiKey");
     private string SendGridFromAddress =>
         Env("SENDGRID_FROM", "SendGrid:From") ?? FromAddress;
+    private string? BrevoApiKey => Env("BREVO_API_KEY", "Brevo:ApiKey");
+    private string BrevoFromAddress =>
+        Env("BREVO_FROM", "Brevo:From") ?? FromAddress;
 
     private int Port =>
         int.TryParse(Env("SMTP_PORT", "Smtp:Port"), out var p) ? p : 587;
@@ -34,7 +37,9 @@ public class EmailService(
 
     /// <summary>True when real mail can actually be delivered.</summary>
     public bool IsConfigured =>
-        !string.IsNullOrWhiteSpace(SendGridApiKey) || !string.IsNullOrWhiteSpace(Host);
+        !string.IsNullOrWhiteSpace(BrevoApiKey) ||
+        !string.IsNullOrWhiteSpace(SendGridApiKey) ||
+        !string.IsNullOrWhiteSpace(Host);
 
     private string? Env(string variable, string configKey) =>
         Environment.GetEnvironmentVariable(variable) is { Length: > 0 } value
@@ -45,8 +50,14 @@ public class EmailService(
 
     public async Task SendAsync(string toEmail, string subject, string htmlBody, string textBody)
     {
-        // Render's free instances block SMTP ports. SendGrid's HTTPS API is the
-        // production transport; SMTP remains available for local development.
+        // Render's free instances block SMTP ports. HTTPS provider APIs are the
+        // production transports; SMTP remains available for local development.
+        if (!string.IsNullOrWhiteSpace(BrevoApiKey))
+        {
+            await SendWithBrevoAsync(toEmail, subject, htmlBody, textBody);
+            return;
+        }
+
         if (!string.IsNullOrWhiteSpace(SendGridApiKey))
         {
             await SendWithSendGridAsync(toEmail, subject, htmlBody, textBody);
@@ -86,6 +97,40 @@ public class EmailService(
             // A mail outage must not turn into a failed registration or a reset
             // response that reveals whether the address exists.
             log.LogError(ex, "Failed to send '{Subject}' to {To}.", subject, toEmail);
+        }
+    }
+
+    private async Task SendWithBrevoAsync(string toEmail, string subject, string htmlBody, string textBody)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Post, "https://api.brevo.com/v3/smtp/email")
+        {
+            Content = JsonContent.Create(new
+            {
+                sender = new { email = BrevoFromAddress, name = FromName },
+                to = new[] { new { email = toEmail } },
+                subject,
+                htmlContent = htmlBody,
+                textContent = textBody,
+            }),
+        };
+        request.Headers.Add("api-key", BrevoApiKey);
+
+        try
+        {
+            using var response = await httpClientFactory.CreateClient().SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                log.LogInformation("Sent '{Subject}' to {To} with Brevo.", subject, toEmail);
+                return;
+            }
+
+            var details = await response.Content.ReadAsStringAsync();
+            log.LogError("Brevo rejected '{Subject}' to {To}: {Status} {Details}",
+                subject, toEmail, (int)response.StatusCode, details);
+        }
+        catch (Exception ex)
+        {
+            log.LogError(ex, "Failed to send '{Subject}' to {To} with Brevo.", subject, toEmail);
         }
     }
 
