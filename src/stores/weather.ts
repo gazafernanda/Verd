@@ -76,7 +76,7 @@ export const useWeatherStore = defineStore("weather", () => {
         `&hourly=temperature_2m,relativehumidity_2m,windspeed_10m,uv_index,apparent_temperature,soil_moisture_0_to_1cm` +
         // Pinned rather than relying on the API default, so the unit can never
         // drift out from under the UI.
-        `&temperature_unit=celsius` +
+        `&temperature_unit=celsius&windspeed_unit=kmh` +
         `&timezone=auto&forecast_days=7`;
       const res = await fetch(url);
       if (!res.ok) {

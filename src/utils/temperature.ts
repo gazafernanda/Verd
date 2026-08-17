@@ -11,6 +11,13 @@ const DECIMALS = 0;
 
 export const TEMPERATURE_UNIT = "°C";
 
+/**
+ * Just the unit letter, for layouts that render the degree sign and the letter
+ * as separate elements at different sizes. Kept here rather than typed inline in
+ * each component — a hardcoded "F" in one card is exactly how this drifted before.
+ */
+export const TEMPERATURE_UNIT_LETTER = "C";
+
 /** Converts a Fahrenheit reading to Celsius. */
 export function fahrenheitToCelsius(fahrenheit: number): number {
   return ((fahrenheit - 32) * 5) / 9;

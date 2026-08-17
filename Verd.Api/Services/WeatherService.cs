@@ -34,7 +34,7 @@ public class WeatherService(IHttpClientFactory factory)
             "&hourly=temperature_2m,relativehumidity_2m,windspeed_10m,uv_index,apparent_temperature,soil_moisture_0_to_1cm" +
             // Pinned rather than relying on the API default: the whole app reports
             // Celsius, and the conversion belongs here in the data layer.
-            "&temperature_unit=celsius" +
+            "&temperature_unit=celsius&windspeed_unit=kmh" +
             "&timezone=auto&forecast_days=7";
 
         var weatherJson = await http.GetStringAsync(url);

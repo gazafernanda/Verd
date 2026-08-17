@@ -2,7 +2,7 @@
 import { computed, markRaw } from "vue";
 import { useI18n } from "vue-i18n";
 import { useWeatherStore } from "../../stores/weather";
-import { formatTempValue } from "../../utils/temperature";
+import { formatTempValue, TEMPERATURE_UNIT_LETTER } from "../../utils/temperature";
 import HelpTip from "../HelpTip.vue";
 import { Droplet, Sun, Droplets, Wind } from "lucide-vue-next";
 
@@ -65,7 +65,7 @@ const metrics = computed(() => [
         >
         <span
           class="text-[2.5rem] max-lg:text-[1.8rem] font-semibold text-text-main mt-2"
-          >C</span
+          >{{ TEMPERATURE_UNIT_LETTER }}</span
         >
       </div>
       <Sun
