@@ -34,13 +34,13 @@ function renderMarkdown(text: string): string {
       </div>
     </div>
 
-    <div :class="['flex flex-col max-w-[80%] max-sm:max-w-[90%]', { 'items-end': !isAssistant }]">
+    <div :class="['flex min-w-0 flex-col max-w-[80%] max-sm:max-w-[90%]', { 'items-end': !isAssistant }]">
       <span class="text-[0.65rem] font-extrabold text-text-muted tracking-[0.5px] mb-2 uppercase">
         {{ isAssistant ? t('chat.assistantLabel') : t('chat.youLabel') }}
       </span>
 
       <div :class="[
-        'p-4 max-sm:p-3 rounded-lg text-[0.9rem] max-sm:text-[0.85rem] leading-relaxed max-sm:leading-normal shadow-sm',
+        'min-w-0 overflow-hidden p-4 max-sm:p-3 rounded-lg text-[0.9rem] max-sm:text-[0.85rem] leading-relaxed max-sm:leading-normal shadow-sm',
         isAssistant
           ? 'bg-surface text-text-main border border-border rounded-tl-[4px]'
           : 'bg-primary text-white rounded-tr-[4px]'
@@ -68,4 +68,27 @@ function renderMarkdown(text: string): string {
 .markdown :deep(ol) { list-style: decimal; padding-left: 1.25rem; margin: 0.5rem 0; }
 .markdown :deep(ul) { list-style: disc; padding-left: 1.25rem; margin: 0.5rem 0; }
 .markdown :deep(li) { margin-bottom: 0.25rem; }
+.markdown { max-width: 100%; overflow-x: auto; }
+.markdown :deep(table) {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: collapse;
+  margin: 0.75rem 0;
+  font-size: 0.8rem;
+}
+.markdown :deep(th),
+.markdown :deep(td) {
+  min-width: 7rem;
+  padding: 0.5rem;
+  text-align: left;
+  vertical-align: top;
+  border: 1px solid var(--color-border, #e5e7eb);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.markdown :deep(th) {
+  font-weight: 700;
+  background: var(--color-bg-app, #f7f9f8);
+}
+.markdown :deep(tr:nth-child(even) td) { background: var(--color-bg-app, #f7f9f8); }
 </style>

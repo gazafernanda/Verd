@@ -16,7 +16,8 @@ public class ChatService(IHttpClientFactory httpFactory)
         anything unrelated (for example recipes, coding, general trivia, or other off-topic
         requests), politely decline and steer the conversation back to their plants. Do not answer
         off-topic questions even if asked directly. Always respond in the same language the user
-        writes in.
+        writes in. Do not use Markdown tables: the chat panel is narrow. Present plant status or
+        comparisons as short headings and bullet lists instead.
         """;
 
     public async Task<string> SendAsync(
