@@ -38,7 +38,9 @@ public class ChatService(IHttpClientFactory httpFactory)
 
         var body = new
         {
-            model = "llama-3.3-70b-versatile",
+            // Groq retired Llama 3.3 70B for developer/free projects on
+            // 2026-08-16. GPT-OSS 20B is its current fast production model.
+            model = "openai/gpt-oss-20b",
             messages
         };
 

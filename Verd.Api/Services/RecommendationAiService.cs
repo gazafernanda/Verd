@@ -102,7 +102,7 @@ public class RecommendationAiService(IHttpClientFactory factory, WeatherService 
         var client = factory.CreateClient("Groq");
         var body = new
         {
-            model = "llama-3.3-70b-versatile",
+            model = "openai/gpt-oss-20b",
             messages = new[]
             {
                 new { role = "system", content = systemMessage },
